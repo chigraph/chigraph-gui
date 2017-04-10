@@ -11,6 +11,11 @@ else()
 	endif()
 endif()
 
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 # make sure they have pulled the submodules
 if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/nodeeditor/CMakeLists.txt")
 	message(FATAL_ERROR "Pull the submodules first, run `git submodule update --init`")
@@ -118,6 +123,12 @@ target_compile_features(chigraphgui
 PRIVATE 
 	cxx_variable_templates
 )
+
+if(${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR} LESS 3.1)
+	CXX11_CHECK_FEATURE("variadic_templates" 2555 HAS_CXX11_VARIADIC_TEMPLATES)
+else(${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR} GREATER 3.1 OR ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR} EQUAL 3.1)
+	target_compile_features(chigraphgui PRIVATE cxx_variable_templates)
+endif()
 
 if(UNIX)
 	target_compile_options(chigraphgui PRIVATE "-fexceptions")

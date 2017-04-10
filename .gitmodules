@@ -1,0 +1,6 @@
+[submodule "chigraph"]
+	path = chigraph
+	url = https://github.com/chigraph/chigraph
+[submodule "third_party/nodeeditor"]
+	path = third_party/nodeeditor
+	url = https://github.com/russelltg/nodeeditor
