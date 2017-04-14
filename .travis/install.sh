@@ -18,16 +18,16 @@ else
 	brew install llvm --with-clang
 
 	brew tap chigraph/kf5
-	brew install kf5-extra-cmake-module
-	brew install kf5-karchive	kf5-ktexteditor		kf5-kjobwidgets	 \
-		     kf5-kdbusaddons	kf5-kio			kf5-kcrash	 \
-		     kf5-sonnet		kf5-syntax-highlighting	kf5-kparts	 \
-		     kf5-kguiaddons	kf5-kitemviews		kf5-kconfig	 \
-		     kf5-kconfigwidgets	kf5-kauth		kf5-kcodecs	 \
-		     kf5-kcompletion	kf5-kglobalaccel	kf5-kservice	 \
-		     kf5-kwindowsystem	kf5-kcoreaddons		kf5-ki18n	 \
-		     kf5-kxmlgui	kf5-kwidgetsaddons	kf5-ktextwidgets \
-		     kf5-kiconthemes
+	brew install chigraph/kf5/kf5-extra-cmake-module
+	brew install chigraph/kf5/kf5-karchive		chigraph/kf5/kf5-ktexteditor		chigraph/kf5/kf5-kjobwidgets	\
+		     chigraph/kf5/kf5-kdbusaddons	chigraph/kf5/kf5-kio			chigraph/kf5/kf5-kcrash		\
+		     chigraph/kf5/kf5-sonnet		chigraph/kf5/kf5-syntax-highlighting	chigraph/kf5/kf5-kparts		\
+		     chigraph/kf5/kf5-kguiaddons	chigraph/kf5/kf5-kitemviews		chigraph/kf5/kf5-kconfig	\
+		     chigraph/kf5/kf5-kconfigwidgets	chigraph/kf5/kf5-kauth			chigraph/kf5/kf5-kcodecs	\
+		     chigraph/kf5/kf5-kcompletion	chigraph/kf5/kf5-kglobalaccel		chigraph/kf5/kf5-kservice	\
+		     chigraph/kf5/kf5-kwindowsystem	chigraph/kf5/kf5-kcoreaddons		kchigraph/kf5/f5-ki18n		\
+		     chigraph/kf5/kf5-kxmlgui		chigraph/kf5/kf5-kwidgetsaddons		chigraph/kf5/kf5-ktextwidgets	\
+		     chigraph/kf5/kf5-kiconthemes
 
 	bash ./setup.sh
 
