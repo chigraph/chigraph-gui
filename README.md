@@ -1,11 +1,11 @@
 
-![chigraph logo](chigraph/doc/images/chigraph.png)
+![chigraph logo](doc/chigraph.png)
 
 # Chigraph GUI
 This is the interface for chigraph to make creating [chigraph](https://github.com/chigraph/chigraph) modules easy. It's written in  [Qt 5](https://www.qt.io) and [KDE Frameworks 5](https://api.kde.org/frameworks/index.html)
 
 
-![screenshot](chigraph/doc/screenshots/looping.png)
+![screenshot](doc/looping.png)
 
 # Build Status
 | Platform  | Status                                                                           |
