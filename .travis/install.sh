@@ -24,16 +24,14 @@ else
 	brew install chigraph/kf5/kf5-kcoreaddons
 	brew link --force --overwrite chigraph/kf5/kf5-kcoreaddons
 
-	brew install chigraph/kf5/kf5-karchive		chigraph/kf5/kf5-ktexteditor		chigraph/kf5/kf5-kjobwidgets	\
-		     chigraph/kf5/kf5-kdbusaddons	chigraph/kf5/kf5-kio			chigraph/kf5/kf5-kcrash		\
-		     chigraph/kf5/kf5-sonnet		chigraph/kf5/kf5-syntax-highlighting	chigraph/kf5/kf5-kparts		\
-		     chigraph/kf5/kf5-kguiaddons	chigraph/kf5/kf5-kitemviews		chigraph/kf5/kf5-kconfig	\
-		     chigraph/kf5/kf5-kconfigwidgets	chigraph/kf5/kf5-kauth			chigraph/kf5/kf5-kcodecs	\
-		     chigraph/kf5/kf5-kcompletion	chigraph/kf5/kf5-kglobalaccel		chigraph/kf5/kf5-kservice	\
-		     chigraph/kf5/kf5-kwindowsystem	chigraph/kf5/kf5-ki18n			chigraph/kf5/kf5-kxmlgui	\
-		     chigraph/kf5/kf5-kwidgetsaddons	chigraph/kf5/kf5-ktextwidgets		chigraph/kf5/kf5-kiconthemes
-
-	bash ./setup.sh
+	brew install chigraph/kf5/kf5-karchive    chigraph/kf5/kf5-ktexteditor          chigraph/kf5/kf5-kjobwidgets  \
+	         chigraph/kf5/kf5-kdbusaddons     chigraph/kf5/kf5-kio                  chigraph/kf5/kf5-kcrash       \
+		     chigraph/kf5/kf5-sonnet          chigraph/kf5/kf5-syntax-highlighting  chigraph/kf5/kf5-kparts       \
+		     chigraph/kf5/kf5-kguiaddons      chigraph/kf5/kf5-kitemviews           chigraph/kf5/kf5-kconfig      \
+		     chigraph/kf5/kf5-kconfigwidgets  chigraph/kf5/kf5-kauth                chigraph/kf5/kf5-kcodecs      \
+		     chigraph/kf5/kf5-kcompletion     chigraph/kf5/kf5-kglobalaccel         chigraph/kf5/kf5-kservice     \
+		     chigraph/kf5/kf5-kwindowsystem   chigraph/kf5/kf5-ki18n                chigraph/kf5/kf5-kxmlgui      \
+		     chigraph/kf5/kf5-kwidgetsaddons  chigraph/kf5/kf5-ktextwidgets         chigraph/kf5/kf5-kiconthemes
 
 fi
 

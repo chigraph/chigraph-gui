@@ -27,10 +27,6 @@ elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ] || [ "$(expr substr $
 	dlAndExtract 'https://github.com/chigraph/chigraph/releases/download/dependencies/kf5-5.31.0-release-gcc6.3-win64.tar.xz' "$tpdir/kf5-release.tar.xz" $tpdir
 	dlAndExtract 'https://github.com/chigraph/chigraph/releases/download/dependencies/kf5-5.31.0-debug-gcc6.3-win64.tar.xz' "$tpdir/kf5-debug.tar.xz" $tpdir
 	
-elif [ "$(uname)" == "Darwin" ]; then
-
-	dlAndExtract 'https://github.com/chigraph/chigraph/releases/download/dependencies/kf5-5.31.0-debug-appleclang8-darwin64.tar.xz' "$tpdir/kf5-debug.tar.xz" $tpdir
-	dlAndExtract 'https://github.com/chigraph/chigraph/releases/download/dependencies/kf5-5.31.0-release-appleclang8-darwin64.tar.xz' "$tpdir/kf5-release.tar.xz" $tpdir
 else
 	echo "Unrecognized OS"
 	exit 1
