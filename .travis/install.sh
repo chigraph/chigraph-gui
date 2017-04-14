@@ -25,7 +25,7 @@ else
 		     chigraph/kf5/kf5-kguiaddons	chigraph/kf5/kf5-kitemviews		chigraph/kf5/kf5-kconfig	\
 		     chigraph/kf5/kf5-kconfigwidgets	chigraph/kf5/kf5-kauth			chigraph/kf5/kf5-kcodecs	\
 		     chigraph/kf5/kf5-kcompletion	chigraph/kf5/kf5-kglobalaccel		chigraph/kf5/kf5-kservice	\
-		     chigraph/kf5/kf5-kwindowsystem	chigraph/kf5/kf5-kcoreaddons		kchigraph/kf5/f5-ki18n		\
+		     chigraph/kf5/kf5-kwindowsystem	chigraph/kf5/kf5-kcoreaddons		chigraph/kf5/f5-ki18n		\
 		     chigraph/kf5/kf5-kxmlgui		chigraph/kf5/kf5-kwidgetsaddons		chigraph/kf5/kf5-ktextwidgets	\
 		     chigraph/kf5/kf5-kiconthemes
 
