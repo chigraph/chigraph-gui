@@ -18,7 +18,7 @@ else
 	brew install llvm --with-clang
 
 	brew tap chigraph/kf5
-	brew install chigraph/kf5/kf5-extra-cmake-module
+	brew install chigraph/kf5/kf5-extra-cmake-modules
 	brew install chigraph/kf5/kf5-karchive		chigraph/kf5/kf5-ktexteditor		chigraph/kf5/kf5-kjobwidgets	\
 		     chigraph/kf5/kf5-kdbusaddons	chigraph/kf5/kf5-kio			chigraph/kf5/kf5-kcrash		\
 		     chigraph/kf5/kf5-sonnet		chigraph/kf5/kf5-syntax-highlighting	chigraph/kf5/kf5-kparts		\
