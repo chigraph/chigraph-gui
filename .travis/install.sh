@@ -12,7 +12,7 @@ if [ "$TRAVIS_OS_NAME" == "linux" ]; then
 
 	bash ./setup.sh
 
-else if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+else
 
 	brew install cmake qt5 bison gettext ninja python3 || echo
 	brew install llvm --with-lldb
@@ -32,3 +32,4 @@ else if [ "$TRAVIS_OS_NAME" == "osx" ]; then
 	bash ./setup.sh
 
 fi
+

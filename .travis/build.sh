@@ -29,7 +29,7 @@ if [ "$TRAVIS_OS_NAME" == "linux" ]; then
 		coveralls --exclude /usr --exclude third_party --exclude chigraphgui --exclude test --exclude build --include libchigraph --include libchigraphdebugger --include chi --exclude libchigraph/include/chi/json.hpp
 	fi
 
-else if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+else
 
 	cmake . \
 		-DCMAKE_PREFIX_PATH='/usr/local/opt/qt5/;/usr/local/opt/gettext' \
