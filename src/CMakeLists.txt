@@ -1,13 +1,15 @@
 set(KDE_SKIP_TEST_SETTINGS ON)
 
 # Check that the dependencies dirs exist
-if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
-	if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/kf5-debug")
-		message(WARNING "Run setup.py first; trying to find system KF5")
-	endif()
-else()
-	if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/kf5-release")
-		message(WARNING "Run setup.py first; trying to find system KF5")
+if (NOT APPLE) # apple uses brew
+	if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
+		if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/kf5-debug")
+			message(WARNING "Run setup.sh first if you wish to use the bundled kf5; trying to find system KF5")
+		endif()
+	else()
+		if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/kf5-release")
+			message(WARNING "Run setup.sh first if you wish to use the bundled kf5; trying to find system KF5")
+		endif()
 	endif()
 endif()
 
