@@ -1,0 +1,19 @@
+clone_depth: 5
+
+configuration:
+  - Release
+  - Debug
+
+platform:
+  - x64
+
+build_script:
+  - 'git submodule update --init --recursive'
+  - 'set PATH=%QTDIR%\bin;C:\msys64\mingw64\bin;C:\msys64\usr\bin;%PATH%'
+  - "sh -c 'pacman -Syu --noconfirm'"
+  - "sc -c 'pacman -S --noconfirm mingw-w64-x86_64-toolchain mingw-w64-x86_64-llvm mingw-w64-x86_64-clang mingw-w64-x86_64-clang-tools-extra mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja git mingw-w64-x86_64-qt5 bison flex mingw-w64-x86_64-python3'"
+  - mkdir build
+  - cd build
+  - cmake "-GNinja" -DCMAKE_BUILD_TYPE="%configuration%" -DCMAKE_PREFIX_PATH="%QTDIR%" -DCG_BUILD_DEBUGGER=OFF ..
+  - ninja
+  - ninja test

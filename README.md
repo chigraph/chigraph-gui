@@ -10,7 +10,7 @@ This is the interface for chigraph to make creating [chigraph](https://github.co
 # Build Status
 | Platform  | Status                                                                           |
 | --------- | -------------------------------------------------------------------------------- |
-| OSX/macOS | [![Travis branch](https://img.shields.io/travis/chigraph/chigraph-gui/master.svg?style=flat-square)](https://travis-ci.org/chigraph/chigraph) |
+| OSX/macOS | [![Travis branch](https://img.shields.io/travis/chigraph/chigraph-gui/master.svg?style=flat-square)](https://travis-ci.org/chigraph/chigraph-gui) |
 | Windows   | [![AppVeyor](https://img.shields.io/appveyor/ci/guapotaco/chigraph-gui.svg?style=flat-square)](https://ci.appveyor.com/project/GuapoTaco/chigraph-gui)  |
 
 ## Features
