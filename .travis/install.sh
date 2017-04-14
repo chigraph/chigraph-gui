@@ -21,8 +21,7 @@ else
 	brew install chigraph/kf5/kf5-extra-cmake-modules
 
 	# kcoreaddons workaround
-	brew install chigraph/kf5/kf5-kcoreaddons
-	brew link --force --overwrite chigraph/kf5/kf5-kcoreaddons
+	brew install chigraph/kf5/kf5-kcoreaddons || brew link --force --overwrite chigraph/kf5/kf5-kcoreaddons
 
 	brew install chigraph/kf5/kf5-karchive    chigraph/kf5/kf5-ktexteditor          chigraph/kf5/kf5-kjobwidgets  \
 	         chigraph/kf5/kf5-kdbusaddons     chigraph/kf5/kf5-kio                  chigraph/kf5/kf5-kcrash       \
