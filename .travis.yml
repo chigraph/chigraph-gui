@@ -5,19 +5,19 @@ dist: trusty
 addons:
   apt:
     sources:
-	- ubuntu-toolchain-r-test
-	- sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-4.0 main'
-	  key_url: 'http://apt.llvm.org/llvm-snapshot.gpg.key'
-	- sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main'
-	  key_url: 'http://apt.llvm.org/llvm-snapshot.gpg.key'
-	- sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.8 main'
-	  key_url: 'http://apt.llvm.org/llvm-snapshot.gpg.key'
-	- sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.7 main'
-	  key_url: 'http://apt.llvm.org/llvm-snapshot.gpg.key'
-	- sourceline: 'ppa:beineri/opt-qt562-trusty'
-	- sourceline: 'ppa:beineri/opt-qt571-trusty'
-	- sourceline: 'ppa:beineri/opt-qt58-trusty'
-	- sourceline: 'ppa:presslabs/gitfs'
+      - ubuntu-toolchain-r-test
+      - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-4.0 main'
+        key_url: 'http://apt.llvm.org/llvm-snapshot.gpg.key'
+      - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main'
+        key_url: 'http://apt.llvm.org/llvm-snapshot.gpg.key'
+      - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.8 main'
+        key_url: 'http://apt.llvm.org/llvm-snapshot.gpg.key'
+      - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.7 main'
+        key_url: 'http://apt.llvm.org/llvm-snapshot.gpg.key'
+      - sourceline: 'ppa:beineri/opt-qt562-trusty'
+      - sourceline: 'ppa:beineri/opt-qt571-trusty'
+      - sourceline: 'ppa:beineri/opt-qt58-trusty'
+      - sourceline: 'ppa:presslabs/gitfs'
 
 matrix:
   include:
