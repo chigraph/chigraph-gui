@@ -15,7 +15,7 @@ if [ "$TRAVIS_OS_NAME" == "linux" ]; then
 else
 
 	brew install cmake qt5 bison gettext ninja python3 || echo
-	brew install llvm --with-lldb
+	brew install llvm --with-clang
 
 	brew tap chigraph/kf5
 	brew install kf5-extra-cmake-module
