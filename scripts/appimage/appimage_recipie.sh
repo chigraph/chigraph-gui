@@ -50,7 +50,18 @@ QT_BASE_DIR=/opt/qt58
 export QTDIR=$QT_BASE_DIR
 export PATH=$QT_BASE_DIR/bin:$PATH
 
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/third_party/kf5-release/lib64:$LD_LIBRARY_PATH:`pwd`/third_party/kf5-release/lib
+if [[ $(uname -m) == "x86_64" ]]; then
+  export LD_LIBRARY_PATH=$QT_BASE_DIR/lib/x86_64-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH
+else
+  export LD_LIBRARY_PATH=$QT_BASE_DIR/lib/i386-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH
+fi
+
+export PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
+
+TEST=`echo $0 | grep wrapper`
+if [ "$TEST" != "" ]; then
+   exec `echo $0 | sed s/-wrapper//` $*
+fi
 
 linuxdeployqt ~/chigraph.appdir/usr/bin/chigraphgui -bundle-non-qt-libs
 strip -s ~/chigraph.appdir/usr/bin/chigraphgui ~/chigraph.appdir/usr/bin/chi
