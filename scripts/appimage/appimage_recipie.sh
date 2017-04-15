@@ -58,6 +58,7 @@ fi
 
 export PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/third_party/kf5-release/lib:`pwd`/third_party/kf5-release/lib64
 
 linuxdeployqt ~/chigraph.appdir/usr/bin/chigraphgui -bundle-non-qt-libs
 strip -s ~/chigraph.appdir/usr/bin/chigraphgui ~/chigraph.appdir/usr/bin/chi
