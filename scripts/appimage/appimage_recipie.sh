@@ -58,10 +58,6 @@ fi
 
 export PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
-TEST=`echo $0 | grep wrapper`
-if [ "$TEST" != "" ]; then
-   exec `echo $0 | sed s/-wrapper//` $*
-fi
 
 linuxdeployqt ~/chigraph.appdir/usr/bin/chigraphgui -bundle-non-qt-libs
 strip -s ~/chigraph.appdir/usr/bin/chigraphgui ~/chigraph.appdir/usr/bin/chi
