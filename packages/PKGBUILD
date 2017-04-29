@@ -1,0 +1,34 @@
+
+pkgname=chigraph-gui
+pkgver=02decd6f2bf7286bfd95ff779aa97b1535ccf016
+pkgrel=1
+arch=('i686' 'x86_64')
+
+pkgdesc="The GUI for chigraph, a visual programming language"
+url='https://github.com/chigraph/chigraph'
+
+depends=('chigraph' 'kxmlgui' 'ktexteditor')
+makedepends=('cmake' 'git')
+
+source=("chigraph-gui::git+https://github.com/chigraph/chigraph-gui")
+md5sums=('SKIP')
+
+pkgver() {
+	cd chigraph-gui
+	git rev-parse HEAD
+}
+
+prepare() {
+	mkdir -p build
+}
+
+build() {
+	cd build
+	cmake ../chigraph-gui -DCMAKE_BUILD_TYPE=Release -DCG_USE_SYSTEM_LIBGIT2=ON -DCG_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=/usr
+	make -j`nproc`
+}
+
+package() {
+	make -C build DESTDIR="${pkgdir}" install
+	rm -r "${pkgdir}/usr/lib/clang"
+}

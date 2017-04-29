@@ -1,5 +1,12 @@
 set(KDE_SKIP_TEST_SETTINGS ON)
 
+
+# make sure QtMain is linked
+cmake_policy(SET CMP0020 NEW)
+
+# supress warnings about expansions
+cmake_policy(SET CMP0053 OLD)
+
 # Check that the dependencies dirs exist
 if (NOT APPLE) # apple uses brew
 	if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
@@ -46,8 +53,6 @@ find_package(Qt5 5.6.0 COMPONENTS DBus)
 
 find_package(KF5 REQUIRED COMPONENTS Archive TextEditor JobWidgets DBusAddons KIO Crash Sonnet SyntaxHighlighting Parts GuiAddons ItemViews Config ConfigWidgets Auth Codecs Completion GlobalAccel Service WindowSystem CoreAddons I18n XmlGui WidgetsAddons TextWidgets IconThemes)
 
-# make sure QtMain is linked
-cmake_policy(SET CMP0020 NEW)
 
 if (CG_BUILD_DEBUGGER)
 	add_subdirectory(debugger)

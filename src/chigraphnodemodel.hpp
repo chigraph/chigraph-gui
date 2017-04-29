@@ -30,7 +30,7 @@ class ChigraphNodeModelPaintDelegate : public QtNodes::NodePainterDelegate {
 	
 	void paint(QPainter* painter,
 		QtNodes::NodeGeometry const& geom,
-		QtNodes::NodeDataModel* const model) override {
+		QtNodes::NodeDataModel const* model) override {
 		
 		for (auto& decorator : mDecorators) {
 			decorator->paint(painter, geom, model);
