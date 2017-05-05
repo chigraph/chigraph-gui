@@ -75,6 +75,7 @@ set(GUI_SRCS
 	functiontabview.cpp
 	launchconfigurationmanager.cpp
 	launchconfigurationdialog.cpp
+	structedit.cpp
 )
 
 set(GUI_RESOURCES
@@ -97,6 +98,7 @@ set(GUI_HEADERS
 	functiontabview.hpp
 	launchconfigurationmanager.hpp
 	launchconfigurationdialog.hpp
+	structedit.hpp
 )
 
 add_executable(chigraphgui ${GUI_SRCS} ${GUI_HEADERS} ${GUI_RESOURCES})

@@ -217,19 +217,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 		outputView->setCurrentIndex(newTabID);
 		cancelAction->setEnabled(true);
 	});
-
-	auto newFunctionAction = new QAction(nullptr);
-	newFunctionAction->setText(i18n("New Function"));
-	newFunctionAction->setIcon(QIcon::fromTheme("list-add"));
-	actColl->addAction(QStringLiteral("new-function"), newFunctionAction);
-	connect(newFunctionAction, &QAction::triggered, this, &MainWindow::newFunction);
-
-	auto newModuleAction = new QAction(nullptr);
-	newModuleAction->setText(i18n("New Module"));
-	newModuleAction->setIcon(QIcon::fromTheme("package-new"));
-	actColl->addAction(QStringLiteral("new-module"), newModuleAction);
-	connect(newModuleAction, &QAction::triggered, this, &MainWindow::newModule);
-
+	
 	auto runConfigDialogAction = new QAction(this);
 	runConfigDialogAction->setText(i18n("Configure Launches"));
 	actColl->addAction(QStringLiteral("configure-launches"), runConfigDialogAction);
@@ -305,54 +293,6 @@ void MainWindow::openWorkspace(const QUrl& url) {
 	mChigContext = std::make_unique<chi::Context>(url.toLocalFile().toStdString());
 
 	workspaceOpened(*mChigContext);
-}
-
-void MainWindow::newFunction() {
-	// TODO: reenable
-	// 	if (currentModule() == nullptr) {
-	// 		KMessageBox::error(this, "Load a module before creating a new function");
-	// 		return;
-	// 	}
-	//
-	// 	QString newName = QInputDialog::getText(this, i18n("New Function Name"), i18n("Function
-	// Name"));
-	//
-	// 	if (newName == "") { return; }
-	//
-	// 	chi::GraphFunction* func =
-	// 	    currentModule()->getOrCreateFunction(newName.toStdString(), {}, {}, {""}, {""});
-	// 	func->getOrInsertEntryNode(0, 0, boost::uuids::random_generator()());
-	//
-	// 	newFunctionCreated(*func);
-	//
-	// 	tabView().selectNewFunction(*func);  // open the newly created function
-}
-
-void MainWindow::newModule() {
-	// can't do this without a workspace
-	if (context().workspacePath().empty()) {
-		KMessageBox::error(this, i18n("Cannot create a module without a workspace to place it in"),
-		                   i18n("Failed to create module"));
-		return;
-	}
-
-	// TODO: validator
-	auto fullName = QInputDialog::getText(this, i18n("New Module"), i18n("Full Module Name"));
-	if (fullName.isEmpty()) {
-		KMessageBox::error(this, i18n("Cannot create a module wth an empty name"));
-
-		return;
-	}
-
-	auto mod = context().newGraphModule(fullName.toStdString());
-
-	// add lang
-	mod->addDependency("lang");
-
-	mod->saveToDisk();
-
-	newModuleCreated(*mod);
-	// then load the module
 }
 
 void MainWindow::moduleDirtied(chi::GraphModule& mod) { mModuleBrowser->moduleDirtied(mod); }
