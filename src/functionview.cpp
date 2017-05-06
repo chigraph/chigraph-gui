@@ -378,7 +378,7 @@ std::shared_ptr<DataModelRegistry> FunctionView::createRegistry() {
 	deps.insert(mFunction->module().fullName());
 	for (auto modName : deps) {
 		auto module = mFunction->context().moduleByFullName(modName);
-		Expects(module != nullptr);
+		assert(module != nullptr);
 
 		for (auto typeName : module->nodeTypeNames()) {
 			// create that node type unless it's entry or exit

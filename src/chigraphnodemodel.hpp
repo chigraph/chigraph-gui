@@ -44,15 +44,7 @@ public:
 		return mDecorators[mDecorators.size() - 1].get();
 	}
 	
-	void removeDecorator(QtNodes::NodePainterDelegate* decorator) {
-		auto iter = std::find_if(mDecorators.begin(), mDecorators.end(), [decorator](auto& uptr) { return uptr.get() == decorator; });
-		
-		if (iter == mDecorators.end()) {
-			return;
-		}
-		
-		mDecorators.erase(iter);
-	}
+	void removeDecorator(QtNodes::NodePainterDelegate* decorator);
 	
 	void clearDecorators() {
 		mDecorators.clear();

@@ -397,7 +397,7 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 			// TODO: implement discard
 			break;
 		case KMessageBox::Cancel: event->ignore(); return;
-		default: Expects(false);
+		default: assert(false);
 		}
 	}
 

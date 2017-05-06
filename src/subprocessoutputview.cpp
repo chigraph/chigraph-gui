@@ -8,8 +8,11 @@
 #include <KLocalizedString>
 #include <KMessageBox>
 
-#include <llvm/Config/llvm-config.h>
-#if LLVM_VERSION_MAJOR <= 3
+#include <chi/Context.hpp>
+#include <chi/Result.hpp>
+#include <chi/LLVMVersion.hpp>
+
+#if LLVM_VERSION_LESS_EQUAL(3, 9)
 #include <llvm/Bitcode/ReaderWriter.h>
 #else
 #include <llvm/Bitcode/BitcodeReader.h>
@@ -21,8 +24,6 @@
 
 #include <boost/filesystem.hpp>
 
-#include <chi/Context.hpp>
-#include <chi/Result.hpp>
 
 #include <iostream>
 

@@ -241,3 +241,16 @@ QtNodes::NodePainterDelegate* ChigraphNodeModel::addDecorator(std::unique_ptr<Qt
 	return ret;
 }
 
+
+void ChigraphNodeModelPaintDelegate::removeDecorator(QtNodes::NodePainterDelegate* decorator) {
+    auto iter = std::find_if(mDecorators.begin(), mDecorators.end(), [decorator](auto& uptr) {
+        return uptr.get() == decorator;
+    });
+
+    if (iter == mDecorators.end()) {
+        return;
+    }
+
+    mDecorators.erase(iter);
+}
+

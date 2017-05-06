@@ -13,9 +13,9 @@
 
 #include <thread>
 
-#include <../functiontabview.hpp>
-#include <../mainwindow.hpp>
-#include <../chigraphnodemodel.hpp>
+#include "../functiontabview.hpp"
+#include "../mainwindow.hpp"
+#include "../chigraphnodemodel.hpp"
 
 #include <../src/Node.hpp>
 
