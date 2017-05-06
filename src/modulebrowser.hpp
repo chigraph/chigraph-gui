@@ -38,7 +38,8 @@ public:
 	std::unordered_set<chi::GraphModule*> dirtyModules();
 
 signals:
-	void functionSelected(chi::GraphFunction& name);
+	void functionSelected(chi::GraphFunction& func);
+	void structSelected(chi::GraphStruct& str);
 
 public slots:
 	void loadWorkspace(chi::Context& context);

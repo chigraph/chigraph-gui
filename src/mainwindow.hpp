@@ -50,8 +50,6 @@ public slots:
 	void openWorkspaceDialog();           // this one opens a dialog
 	void openWorkspace(const QUrl& url);  // and this one doesn't
 	void save();
-	void newFunction();
-	void newModule();
 
 	void moduleDirtied(chi::GraphModule& mod);
 

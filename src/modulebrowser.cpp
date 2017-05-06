@@ -1,5 +1,6 @@
 #include "modulebrowser.hpp"
 
+#include <chi/GraphStruct.hpp>
 #include <chi/Result.hpp>
 
 #include <QDebug>
@@ -18,14 +19,25 @@
 namespace fs = boost::filesystem;
 
 struct WorkspaceTree {
+	
+	enum eType {
+		FUNCTION,
+		MODULE,
+		STRUCT,
+		FOLDER
+	};
+	
+	
 	WorkspaceTree*                              parent = nullptr;
 	std::vector<std::unique_ptr<WorkspaceTree>> children;
-	bool                                        isModule = false;
 	chi::GraphModule*                           module   = nullptr;
 	chi::GraphFunction*                         func     = nullptr;
+	chi::GraphStruct*                           str      = nullptr;
 	QString                                     name;
 	bool                                        dirty = false;
 	int                                         row   = 0;
+	eType type;
+	
 };
 
 class ModuleTreeModel : public QAbstractItemModel {
@@ -63,14 +75,14 @@ public:
 		if (!index.isValid()) { return true; }
 
 		auto item = static_cast<WorkspaceTree*>(index.internalPointer());
-		return item->func == nullptr;
+		return item->type == WorkspaceTree::MODULE || item->type == WorkspaceTree::FOLDER;
 	}
 	bool canFetchMore(const QModelIndex& index) const override {
 		if (!index.isValid()) { return false; }
 
 		auto item = static_cast<WorkspaceTree*>(index.internalPointer());
 
-		return item->isModule;
+		return item->type == WorkspaceTree::MODULE;
 	}
 	void fetchMore(const QModelIndex& index) override {
 		if (!index.isValid()) { return; }
@@ -90,6 +102,7 @@ public:
 				p      = parent->name.toStdString() / p;
 				parent = parent->parent;
 			}
+			p = p.string().substr(4);
 		}
 
 		// load it
@@ -106,13 +119,27 @@ public:
 
 		item->module = static_cast<chi::GraphModule*>(mod);
 
+		// add functions
 		for (const auto& func : item->module->functions()) {
 			auto child    = std::make_unique<WorkspaceTree>();
 			child->func   = func.get();
 			child->parent = item;
 			child->name   = QString::fromStdString(func->name());
 			child->row    = item->children.size();
+			child->type = WorkspaceTree::FUNCTION;
 
+			item->children.push_back(std::move(child));
+		}
+		
+		// add structs
+		for (const auto& str : item->module->structs()) {
+			auto child = std::make_unique<WorkspaceTree>();
+			child->str = str.get();
+			child->name = QString::fromStdString(str->name());
+			child->parent = item;
+			child->row = item->children.size();
+			child->type = WorkspaceTree::STRUCT;
+			
 			item->children.push_back(std::move(child));
 		}
 	}
@@ -139,8 +166,12 @@ public:
 				return item->name;
 			}
 		case Qt::DecorationRole:
-			if (item->func != nullptr) { return QIcon::fromTheme(QStringLiteral("code-class")); }
-			if (item->isModule) { return QIcon::fromTheme(QStringLiteral("package-available")); }
+			switch (item->type) {
+				case WorkspaceTree::MODULE: return QIcon::fromTheme(QStringLiteral("package-available"));
+				case WorkspaceTree::FUNCTION: return QIcon::fromTheme(QStringLiteral("code-context"));
+				case WorkspaceTree::STRUCT: return QIcon::fromTheme(QStringLiteral("code-class"));
+				default: return {};
+			}
 		case Qt::FontRole:
 			if (item->dirty || (item->parent != nullptr && item->parent->dirty)) {
 				QFont bold;
@@ -163,6 +194,16 @@ ModuleBrowser::ModuleBrowser(QWidget* parent) : QTreeView(parent) {
 	connect(this, &QTreeView::doubleClicked, this, [this](const QModelIndex& index) {
 		auto item = static_cast<WorkspaceTree*>(index.internalPointer());
 
+		switch (item->type) {
+			case WorkspaceTree::FUNCTION:
+				functionSelected(*item->func);
+				return;
+			case WorkspaceTree::STRUCT:
+				structSelected(*item->str);
+				return;
+			default: return;
+		}
+		
 		if (item->func == nullptr) {  // don't do module folders or modules
 			return;
 		}
@@ -196,10 +237,18 @@ void ModuleBrowser::loadWorkspace(chi::Context& context) {
 	auto modules = context.listModulesInWorkspace();
 
 	auto tree = std::make_unique<WorkspaceTree>();
+	
+	// add src object
+	auto srcTree = std::make_unique<WorkspaceTree>();
+	srcTree->parent = tree.get();
+	srcTree->type = WorkspaceTree::FOLDER;
+	srcTree->row = 0;
+	srcTree->name = QStringLiteral("src");
+	
 
 	// create the tree
 	for (const fs::path& mod : modules) {
-		WorkspaceTree* parent = tree.get();
+		WorkspaceTree* parent = srcTree.get();
 
 		// for each component of mod
 		for (auto componentIter = mod.begin(); componentIter != mod.end(); ++componentIter) {
@@ -210,7 +259,7 @@ void ModuleBrowser::loadWorkspace(chi::Context& context) {
 			bool found = false;
 			for (const auto& child : parent->children) {
 				if (child->name.toStdString() == component.string() &&
-				    child->isModule == isModule) {
+				    (child->type == WorkspaceTree::MODULE) == isModule) {
 					found  = true;
 					parent = child.get();
 					break;
@@ -220,7 +269,7 @@ void ModuleBrowser::loadWorkspace(chi::Context& context) {
 				// insert it
 				auto newChild      = std::make_unique<WorkspaceTree>();
 				newChild->parent   = parent;
-				newChild->isModule = isModule;
+				newChild->type = isModule ? WorkspaceTree::MODULE : WorkspaceTree::FOLDER;
 				newChild->row      = parent->children.size();
 				newChild->name     = QString::fromStdString(component.string());
 				parent->children.push_back(std::move(newChild));
@@ -229,6 +278,8 @@ void ModuleBrowser::loadWorkspace(chi::Context& context) {
 			}
 		}
 	}
+	
+	tree->children.push_back(std::move(srcTree));
 	mTree = tree.get();
 
 	mModel = std::make_unique<ModuleTreeModel>(std::move(tree), *mContext);
@@ -277,7 +328,7 @@ std::pair<WorkspaceTree*, QModelIndex> ModuleBrowser::idxFromModuleName(const fs
 		auto id = 0ull;
 		for (const auto& ch : item->children) {
 			if (ch->name.toStdString() == component.string() &&
-			    ch->isModule == (componentIter == --name.end())) {
+			    (ch->type == WorkspaceTree::MODULE) == (componentIter == --name.end())) {
 				item = ch.get();
 				idx  = mModel->index(id, 0, idx);
 				break;

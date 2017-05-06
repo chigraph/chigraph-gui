@@ -15,6 +15,7 @@
 #include <boost/filesystem.hpp>
 
 class FunctionView;
+class StructEdit;
 
 class FunctionTabView : public QTabWidget, public KXMLGUIClient {
 	Q_OBJECT
@@ -44,6 +45,7 @@ private:
 	void closeTab(int idx);
 
 	std::map<QString, FunctionView*> mOpenFunctions;
+	std::map<QString, StructEdit*> mOpenStructs;
 };
 
 #endif  // CHIGRAPHGUI_FUNCTION_TAB_VIEW_HPP
