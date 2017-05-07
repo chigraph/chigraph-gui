@@ -181,3 +181,7 @@ if(WIN32)
 endif()
 
 install(TARGETS chigraphgui DESTINATION bin)
+
+# install desktop file and icon
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../chigraphgui.desktop DESTINATION share/applications)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../chigraph.png DESTINATION share/chigraph/icons/)

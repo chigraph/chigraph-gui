@@ -1,5 +1,7 @@
 [Desktop Entry]
+Type=Application
 Name=Chigraph
 Exec=chigraphgui
 Icon=chigraph
+Categories=Qt;KDE;Development;IDE;
 
