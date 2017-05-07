@@ -14,6 +14,7 @@
 
 #include "mainwindow.hpp"
 #include "moduletreemodel.hpp"
+#include "newmoduledialog.hpp"
 
 #include <boost/filesystem.hpp>
 
@@ -22,6 +23,18 @@ namespace fs = boost::filesystem;
 
 ModuleBrowser::ModuleBrowser(QWidget* parent) : QTreeView(parent) {
 	setXMLFile("chigraphmodulebrowserui.rc");
+	
+	// setup actions
+	newModuleAction = actionCollection()->addAction(QStringLiteral("new-module"), new QAction(QIcon::fromTheme(QStringLiteral("package-new")), i18n("New Module"), nullptr));
+	connect(newModuleAction, &QAction::triggered, this, &ModuleBrowser::newModule);
+	
+	newFunctionAction = actionCollection()->addAction(QStringLiteral("new-function"), new QAction(QIcon::fromTheme(QStringLiteral("message-new")), i18n("New Function"), nullptr));
+	
+	newStructAction = actionCollection()->addAction(QStringLiteral("new-struct"), new QAction(QIcon::fromTheme(QStringLiteral("window-new")), i18n("New Struct"), nullptr));
+	
+	deleteAction = actionCollection()->addAction(QStringLiteral("remove-item"), new QAction(QIcon::fromTheme(QStringLiteral("entry-delete")), i18n("Delete"), nullptr));
+	
+	renameAction = actionCollection()->addAction(QStringLiteral("rename"), new QAction(QIcon::fromTheme(QStringLiteral("edit-rename")), i18n("Rename"), nullptr));
 
 	setAnimated(true);
 	setSortingEnabled(true);
@@ -47,13 +60,36 @@ ModuleBrowser::ModuleBrowser(QWidget* parent) : QTreeView(parent) {
 
 		auto item = static_cast<WorkspaceTree*>(idx.internalPointer());
 
-		if (!item || !item->dirty) { return; }
+		if (!item) { return; }
 
 		setCurrentIndex(idx);
 
 		QMenu contextMenu;
-		// TODO: actions
+		
+		// add actions depending on the type
+		switch(item->type) {
+			case WorkspaceTree::MODULE: 
+				contextMenu.addAction(renameAction);
+				contextMenu.addAction(newFunctionAction);
+				contextMenu.addAction(newStructAction);
+				contextMenu.addAction(deleteAction);
+				break;
+			case WorkspaceTree::FOLDER:
+				contextMenu.addAction(renameAction);
+				contextMenu.addAction(newModuleAction);
+				// contextMenu.addAction(deleteAction); TODO: do this
+				break;
+			case WorkspaceTree::FUNCTION:
+				contextMenu.addAction(renameAction);
+				contextMenu.addAction(deleteAction);
+				break;
+			case WorkspaceTree::STRUCT:
+				contextMenu.addAction(renameAction);
+				contextMenu.addAction(deleteAction);
+				break;
+		}
 		contextMenu.exec(mapToGlobal(p));
+		
 	});
 }
 
@@ -78,6 +114,24 @@ void ModuleBrowser::moduleDirtied(chi::GraphModule& dirtied) {
 void ModuleBrowser::moduleSaved(chi::GraphModule& saved) {
 	updateDirtyStatus(saved, false);
 	mDirtyModules.erase(&saved);
+}
+
+void ModuleBrowser::newModule()
+{
+	fs::path startingDir;
+	
+	// get the currently selected folder
+	auto idx = currentIndex();
+	if (idx.isValid()) {
+		auto item = static_cast<WorkspaceTree*>(idx.internalPointer());
+		
+		startingDir = item->fullName();
+
+	}
+	
+	// create a new module dialog
+	auto dialog = new NewModuleDialog(this, context(), startingDir);
+	dialog->exec();
 }
 
 void ModuleBrowser::updateDirtyStatus(chi::GraphModule& updated, bool dirty) {

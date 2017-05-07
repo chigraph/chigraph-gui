@@ -79,6 +79,9 @@ set(GUI_SRCS
 	moduletreemodel.cpp
 	moduleselectiondialog.cpp
 	moduleselectwidget.cpp
+	folderselectiondialog.cpp
+	folderselectwidget.cpp
+	newmoduledialog.cpp
 )
 
 set(GUI_RESOURCES
@@ -105,6 +108,9 @@ set(GUI_HEADERS
 	moduletreemodel.hpp
 	moduleselectiondialog.hpp
 	moduleselectwidget.hpp
+	folderselectiondialog.hpp
+	folderselectwidget.hpp
+	newmoduledialog.hpp
 )
 
 add_executable(chigraphgui ${GUI_SRCS} ${GUI_HEADERS} ${GUI_RESOURCES})

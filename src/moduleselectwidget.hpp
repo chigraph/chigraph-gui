@@ -17,6 +17,8 @@ public:
 
 	void setModule(const boost::filesystem::path& newModule);
 	
+	boost::filesystem::path module() const;
+	
 signals:
 	void moduleChanged(const boost::filesystem::path& moduleName);
 };

@@ -30,6 +30,8 @@ public:
 	QWidget*           toolView() override { return this; }
 	Qt::DockWidgetArea defaultArea() const override { return Qt::LeftDockWidgetArea; }
 	QString            label() override { return i18n("Module Browser"); }
+	
+	chi::Context& context() const { return *mContext; }
 
 public:
 	ModuleBrowser(QWidget* parent = nullptr);
@@ -45,6 +47,9 @@ public slots:
 	void loadWorkspace(chi::Context& context);
 	void moduleDirtied(chi::GraphModule& dirtied);
 	void moduleSaved(chi::GraphModule& saved);
+	
+private slots:
+	void newModule();
 
 private:
 	void updateDirtyStatus(chi::GraphModule& updated, bool dirty);
@@ -56,6 +61,12 @@ private:
 
 	WorkspaceTree*                   mTree = nullptr;
 	std::unique_ptr<ModuleTreeModel> mModel;
+	
+	QAction* newModuleAction;
+	QAction* newFunctionAction;
+	QAction* newStructAction;
+	QAction* deleteAction;
+	QAction* renameAction;
 };
 
 #endif  // CHIGRAPHGUI_MODULE_BROWSER_HPP

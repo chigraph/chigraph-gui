@@ -19,6 +19,11 @@ ModuleSelectWidget::ModuleSelectWidget(chi::Context& ctx)
 	setIcon(QIcon::fromTheme(QStringLiteral("package-available")));
 }
 
+boost::filesystem::path ModuleSelectWidget::module() const
+{
+	return text().toStdString();
+}
+
 void ModuleSelectWidget::setModule(const boost::filesystem::path& newModule)
 {
 	setText(QString::fromStdString(newModule.string()));
