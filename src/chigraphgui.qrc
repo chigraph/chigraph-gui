@@ -7,6 +7,6 @@
 		<file>chigraphfunctiontabviewui.rc</file>
     </qresource>
     <qresource prefix="/icons">
-        <file alias="chigraphsmall.png">../chigraph/doc/images/chigraphsmall.png</file>
+        <file alias="chigraphsmall.png">../icons/128x128/chigraph.png</file>
     </qresource>
 </RCC>
