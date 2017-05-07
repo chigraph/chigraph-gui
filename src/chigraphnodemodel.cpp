@@ -33,9 +33,7 @@ public:
 		KTextEditor::Document* doc = editor->createDocument(this);
 		doc->setText(QString::fromStdString(inst->type().toJSON()["code"]));
 		doc->setHighlightingMode("C");
-		connect(doc, &KTextEditor::Document::highlightingModeChanged, this, [](auto* doc) {
-			std::cout << "Changed to " << doc->highlightingMode().toStdString() << std::endl;
-		});
+
 		// create a widget to display the document
 		KTextEditor::View* textEdit = doc->createView(nullptr);
 		// delete save and saveAs actions

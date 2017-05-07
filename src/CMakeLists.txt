@@ -42,10 +42,10 @@ set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} ${CMAKE_CURRENT_S
 
 set(CMAKE_AUTORCC ON)
 
-# include(KDEInstallDirs)
-# include(KDECMakeSettings)
-# include(KDECompilerSettings)
-# include(FeatureSummary)
+include(KDEInstallDirs)
+include(KDECMakeSettings)
+#include(KDECompilerSettings)
+include(FeatureSummary)
 
 # find qt
 find_package(Qt5 5.6.0 REQUIRED COMPONENTS Gui Script Xml Core Widgets Network PrintSupport)
@@ -76,6 +76,8 @@ set(GUI_SRCS
 	launchconfigurationmanager.cpp
 	launchconfigurationdialog.cpp
 	structedit.cpp
+	moduletreemodel.cpp
+	moduleselectiondialog.cpp
 )
 
 set(GUI_RESOURCES
@@ -99,6 +101,8 @@ set(GUI_HEADERS
 	launchconfigurationmanager.hpp
 	launchconfigurationdialog.hpp
 	structedit.hpp
+	moduletreemodel.hpp
+	moduleselectiondialog.hpp
 )
 
 add_executable(chigraphgui ${GUI_SRCS} ${GUI_HEADERS} ${GUI_RESOURCES})
