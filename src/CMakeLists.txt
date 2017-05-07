@@ -126,7 +126,7 @@ target_link_libraries(chigraphgui
 	KF5::WidgetsAddons 
 	KF5::TextWidgets 
 	KF5::IconThemes 
-	nodes 
+	chigraphnodes 
 	chigraph
 )
 
