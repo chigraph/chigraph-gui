@@ -7,8 +7,12 @@
 
 #include "launchconfigurationmanager.hpp"
 
+#include <boost/filesystem/path.hpp>
+
 class QListWidget;
 class QLineEdit;
+
+class ModuleSelectWidget;
 
 class LaunchConfigurationDialog : public QDialog {
 	Q_OBJECT
@@ -21,7 +25,7 @@ private slots:
 
 	void nameChanged(const QString& newName);
 	void wdChanged(const QString& newWd);
-	void moduleChanged(const QString& newModule);
+	void moduleChanged(const boost::filesystem::path& newModule);
 	void argsChanged(const QString& newArgs);
 
 private:
@@ -30,7 +34,7 @@ private:
 
 	QLineEdit* mNameEdit;
 	QLineEdit* mWdEdit;
-	QLineEdit* mModuleEdit;
+	ModuleSelectWidget* mModuleEdit;
 	QLineEdit* mArgsEdit;
 
 	QListWidget* mConfigList;

@@ -78,6 +78,7 @@ set(GUI_SRCS
 	structedit.cpp
 	moduletreemodel.cpp
 	moduleselectiondialog.cpp
+	moduleselectwidget.cpp
 )
 
 set(GUI_RESOURCES
@@ -103,6 +104,7 @@ set(GUI_HEADERS
 	structedit.hpp
 	moduletreemodel.hpp
 	moduleselectiondialog.hpp
+	moduleselectwidget.hpp
 )
 
 add_executable(chigraphgui ${GUI_SRCS} ${GUI_HEADERS} ${GUI_RESOURCES})

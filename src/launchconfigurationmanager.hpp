@@ -7,6 +7,8 @@
 
 #include <KConfigGroup>
 
+#include <chi/Fwd.hpp>
+
 struct LaunchConfiguration {
 	// constructs an invalid configuration
 	LaunchConfiguration() {}
@@ -40,7 +42,7 @@ private:
 class LaunchConfigurationManager : public QObject {
 	Q_OBJECT
 public:
-	LaunchConfigurationManager();
+	LaunchConfigurationManager(chi::Context& context);
 
 	LaunchConfigurationManager(const LaunchConfigurationManager&) = delete;
 	LaunchConfigurationManager(LaunchConfigurationManager&&)      = delete;
@@ -61,10 +63,15 @@ public:
 		}
 		return {};
 	}
+	
+	chi::Context& context() const { return *mContext; }
 
 private:
 	LaunchConfiguration              mCurrent;
 	std::vector<LaunchConfiguration> mConfigurations;
+	KConfigGroup mConfigGroup;
+	
+	chi::Context* mContext;
 };
 
 #endif  // CHIGRAPHGUI_LAUNCH_CONFIGURATION_HPP

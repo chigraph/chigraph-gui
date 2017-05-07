@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	setWindowIcon(QIcon(":/icons/chigraphsmall.png"));
 
 	mChigContext = std::make_unique<chi::Context>(qApp->arguments()[0].toStdString().c_str());
+	mLaunchManager = std::make_unique<LaunchConfigurationManager>(*mChigContext);
 
 	mFunctionTabs = new FunctionTabView;
 	mFunctionTabs->setMovable(true);
@@ -222,7 +223,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	runConfigDialogAction->setText(i18n("Configure Launches"));
 	actColl->addAction(QStringLiteral("configure-launches"), runConfigDialogAction);
 	connect(runConfigDialogAction, &QAction::triggered, this, [this] {
-		LaunchConfigurationDialog d(mLaunchManager);
+		LaunchConfigurationDialog d(launchManager());
 
 		d.exec();
 
@@ -235,11 +236,11 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	connect(mConfigSelectAction,
 	        static_cast<void (KSelectAction::*)(const QString&)>(&KSelectAction::triggered), this,
 	        [this](const QString& str) {
-		        mLaunchManager.setCurrentConfiguration(mLaunchManager.configByName(str));
+		        launchManager().setCurrentConfiguration(launchManager().configByName(str));
 		    });
 	updateUsableConfigs();
-	if (mLaunchManager.currentConfiguration().valid()) {
-		mConfigSelectAction->setCurrentAction(mLaunchManager.currentConfiguration().name(),
+	if (launchManager().currentConfiguration().valid()) {
+		mConfigSelectAction->setCurrentAction(launchManager().currentConfiguration().name(),
 		                                      Qt::CaseSensitive);
 	}
 
@@ -291,6 +292,8 @@ void MainWindow::openWorkspaceDialog() {
 
 void MainWindow::openWorkspace(const QUrl& url) {
 	mChigContext = std::make_unique<chi::Context>(url.toLocalFile().toStdString());
+	mLaunchManager = std::make_unique<LaunchConfigurationManager>(*mChigContext);
+	updateUsableConfigs();
 
 	workspaceOpened(*mChigContext);
 }
@@ -298,18 +301,22 @@ void MainWindow::openWorkspace(const QUrl& url) {
 void MainWindow::moduleDirtied(chi::GraphModule& mod) { mModuleBrowser->moduleDirtied(mod); }
 
 void MainWindow::updateUsableConfigs() {
-	// save the current so we can set it back later
-	QString selectedText = mConfigSelectAction->currentText();
 
 	// repopulate
 	mConfigSelectAction->clear();
 
-	for (const auto& config : mLaunchManager.configurations()) {
+	for (const auto& config : launchManager().configurations()) {
 		mConfigSelectAction->addAction(config.name());
 	}
 
-	// set it back
-	mConfigSelectAction->setCurrentAction(selectedText, Qt::CaseSensitive);
+	auto currentConfig = launchManager().currentConfiguration();
+	
+	if (currentConfig.valid()) {
+	
+		// set it to the current config
+		mConfigSelectAction->setCurrentAction(currentConfig.name(), Qt::CaseSensitive);
+		
+	}
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {

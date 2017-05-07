@@ -230,6 +230,8 @@ QVariant ModuleTreeModel::data(const QModelIndex& index, int role) const {
             return QIcon::fromTheme(QStringLiteral("code-context"));
         case WorkspaceTree::STRUCT:
             return QIcon::fromTheme(QStringLiteral("code-class"));
+		case WorkspaceTree::FOLDER:
+			return QIcon::fromTheme(QStringLiteral("stock_folder"));
         default:
             return {};
         }

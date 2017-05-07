@@ -36,7 +36,7 @@ public:
 	chi::Context&    context() const { return *mChigContext; }
 	FunctionTabView& tabView() const { return *mFunctionTabs; }
 
-	LaunchConfigurationManager& launchManager() { return mLaunchManager; }
+	LaunchConfigurationManager& launchManager() { return *mLaunchManager; }
 
 	std::pair<chi::Result, chi::GraphModule*> loadModule(const QString& name);
 
@@ -65,7 +65,7 @@ private:
 
 	void updateUsableConfigs();
 
-	LaunchConfigurationManager mLaunchManager;
+	std::unique_ptr<LaunchConfigurationManager> mLaunchManager;
 
 	KRecentFilesAction* mOpenRecentAction;  // keep this so we can save the entries
 

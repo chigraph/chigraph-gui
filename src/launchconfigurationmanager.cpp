@@ -1,5 +1,7 @@
 #include "launchconfigurationmanager.hpp"
 
+#include <chi/Context.hpp>
+
 #include <KConfigGroup>
 #include <KSharedConfig>
 
@@ -8,14 +10,16 @@
 
 LaunchConfiguration::LaunchConfiguration(KConfigGroup grp) : mConfigGroup{grp} {}
 
-LaunchConfigurationManager::LaunchConfigurationManager() {
-	KConfigGroup config(KSharedConfig::openConfig(), "launchconfigurations");
+LaunchConfigurationManager::LaunchConfigurationManager(chi::Context& context) : mContext{&context} {
+	KConfigGroup contextConfig(KSharedConfig::openConfig(), context.workspacePath().string().c_str());
+	
+	mConfigGroup = contextConfig.group("launchconfigurations");
 
-	auto configurations = config.readEntry("configurations", QStringList());
-	auto currentName    = config.readEntry("current", QString());
+	auto configurations = mConfigGroup.readEntry("configurations", QStringList());
+	auto currentName    = mConfigGroup.readEntry("current", QString());
 
 	for (const auto& configName : configurations) {
-		mConfigurations.emplace_back(KConfigGroup{KSharedConfig::openConfig(), configName});
+		mConfigurations.emplace_back(mConfigGroup.group(configName));
 
 		if (configName == currentName) { mCurrent = mConfigurations[mConfigurations.size() - 1]; }
 	}
@@ -26,11 +30,10 @@ LaunchConfiguration LaunchConfigurationManager::newConfiguration() {
 	auto uuid = QUuid::createUuid();
 
 	// add it to the list
-	KConfigGroup configs(KSharedConfig::openConfig(), "launchconfigurations");
-	configs.writeEntry("configurations",
-	                   configs.readEntry("configurations", QStringList()) << uuid.toString());
+	mConfigGroup.writeEntry("configurations",
+	                   mConfigGroup.readEntry("configurations", QStringList()) << uuid.toString());
 
-	auto group = KConfigGroup{KSharedConfig::openConfig(), uuid.toString()};
+	auto group = mConfigGroup.group(uuid.toString());
 
 	mConfigurations.emplace_back(group);
 
@@ -40,6 +43,5 @@ LaunchConfiguration LaunchConfigurationManager::newConfiguration() {
 void LaunchConfigurationManager::setCurrentConfiguration(LaunchConfiguration config) {
 	mCurrent = config;
 
-	KConfigGroup kconfig(KSharedConfig::openConfig(), "launchconfigurations");
-	kconfig.writeEntry("current", config.id());
+	mConfigGroup.writeEntry("current", config.id());
 }

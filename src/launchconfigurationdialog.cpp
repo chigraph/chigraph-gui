@@ -1,4 +1,5 @@
 #include "launchconfigurationdialog.hpp"
+#include "moduleselectwidget.hpp"
 
 #include <KLocalizedString>
 
@@ -52,8 +53,8 @@ LaunchConfigurationDialog::LaunchConfigurationDialog(LaunchConfigurationManager&
 
 		// module
 		{
-			mModuleEdit = new QLineEdit;
-			connect(mModuleEdit, &QLineEdit::textChanged, this,
+			mModuleEdit = new ModuleSelectWidget(manager.context());
+			connect(mModuleEdit, &ModuleSelectWidget::moduleChanged, this,
 			        &LaunchConfigurationDialog::moduleChanged);
 			layout->addRow(i18n("Module"), mModuleEdit);
 		}
@@ -123,8 +124,8 @@ void LaunchConfigurationDialog::argsChanged(const QString& newArgs) {
 	if (currentlyEditing.valid()) { currentlyEditing.setArguments(newArgs); }
 }
 
-void LaunchConfigurationDialog::moduleChanged(const QString& newModule) {
-	if (currentlyEditing.valid()) { currentlyEditing.setModule(newModule); }
+void LaunchConfigurationDialog::moduleChanged(const boost::filesystem::path& newModule) {
+	if (currentlyEditing.valid()) { currentlyEditing.setModule(QString::fromStdString(newModule.string())); }
 }
 
 void LaunchConfigurationDialog::nameChanged(const QString& newName) {
