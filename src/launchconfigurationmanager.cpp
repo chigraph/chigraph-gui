@@ -7,6 +7,7 @@
 
 #include <QUuid>
 #include <QVector>
+#include <QDebug>
 
 LaunchConfiguration::LaunchConfiguration(KConfigGroup grp) : mConfigGroup{grp} {}
 
@@ -38,6 +39,20 @@ LaunchConfiguration LaunchConfigurationManager::newConfiguration() {
 	mConfigurations.emplace_back(group);
 
 	return mConfigurations[mConfigurations.size() - 1];
+}
+
+void LaunchConfigurationManager::removeConfiguration(LaunchConfiguration config)
+{
+	// find it and remove it from the list
+	auto iter = std::find(mConfigurations.begin(), mConfigurations.end(), config);
+	if (iter == mConfigurations.end()) {
+		qDebug() << "Failed to find config to delete: " << config.id();
+		return;
+	}
+	
+	mConfigurations.erase(iter);
+	
+	mConfigGroup.deleteEntry(config.id());
 }
 
 void LaunchConfigurationManager::setCurrentConfiguration(LaunchConfiguration config) {

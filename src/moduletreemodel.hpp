@@ -50,6 +50,8 @@ struct WorkspaceTree {
 
 class ModuleTreeModel : public QAbstractItemModel {
 public:
+	
+	static QIcon iconForItemType(WorkspaceTree::eType type);
 		
 	enum Filter {
 		Folders = 0b1,
@@ -68,6 +70,8 @@ public:
 
 	// create a model from just the context
 	static std::unique_ptr<ModuleTreeModel> createFromContext(chi::Context& context, Filter filter = Filter::All);
+	
+	QModelIndex indexFromName(const boost::filesystem::path& name, WorkspaceTree::eType type);
 	
 	int columnCount(const QModelIndex& parent) const override;
 	QModelIndex index(int row, int column, const QModelIndex& parent) const override;

@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	// setup module browser
 	mModuleBrowser = new ModuleBrowser(this);
 	auto docker    = new QDockWidget(mModuleBrowser->label(), this);
-	docker->setObjectName("Modules");
+	docker->setObjectName(mModuleBrowser->dockObjectName());
 	insertChildClient(mModuleBrowser);
 	docker->setWidget(mModuleBrowser);
 	addDockWidget(mModuleBrowser->defaultArea(), docker);
@@ -93,8 +93,8 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	connect(outputView, &QTabWidget::tabCloseRequested, outputView, &QTabWidget::removeTab);
 
 	docker = new QDockWidget(i18n("Function Details"), this);
-	docker->setObjectName("Function Details");
 	auto functionDetails = new FunctionDetails;
+	docker->setObjectName(functionDetails->dockObjectName());
 	insertChildClient(functionDetails);
 	auto scroll = new QScrollArea;
 	scroll->setWidget(functionDetails);
@@ -119,6 +119,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 
 			for (auto view : chiPlugin->toolViews()) {
 				docker = new QDockWidget(view->label(), this);
+				docker->setObjectName(view->dockObjectName());
 				docker->setWidget(view->toolView());
 
 				insertChildClient(view);

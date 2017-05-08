@@ -9,7 +9,7 @@
 
 #include <boost/filesystem/path.hpp>
 
-class FolderSelectWidget;
+class ChiItemSelectWidget;
 class QLineEdit;
 
 class NewModuleDialog : public QDialog {
@@ -18,7 +18,7 @@ public:
 	
 
 private:
-	FolderSelectWidget* mFolderWidget;
+	ChiItemSelectWidget* mFolderWidget;
 	QLineEdit* mNameEdit;
 };
 

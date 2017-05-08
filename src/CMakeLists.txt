@@ -77,10 +77,8 @@ set(GUI_SRCS
 	launchconfigurationdialog.cpp
 	structedit.cpp
 	moduletreemodel.cpp
-	moduleselectiondialog.cpp
-	moduleselectwidget.cpp
-	folderselectiondialog.cpp
-	folderselectwidget.cpp
+	chiitemselectiondialog.cpp
+	chiitemselectwidget.cpp
 	newmoduledialog.cpp
 )
 
@@ -106,10 +104,8 @@ set(GUI_HEADERS
 	launchconfigurationdialog.hpp
 	structedit.hpp
 	moduletreemodel.hpp
-	moduleselectiondialog.hpp
-	moduleselectwidget.hpp
-	folderselectiondialog.hpp
-	folderselectwidget.hpp
+	chiitemselectiondialog.hpp
+	chiitemselectwidget.hpp
 	newmoduledialog.hpp
 )
 

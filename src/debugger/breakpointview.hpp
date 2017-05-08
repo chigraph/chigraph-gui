@@ -30,6 +30,7 @@ private:
 	QWidget*           toolView() override { return this; }
 	Qt::DockWidgetArea defaultArea() const override { return Qt::BottomDockWidgetArea; }
 	QString            label() override { return i18n("Breakpoints"); }
+	QString dockObjectName() override { return QStringLiteral("breakpoints"); }
 
 	std::unordered_map<chi::NodeInstance*, BreakpointItem*> mBreakpoints;
 };

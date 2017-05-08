@@ -30,6 +30,7 @@ public:
 	QWidget*           toolView() override { return this; }
 	Qt::DockWidgetArea defaultArea() const override { return Qt::LeftDockWidgetArea; }
 	QString            label() override { return i18n("Module Browser"); }
+	QString dockObjectName() override { return QStringLiteral("module-browser"); }
 	
 	chi::Context& context() const { return *mContext; }
 

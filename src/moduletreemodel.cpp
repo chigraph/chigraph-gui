@@ -12,6 +12,22 @@
 
 namespace fs = boost::filesystem;
 
+QIcon ModuleTreeModel::iconForItemType(WorkspaceTree::eType type)
+{
+	switch(type) {
+		case WorkspaceTree::MODULE:
+			return QIcon::fromTheme(QStringLiteral("package-available"));
+		case WorkspaceTree::FUNCTION:
+			return QIcon::fromTheme(QStringLiteral("code-context"));
+		case WorkspaceTree::STRUCT:
+			return QIcon::fromTheme(QStringLiteral("code-class"));
+		case WorkspaceTree::FOLDER:
+			return QIcon::fromTheme(QStringLiteral("stock_folder"));
+		default:
+			return {};
+	}
+}
+
 std::unique_ptr<ModuleTreeModel> ModuleTreeModel::createFromContext(chi::Context& context, Filter filter)
 {
 	
@@ -71,6 +87,32 @@ std::unique_ptr<ModuleTreeModel> ModuleTreeModel::createFromContext(chi::Context
 	return std::make_unique<ModuleTreeModel>(std::move(tree), context, filter);
 }
 
+QModelIndex ModuleTreeModel::indexFromName(const boost::filesystem::path& name, WorkspaceTree::eType type) {
+	auto currentItem = tree->children[0].get();
+	
+	for (auto iter = name.begin(); iter != name.end(); ++iter) {
+		bool isLastItem = iter == --name.end();
+		auto expectedType = isLastItem ? type : WorkspaceTree::FOLDER;
+		
+		bool succeeded = false;
+		
+		// find it in the children
+		for (const auto& item : currentItem->children) {
+			if (item->name.toStdString() == *iter && item->type == expectedType) {
+				currentItem = item.get();
+				succeeded = true;
+				break;
+			}
+		}
+		
+		if (!succeeded) {
+			return {};
+		}
+		
+	}
+	
+	return createIndex(currentItem->row, 0, currentItem);
+}
 
 int ModuleTreeModel::columnCount(const QModelIndex& parent) const {
     return 1;
@@ -223,18 +265,7 @@ QVariant ModuleTreeModel::data(const QModelIndex& index, int role) const {
             return item->name;
         }
     case Qt::DecorationRole:
-        switch (item->type) {
-        case WorkspaceTree::MODULE:
-            return QIcon::fromTheme(QStringLiteral("package-available"));
-        case WorkspaceTree::FUNCTION:
-            return QIcon::fromTheme(QStringLiteral("code-context"));
-        case WorkspaceTree::STRUCT:
-            return QIcon::fromTheme(QStringLiteral("code-class"));
-		case WorkspaceTree::FOLDER:
-			return QIcon::fromTheme(QStringLiteral("stock_folder"));
-        default:
-            return {};
-        }
+        return iconForItemType(item->type);
     case Qt::FontRole:
         if (item->dirty || (item->parent != nullptr && item->parent->dirty)) {
             QFont bold;

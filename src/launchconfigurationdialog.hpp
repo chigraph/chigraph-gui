@@ -12,7 +12,7 @@
 class QListWidget;
 class QLineEdit;
 
-class ModuleSelectWidget;
+class ChiItemSelectWidget;
 
 class LaunchConfigurationDialog : public QDialog {
 	Q_OBJECT
@@ -32,9 +32,8 @@ private:
 	LaunchConfigurationManager* mManager;
 	LaunchConfiguration         currentlyEditing;
 
-	QLineEdit* mNameEdit;
 	QLineEdit* mWdEdit;
-	ModuleSelectWidget* mModuleEdit;
+	ChiItemSelectWidget* mModuleEdit;
 	QLineEdit* mArgsEdit;
 
 	QListWidget* mConfigList;

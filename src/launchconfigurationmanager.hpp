@@ -34,6 +34,14 @@ struct LaunchConfiguration {
 	bool valid() const { return mConfigGroup.isValid(); }
 
 	QString id() const { return mConfigGroup.name(); }
+	
+	bool operator==(const LaunchConfiguration& rhs) const {
+		return id() == rhs.id();
+	}
+	
+	bool operator!=(const LaunchConfiguration& rhs) const {
+		return id() != rhs.id();
+	}
 
 private:
 	KConfigGroup mConfigGroup;
@@ -56,6 +64,8 @@ public:
 	void setCurrentConfiguration(LaunchConfiguration config);
 
 	LaunchConfiguration newConfiguration();
+	
+	void removeConfiguration(LaunchConfiguration config);
 
 	LaunchConfiguration configByName(const QString& str) {
 		for (const auto& config : configurations()) {
