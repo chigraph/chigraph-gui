@@ -44,6 +44,11 @@ LaunchConfiguration LaunchConfigurationManager::newConfiguration() {
 }
 
 void LaunchConfigurationManager::removeConfiguration(LaunchConfiguration config) {
+	// remove it as the current if it's the current
+	if (config.valid() && currentConfiguration().valid() && config == currentConfiguration()) {
+		setCurrentConfiguration({});
+	}
+	
 	// find it and remove it from the list
 	auto iter = std::find(mConfigurations.begin(), mConfigurations.end(), config);
 	if (iter == mConfigurations.end()) {
@@ -59,5 +64,9 @@ void LaunchConfigurationManager::removeConfiguration(LaunchConfiguration config)
 void LaunchConfigurationManager::setCurrentConfiguration(LaunchConfiguration config) {
 	mCurrent = config;
 
-	mConfigGroup.writeEntry("current", config.id());
+	if (config.valid()) {
+		mConfigGroup.writeEntry("current", config.id());
+	} else {
+		mConfigGroup.deleteEntry("current");
+	}
 }

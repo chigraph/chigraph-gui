@@ -72,7 +72,7 @@ void ChiItemSelectionDialog::tryAccept(const QModelIndex& index) {
 	auto item = static_cast<WorkspaceTree*>(index.internalPointer());
 
 	// make sure it's a folder and it isn't the src folder
-	if (mType == mType && item->parent->parent != nullptr) {
+	if (mType == item->type && item->parent->parent != nullptr) {
 		*mToFill = item->fullName();
 		accept();
 	}

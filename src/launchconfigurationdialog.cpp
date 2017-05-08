@@ -2,6 +2,7 @@
 #include "chiitemselectwidget.hpp"
 
 #include <KLocalizedString>
+#include <KUrlRequester>
 
 #include <QAction>
 #include <QDialogButtonBox>
@@ -11,11 +12,49 @@
 #include <QMenu>
 #include <QPushButton>
 #include <QSplitter>
+#include <QHBoxLayout>
 #include <QVBoxLayout>
 
 LaunchConfigurationDialog::LaunchConfigurationDialog(LaunchConfigurationManager& manager)
     : mManager{&manager} {
 	setWindowTitle(i18n("Launch Configurations"));
+
+
+	// config list
+	mConfigList = new QListWidget;
+	
+	// init actions
+	auto renameAction =
+		new QAction(QIcon::fromTheme(QStringLiteral("edit-rename")), i18n("Rename"), nullptr);
+	renameAction->setShortcut(Qt::Key_F2);
+	connect(renameAction, &QAction::triggered, this,
+			[this] { mConfigList->openPersistentEditor(mConfigList->currentItem()); });
+
+	auto deleteAction =
+		new QAction(QIcon::fromTheme(QStringLiteral("edit-delete")), i18n("Delete"), nullptr);
+	deleteAction->setShortcut(Qt::Key_Delete);
+	connect(deleteAction, &QAction::triggered, this, [this] {
+		auto currentItem = mConfigList->currentItem();
+		if (idToItem[currentItem] == currentlyEditing) {
+			// if this is the case, then clear our fields and currentlyEditing
+			currentlyEditing = {};
+			
+			mModuleEdit->setItem({});
+			mWdEdit->setText({});
+			mArgsEdit->setText({});
+		}
+		
+		// remove it from the manager
+		mManager->removeConfiguration(idToItem[currentItem]);
+		
+		// delete it
+		delete mConfigList->takeItem(mConfigList->row(currentItem));
+		
+	});
+
+	addAction(renameAction);
+	addAction(deleteAction);
+
 
 	// left side widget
 	auto leftWidget = new QWidget;
@@ -23,14 +62,31 @@ LaunchConfigurationDialog::LaunchConfigurationDialog(LaunchConfigurationManager&
 		auto layout = new QVBoxLayout;
 		leftWidget->setLayout(layout);
 
-		// new button
-		auto newButton = new QPushButton(QIcon::fromTheme(QStringLiteral("list-add")),
-		                                 i18n("New Configuration"));
-		layout->addWidget(newButton);
-		connect(newButton, &QPushButton::pressed, this, &LaunchConfigurationDialog::addNewConfig);
+		// buttons
+		auto buttonWidget = new QWidget;
+		{
+			
+			auto hbuttonlayout = new QHBoxLayout;
+			buttonWidget->setLayout(hbuttonlayout);
+			hbuttonlayout->setAlignment(Qt::AlignRight);
+			
+			// new button
+			auto newButton = new QPushButton(QIcon::fromTheme(QStringLiteral("list-add")), {});
+			newButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+			connect(newButton, &QPushButton::pressed, this, &LaunchConfigurationDialog::addNewConfig);
+			hbuttonlayout->addWidget(newButton);
+			
+			// delete button
+			auto deleteButton = new QPushButton(QIcon::fromTheme(QStringLiteral("edit-delete")), {});
+			deleteButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+			connect(deleteButton, &QPushButton::pressed, deleteAction, &QAction::trigger);
+			hbuttonlayout->addWidget(deleteButton);
+			
+			hbuttonlayout->addWidget(deleteButton);
+		}
+		
+		layout->addWidget(buttonWidget);
 
-		// config list
-		mConfigList = new QListWidget;
 		mConfigList->setEditTriggers(QAbstractItemView::SelectedClicked);
 		layout->addWidget(mConfigList);
 
@@ -42,36 +98,16 @@ LaunchConfigurationDialog::LaunchConfigurationDialog(LaunchConfigurationManager&
 			listItem->setFlags(listItem->flags() | Qt::ItemIsEditable);
 
 			mConfigList->addItem(listItem);
+			
+			// store it in the map
+			idToItem[listItem] = config;
 		}
 		connect(mConfigList, &QListWidget::currentItemChanged, this,
-		        [this](QListWidgetItem* item, QListWidgetItem*) { selectConfig(item->text()); });
+		        [this](QListWidgetItem* item, QListWidgetItem*) { selectConfig(item); });
 		connect(mConfigList, &QListWidget::itemChanged, this,
 		        [this](QListWidgetItem* item) { nameChanged(item->text()); });
 
-		auto renameAction =
-		    new QAction(QIcon::fromTheme(QStringLiteral("edit-rename")), i18n("Rename"), nullptr);
-		renameAction->setShortcut(Qt::Key_F2);
-		connect(renameAction, &QAction::triggered, this,
-		        [this] { mConfigList->openPersistentEditor(mConfigList->currentItem()); });
-
-		auto deleteAction =
-		    new QAction(QIcon::fromTheme(QStringLiteral("edit-delete")), i18n("Delete"), nullptr);
-		deleteAction->setShortcut(Qt::Key_Delete);
-		connect(deleteAction, &QAction::triggered, this, [this] {
-			auto currentItem = mConfigList->currentItem();
-			if (currentItem->text() == currentlyEditing.name()) {
-				// if this is the case, then clear our fields and currentlyEditing
-				currentlyEditing = {};
-
-				mModuleEdit->setItem({});
-				mWdEdit->setText({});
-				mArgsEdit->setText({});
-			}
-		});
-
-		addAction(renameAction);
-		addAction(deleteAction);
-
+	
 		// context menus
 		mConfigList->setContextMenuPolicy(Qt::CustomContextMenu);
 		connect(mConfigList, &QWidget::customContextMenuRequested, this,
@@ -85,6 +121,8 @@ LaunchConfigurationDialog::LaunchConfigurationDialog(LaunchConfigurationManager&
 			        QMenu menu;
 			        menu.addAction(renameAction);
 			        menu.addAction(deleteAction);
+					
+					menu.exec(mConfigList->mapToGlobal(point));
 			    });
 	}
 
@@ -104,14 +142,17 @@ LaunchConfigurationDialog::LaunchConfigurationDialog(LaunchConfigurationManager&
 
 		// working directory
 		{
-			mWdEdit = new QLineEdit;
-			connect(mWdEdit, &QLineEdit::textChanged, this, &LaunchConfigurationDialog::wdChanged);
+			mWdEdit = new KUrlRequester();
+			mWdEdit->setAcceptMode(QFileDialog::AcceptMode::AcceptOpen);
+			mWdEdit->setMode(KFile::Directory);
+			connect(mWdEdit, &KUrlRequester::textChanged, this, &LaunchConfigurationDialog::wdChanged);
 			layout->addRow(i18n("Working Directory"), mWdEdit);
 		}
 
 		// arguments
 		{
 			mArgsEdit = new QLineEdit;
+			mArgsEdit->setPlaceholderText(i18n("Enter arguments to be passed to the executable"));
 			connect(mArgsEdit, &QLineEdit::textChanged, this,
 			        &LaunchConfigurationDialog::argsChanged);
 			layout->addRow(i18n("Arguments"), mArgsEdit);
@@ -132,19 +173,25 @@ LaunchConfigurationDialog::LaunchConfigurationDialog(LaunchConfigurationManager&
 
 	// select the first one
 	if (mManager->configurations().size() > 1) {
-		selectConfig(mManager->configurations()[0].name());
+		selectConfig(mManager->configurations()[0]);
 	}
 }
 
-void LaunchConfigurationDialog::selectConfig(const QString& newConfig) {
+
+
+void LaunchConfigurationDialog::selectConfig(QListWidgetItem* newItem) {
 	// find it
-	LaunchConfiguration config;
-	for (const auto& conf : mManager->configurations()) {
-		if (conf.name() == newConfig) {
-			config = conf;
-			break;
-		}
+	auto iter = idToItem.find(newItem);
+	if (iter == idToItem.end()) {
+		return;
 	}
+	
+	selectConfig(iter->second);
+	
+}
+
+void LaunchConfigurationDialog::selectConfig(LaunchConfiguration config) {
+	
 	if (!config.valid()) { return; }
 
 	currentlyEditing = config;
@@ -164,8 +211,10 @@ void LaunchConfigurationDialog::addNewConfig() {
 	newItem->setFlags(newItem->flags() | Qt::ItemIsEditable);
 
 	mConfigList->addItem(newItem);
+	
+	idToItem[newItem] = config;
 
-	selectConfig(config.name());
+	selectConfig(config);
 }
 
 void LaunchConfigurationDialog::argsChanged(const QString& newArgs) {

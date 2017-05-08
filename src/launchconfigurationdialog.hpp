@@ -5,12 +5,17 @@
 
 #include <QDialog>
 
+#include <unordered_map>
+
 #include "launchconfigurationmanager.hpp"
 
 #include <boost/filesystem/path.hpp>
 
+class KUrlRequester;
+
 class QListWidget;
 class QLineEdit;
+class QListWidgetItem;
 
 class ChiItemSelectWidget;
 
@@ -21,7 +26,8 @@ public:
 
 private slots:
 	void addNewConfig();
-	void selectConfig(const QString& newConfig);
+	void selectConfig(QListWidgetItem* newConfig);
+	void selectConfig(LaunchConfiguration newConfig);
 
 	void nameChanged(const QString& newName);
 	void wdChanged(const QString& newWd);
@@ -31,8 +37,10 @@ private slots:
 private:
 	LaunchConfigurationManager* mManager;
 	LaunchConfiguration         currentlyEditing;
+	
+	std::unordered_map<QListWidgetItem*, LaunchConfiguration> idToItem;
 
-	QLineEdit*           mWdEdit;
+	KUrlRequester*           mWdEdit;
 	ChiItemSelectWidget* mModuleEdit;
 	QLineEdit*           mArgsEdit;
 
