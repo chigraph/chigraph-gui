@@ -1,0 +1,19 @@
+BasedOnStyle: Google
+Language: Cpp
+
+IndentWidth: 4
+PointerAlignment: Left
+ColumnLimit: 100
+AccessModifierOffset: -4
+BreakBeforeBraces: Attach
+UseTab: ForIndentation
+TabWidth: 4
+AlignAfterOpenBracket: true
+PointerAlignment: Left
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+Cpp11BracedListStyle: true
+IndentCaseLabels: false
+AllowShortIfStatementsOnASingleLine: true
+AllowShortBlocksOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: true
