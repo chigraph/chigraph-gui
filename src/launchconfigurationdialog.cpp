@@ -3,13 +3,13 @@
 
 #include <KLocalizedString>
 
+#include <QAction>
 #include <QDialogButtonBox>
 #include <QFormLayout>
 #include <QLineEdit>
 #include <QListWidget>
-#include <QPushButton>
 #include <QMenu>
-#include <QAction>
+#include <QPushButton>
 #include <QSplitter>
 #include <QVBoxLayout>
 
@@ -35,59 +35,57 @@ LaunchConfigurationDialog::LaunchConfigurationDialog(LaunchConfigurationManager&
 		layout->addWidget(mConfigList);
 
 		// populate it
-		for (const auto& config : manager.configurations()) { 
+		for (const auto& config : manager.configurations()) {
 			auto listItem = new QListWidgetItem(config.name());
-			
+
 			// make it editable
 			listItem->setFlags(listItem->flags() | Qt::ItemIsEditable);
-			
-			mConfigList->addItem(listItem); 
-			
+
+			mConfigList->addItem(listItem);
 		}
 		connect(mConfigList, &QListWidget::currentItemChanged, this,
 		        [this](QListWidgetItem* item, QListWidgetItem*) { selectConfig(item->text()); });
-		connect(mConfigList, &QListWidget::itemChanged, this, [this](QListWidgetItem* item) {
-			nameChanged(item->text());
-		});
-		
-		auto renameAction = new QAction(QIcon::fromTheme(QStringLiteral("edit-rename")), i18n("Rename"), nullptr);
+		connect(mConfigList, &QListWidget::itemChanged, this,
+		        [this](QListWidgetItem* item) { nameChanged(item->text()); });
+
+		auto renameAction =
+		    new QAction(QIcon::fromTheme(QStringLiteral("edit-rename")), i18n("Rename"), nullptr);
 		renameAction->setShortcut(Qt::Key_F2);
-		connect(renameAction, &QAction::triggered, this, [this] {
-			mConfigList->openPersistentEditor(mConfigList->currentItem());
-		});
-		
-		auto deleteAction = new QAction(QIcon::fromTheme(QStringLiteral("edit-delete")), i18n("Delete"), nullptr);
+		connect(renameAction, &QAction::triggered, this,
+		        [this] { mConfigList->openPersistentEditor(mConfigList->currentItem()); });
+
+		auto deleteAction =
+		    new QAction(QIcon::fromTheme(QStringLiteral("edit-delete")), i18n("Delete"), nullptr);
 		deleteAction->setShortcut(Qt::Key_Delete);
 		connect(deleteAction, &QAction::triggered, this, [this] {
 			auto currentItem = mConfigList->currentItem();
 			if (currentItem->text() == currentlyEditing.name()) {
 				// if this is the case, then clear our fields and currentlyEditing
 				currentlyEditing = {};
-				
+
 				mModuleEdit->setItem({});
 				mWdEdit->setText({});
 				mArgsEdit->setText({});
 			}
 		});
-		
+
 		addAction(renameAction);
 		addAction(deleteAction);
-		
+
 		// context menus
 		mConfigList->setContextMenuPolicy(Qt::CustomContextMenu);
-		connect(mConfigList, &QWidget::customContextMenuRequested, this, [this, renameAction, deleteAction](const QPoint& point) {
-			auto item = mConfigList->itemAt(point);
-			
-			mConfigList->setCurrentItem(item);
-			
-			if (item == nullptr) {
-				return;
-			}
-			
-			QMenu menu;
-			menu.addAction(renameAction);
-			menu.addAction(deleteAction);
-		});
+		connect(mConfigList, &QWidget::customContextMenuRequested, this,
+		        [this, renameAction, deleteAction](const QPoint& point) {
+			        auto item = mConfigList->itemAt(point);
+
+			        mConfigList->setCurrentItem(item);
+
+			        if (item == nullptr) { return; }
+
+			        QMenu menu;
+			        menu.addAction(renameAction);
+			        menu.addAction(deleteAction);
+			    });
 	}
 
 	// right side widget
@@ -159,7 +157,7 @@ void LaunchConfigurationDialog::selectConfig(const QString& newConfig) {
 void LaunchConfigurationDialog::addNewConfig() {
 	auto config = mManager->newConfiguration();
 	config.setName(i18n("New Configuration"));
-	
+
 	auto newItem = new QListWidgetItem(config.name());
 
 	// make it editable
@@ -175,13 +173,13 @@ void LaunchConfigurationDialog::argsChanged(const QString& newArgs) {
 }
 
 void LaunchConfigurationDialog::moduleChanged(const boost::filesystem::path& newModule) {
-	if (currentlyEditing.valid()) { currentlyEditing.setModule(QString::fromStdString(newModule.string())); }
+	if (currentlyEditing.valid()) {
+		currentlyEditing.setModule(QString::fromStdString(newModule.string()));
+	}
 }
 
 void LaunchConfigurationDialog::nameChanged(const QString& newName) {
-	if (currentlyEditing.valid()) {
-		currentlyEditing.setName(newName);
-	}
+	if (currentlyEditing.valid()) { currentlyEditing.setName(newName); }
 }
 
 void LaunchConfigurationDialog::wdChanged(const QString& newWd) {

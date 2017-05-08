@@ -12,4 +12,4 @@ public:
 	explicit StructEdit(chi::GraphStruct* str);
 };
 
-#endif // CHIGRAPHGUI_STRUCT_EDIT_HPP
+#endif  // CHIGRAPHGUI_STRUCT_EDIT_HPP

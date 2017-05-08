@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	// set icon
 	setWindowIcon(QIcon(":/icons/chigraphsmall.png"));
 
-	mChigContext = std::make_unique<chi::Context>(qApp->arguments()[0].toStdString().c_str());
+	mChigContext   = std::make_unique<chi::Context>(qApp->arguments()[0].toStdString().c_str());
 	mLaunchManager = std::make_unique<LaunchConfigurationManager>(*mChigContext);
 
 	mFunctionTabs = new FunctionTabView;
@@ -92,7 +92,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	addDockWidget(Qt::BottomDockWidgetArea, docker);
 	connect(outputView, &QTabWidget::tabCloseRequested, outputView, &QTabWidget::removeTab);
 
-	docker = new QDockWidget(i18n("Function Details"), this);
+	docker               = new QDockWidget(i18n("Function Details"), this);
 	auto functionDetails = new FunctionDetails;
 	docker->setObjectName(functionDetails->dockObjectName());
 	insertChildClient(functionDetails);
@@ -104,10 +104,10 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	connect(mFunctionTabs, &FunctionTabView::functionViewChanged, functionDetails,
 	        [this, docker, functionDetails](FunctionView* view, bool) {
 
-				functionDetails->loadFunction(view);
-				docker->setWindowTitle(i18n("Function Details") + " - " +
-										QString::fromStdString(view->function()->name()));
-			
+		        functionDetails->loadFunction(view);
+		        docker->setWindowTitle(i18n("Function Details") + " - " +
+		                               QString::fromStdString(view->function()->name()));
+
 		    });
 	connect(functionDetails, &FunctionDetails::dirtied, this,
 	        [this, functionDetails] { moduleDirtied(functionDetails->chiFunc()->module()); });
@@ -219,7 +219,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 		outputView->setCurrentIndex(newTabID);
 		cancelAction->setEnabled(true);
 	});
-	
+
 	auto runConfigDialogAction = new QAction(this);
 	runConfigDialogAction->setText(i18n("Configure Launches"));
 	actColl->addAction(QStringLiteral("configure-launches"), runConfigDialogAction);
@@ -292,7 +292,7 @@ void MainWindow::openWorkspaceDialog() {
 }
 
 void MainWindow::openWorkspace(const QUrl& url) {
-	mChigContext = std::make_unique<chi::Context>(url.toLocalFile().toStdString());
+	mChigContext   = std::make_unique<chi::Context>(url.toLocalFile().toStdString());
 	mLaunchManager = std::make_unique<LaunchConfigurationManager>(*mChigContext);
 	updateUsableConfigs();
 
@@ -302,7 +302,6 @@ void MainWindow::openWorkspace(const QUrl& url) {
 void MainWindow::moduleDirtied(chi::GraphModule& mod) { mModuleBrowser->moduleDirtied(mod); }
 
 void MainWindow::updateUsableConfigs() {
-
 	// repopulate
 	mConfigSelectAction->clear();
 
@@ -311,12 +310,10 @@ void MainWindow::updateUsableConfigs() {
 	}
 
 	auto currentConfig = launchManager().currentConfiguration();
-	
+
 	if (currentConfig.valid()) {
-	
 		// set it to the current config
 		mConfigSelectAction->setCurrentAction(currentConfig.name(), Qt::CaseSensitive);
-		
 	}
 }
 

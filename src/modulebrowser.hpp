@@ -30,8 +30,8 @@ public:
 	QWidget*           toolView() override { return this; }
 	Qt::DockWidgetArea defaultArea() const override { return Qt::LeftDockWidgetArea; }
 	QString            label() override { return i18n("Module Browser"); }
-	QString dockObjectName() override { return QStringLiteral("module-browser"); }
-	
+	QString            dockObjectName() override { return QStringLiteral("module-browser"); }
+
 	chi::Context& context() const { return *mContext; }
 
 public:
@@ -48,7 +48,7 @@ public slots:
 	void loadWorkspace(chi::Context& context);
 	void moduleDirtied(chi::GraphModule& dirtied);
 	void moduleSaved(chi::GraphModule& saved);
-	
+
 private slots:
 	void newModule();
 
@@ -62,7 +62,7 @@ private:
 
 	WorkspaceTree*                   mTree = nullptr;
 	std::unique_ptr<ModuleTreeModel> mModel;
-	
+
 	QAction* newModuleAction;
 	QAction* newFunctionAction;
 	QAction* newStructAction;

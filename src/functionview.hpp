@@ -27,10 +27,8 @@ public:
 	void refreshGuiForNode(QtNodes::Node& node);
 	void refreshGuiForNode(chi::NodeInstance& node) {
 		auto guiNode = guiNodeFromChiNode(&node);
-		if (guiNode == nullptr) {
-			return;
-		}
-		
+		if (guiNode == nullptr) { return; }
+
 		refreshGuiForNode(*guiNode);
 	};
 

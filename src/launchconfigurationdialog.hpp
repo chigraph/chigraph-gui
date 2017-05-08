@@ -32,9 +32,9 @@ private:
 	LaunchConfigurationManager* mManager;
 	LaunchConfiguration         currentlyEditing;
 
-	QLineEdit* mWdEdit;
+	QLineEdit*           mWdEdit;
 	ChiItemSelectWidget* mModuleEdit;
-	QLineEdit* mArgsEdit;
+	QLineEdit*           mArgsEdit;
 
 	QListWidget* mConfigList;
 };

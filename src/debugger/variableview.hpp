@@ -22,7 +22,7 @@ private:
 	QWidget*           toolView() override { return this; }
 	Qt::DockWidgetArea defaultArea() const override { return Qt::LeftDockWidgetArea; }
 	QString            label() override { return i18n("Variables"); }
-	QString dockObjectName() override { return QStringLiteral("variable-view"); }
+	QString            dockObjectName() override { return QStringLiteral("variable-view"); }
 };
 
 #endif  // CHIGRAPHGUI_DEBUGGER_VARIABLE_VIEW_HPP

@@ -1,10 +1,5 @@
 #include "structedit.hpp"
 
-
 #include <QFormLayout>
 
-StructEdit::StructEdit(chi::GraphStruct* str) {
-	
-}
-
-
+StructEdit::StructEdit(chi::GraphStruct* str) {}

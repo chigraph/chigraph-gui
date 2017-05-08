@@ -45,7 +45,7 @@ private:
 	void closeTab(int idx);
 
 	std::map<QString, FunctionView*> mOpenFunctions;
-	std::map<QString, StructEdit*> mOpenStructs;
+	std::map<QString, StructEdit*>   mOpenStructs;
 };
 
 #endif  // CHIGRAPHGUI_FUNCTION_TAB_VIEW_HPP

@@ -57,7 +57,8 @@ public:
 			std::string code     = doc->text().toStdString();
 
 			std::unique_ptr<chi::NodeType> ty;
-			auto res = static_cast<chi::GraphModule&>(inst->type().module()).createNodeTypeFromCCode(code, function, {}, &ty);
+			auto res = static_cast<chi::GraphModule&>(inst->type().module())
+			               .createNodeTypeFromCCode(code, function, {}, &ty);
 			if (!res) {
 				KMessageBox::detailedError(this, "Failed to compile C node",
 				                           QString::fromStdString(res.dump()));
@@ -70,8 +71,7 @@ public:
 
 		});
 
-		connect(this, &QDialog::accepted, this,
-		        [fview, inst] { fview->refreshGuiForNode(*inst); });
+		connect(this, &QDialog::accepted, this, [fview, inst] { fview->refreshGuiForNode(*inst); });
 	}
 };
 
@@ -159,7 +159,7 @@ ChigraphNodeModel::ChigraphNodeModel(chi::NodeInstance* inst_, FunctionView* fvi
 
 		mEmbedded = edit;
 	}
-	
+
 	mPainterDelegate = new ChigraphNodeModelPaintDelegate;
 }
 
@@ -221,34 +221,28 @@ QString ChigraphNodeModel::validationMessage() const { return mValidationMessage
 QWidget* ChigraphNodeModel::embeddedWidget() { return mEmbedded; }
 
 void ChigraphNodeModel::removeDecorator(QtNodes::NodePainterDelegate* decorator) {
-    paintDelegate().removeDecorator(decorator);
-    mFunctionView->refreshGuiForNode(instance());
+	paintDelegate().removeDecorator(decorator);
+	mFunctionView->refreshGuiForNode(instance());
 }
-
 
 void ChigraphNodeModel::clearDecorators() {
-    paintDelegate().clearDecorators();
-    mFunctionView->refreshGuiForNode(instance());
+	paintDelegate().clearDecorators();
+	mFunctionView->refreshGuiForNode(instance());
 }
 
+QtNodes::NodePainterDelegate* ChigraphNodeModel::addDecorator(
+    std::unique_ptr<QtNodes::NodePainterDelegate>&& decorator) {
+	auto ret = paintDelegate().addDecorator(std::move(decorator));
+	mFunctionView->refreshGuiForNode(instance());
 
-QtNodes::NodePainterDelegate* ChigraphNodeModel::addDecorator(std::unique_ptr<QtNodes::NodePainterDelegate>&& decorator) {
-    auto ret = paintDelegate().addDecorator(std::move(decorator));
-    mFunctionView->refreshGuiForNode(instance());
-	
 	return ret;
 }
 
-
 void ChigraphNodeModelPaintDelegate::removeDecorator(QtNodes::NodePainterDelegate* decorator) {
-    auto iter = std::find_if(mDecorators.begin(), mDecorators.end(), [decorator](auto& uptr) {
-        return uptr.get() == decorator;
-    });
+	auto iter = std::find_if(mDecorators.begin(), mDecorators.end(),
+	                         [decorator](auto& uptr) { return uptr.get() == decorator; });
 
-    if (iter == mDecorators.end()) {
-        return;
-    }
+	if (iter == mDecorators.end()) { return; }
 
-    mDecorators.erase(iter);
+	mDecorators.erase(iter);
 }
-

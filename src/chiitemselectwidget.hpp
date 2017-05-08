@@ -14,17 +14,16 @@
 class ChiItemSelectWidget : public QPushButton {
 	Q_OBJECT
 public:
-	
 	ChiItemSelectWidget(chi::Context& ctx, WorkspaceTree::eType type);
 
 	void setItem(const boost::filesystem::path& newItem);
-	
+
 	boost::filesystem::path item() const;
-	
+
 private:
 	boost::filesystem::path mData;
 signals:
 	void itemChanged(const boost::filesystem::path& itemName);
 };
 
-#endif // CHIGRAPHGUI_CHI_ITEM_SELECT_WIDGET_HPP
+#endif  // CHIGRAPHGUI_CHI_ITEM_SELECT_WIDGET_HPP

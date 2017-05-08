@@ -34,14 +34,10 @@ struct LaunchConfiguration {
 	bool valid() const { return mConfigGroup.isValid(); }
 
 	QString id() const { return mConfigGroup.name(); }
-	
-	bool operator==(const LaunchConfiguration& rhs) const {
-		return id() == rhs.id();
-	}
-	
-	bool operator!=(const LaunchConfiguration& rhs) const {
-		return id() != rhs.id();
-	}
+
+	bool operator==(const LaunchConfiguration& rhs) const { return id() == rhs.id(); }
+
+	bool operator!=(const LaunchConfiguration& rhs) const { return id() != rhs.id(); }
 
 private:
 	KConfigGroup mConfigGroup;
@@ -64,7 +60,7 @@ public:
 	void setCurrentConfiguration(LaunchConfiguration config);
 
 	LaunchConfiguration newConfiguration();
-	
+
 	void removeConfiguration(LaunchConfiguration config);
 
 	LaunchConfiguration configByName(const QString& str) {
@@ -73,14 +69,14 @@ public:
 		}
 		return {};
 	}
-	
+
 	chi::Context& context() const { return *mContext; }
 
 private:
 	LaunchConfiguration              mCurrent;
 	std::vector<LaunchConfiguration> mConfigurations;
-	KConfigGroup mConfigGroup;
-	
+	KConfigGroup                     mConfigGroup;
+
 	chi::Context* mContext;
 };
 

@@ -285,7 +285,7 @@ void FunctionView::refreshGuiForNode(Node& node) {
 	auto model = dynamic_cast<ChigraphNodeModel*>(node.nodeDataModel());
 
 	auto inst = &model->instance();
-	
+
 	auto paintDelegate = ChigraphNodeModelPaintDelegate{std::move(model->paintDelegate())};
 
 	// find connections with this node
@@ -306,11 +306,10 @@ void FunctionView::refreshGuiForNode(Node& node) {
 
 	mNodeMap.emplace(inst, nullptr);  // just so the signal doesn't do stuff
 
-	
-	auto newModel = std::make_unique<ChigraphNodeModel>(inst, this);
+	auto newModel             = std::make_unique<ChigraphNodeModel>(inst, this);
 	newModel->paintDelegate() = std::move(paintDelegate);
-	auto& thisNode = mScene->createNode(std::move(newModel));
-	mNodeMap[inst] = &thisNode;
+	auto& thisNode            = mScene->createNode(std::move(newModel));
+	mNodeMap[inst]            = &thisNode;
 	mScene->setNodePosition(thisNode, pos);
 
 	// recreate connections
@@ -351,7 +350,6 @@ void FunctionView::refreshGuiForNode(Node& node) {
 			          .get()] = {{{inst, localID}, {conn.first, remoteID}}};
 		}
 	}
-
 }
 
 void FunctionView::refreshRegistry() { mScene->setRegistry(createRegistry()); }

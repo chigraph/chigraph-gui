@@ -26,33 +26,24 @@
 class FunctionView;
 
 class ChigraphNodeModelPaintDelegate : public QtNodes::NodePainterDelegate {
-	
-	
-	void paint(QPainter* painter,
-		QtNodes::NodeGeometry const& geom,
-		QtNodes::NodeDataModel const* model) override {
-		
-		for (auto& decorator : mDecorators) {
-			decorator->paint(painter, geom, model);
-		} 
+	void paint(QPainter* painter, QtNodes::NodeGeometry const& geom,
+	           QtNodes::NodeDataModel const* model) override {
+		for (auto& decorator : mDecorators) { decorator->paint(painter, geom, model); }
 	}
-	
+
 public:
-	
-	QtNodes::NodePainterDelegate* addDecorator(std::unique_ptr<QtNodes::NodePainterDelegate>&& decorator) {
+	QtNodes::NodePainterDelegate* addDecorator(
+	    std::unique_ptr<QtNodes::NodePainterDelegate>&& decorator) {
 		mDecorators.push_back(std::move(decorator));
 		return mDecorators[mDecorators.size() - 1].get();
 	}
-	
+
 	void removeDecorator(QtNodes::NodePainterDelegate* decorator);
-	
-	void clearDecorators() {
-		mDecorators.clear();
-	}
-	
+
+	void clearDecorators() { mDecorators.clear(); }
+
 private:
 	std::vector<std::unique_ptr<QtNodes::NodePainterDelegate>> mDecorators;
-	
 };
 
 class ChigraphNodeModel : public QtNodes::NodeDataModel {
@@ -62,11 +53,12 @@ public:
 	chi::NodeInstance& instance() const { return *mInst; }
 
 	void setErrorState(QtNodes::NodeValidationState state, QString message);
-	
+
 	ChigraphNodeModelPaintDelegate& paintDelegate() { return *mPainterDelegate; }
-	
+
 	// convenieence function for decorators
-	QtNodes::NodePainterDelegate* addDecorator(std::unique_ptr<QtNodes::NodePainterDelegate>&& decorator);
+	QtNodes::NodePainterDelegate* addDecorator(
+	    std::unique_ptr<QtNodes::NodePainterDelegate>&& decorator);
 	void removeDecorator(QtNodes::NodePainterDelegate* decorator);
 	void clearDecorators();
 
@@ -113,16 +105,15 @@ public:
 		}
 		return NodeConnectionPolicy::Many;
 	}
-	
+
 	QtNodes::NodePainterDelegate* painterDelegate() const override { return mPainterDelegate; }
 
-
 private:
-	QtNodes::NodeValidationState mValidationState = QtNodes::NodeValidationState::Valid;
-	QString                      mValidationMessage;
-	chi::NodeInstance*           mInst;
-	FunctionView*                mFunctionView;
-	QWidget*                     mEmbedded = nullptr;
+	QtNodes::NodeValidationState    mValidationState = QtNodes::NodeValidationState::Valid;
+	QString                         mValidationMessage;
+	chi::NodeInstance*              mInst;
+	FunctionView*                   mFunctionView;
+	QWidget*                        mEmbedded = nullptr;
 	ChigraphNodeModelPaintDelegate* mPainterDelegate;
 };
 

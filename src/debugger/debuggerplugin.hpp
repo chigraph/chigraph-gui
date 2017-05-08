@@ -27,7 +27,7 @@ public:
 	VariableView&   variableView() { return *mVariableView; }
 
 	bool stopped() const { return mStopped; }
-	
+
 private slots:
 	void toggleBreakpoint();
 	void debugStart();
@@ -38,12 +38,11 @@ private:
 	QVector<ToolView*> toolViews() override {
 		return QVector<ToolView*>({mBreakpointView, mVariableView});
 	}
-	
-	
+
 	void hoverOverConnection(chi::NodeInstance& inst, int connID);
 
 	bool mStopped = false;
-	
+
 	BreakpointView* mBreakpointView;
 	VariableView*   mVariableView;
 
@@ -57,9 +56,9 @@ private:
 	std::shared_ptr<chi::Debugger>        mDebugger;
 	std::unique_ptr<DebuggerWorkerThread> mEventListener;
 	QThread*                              mThread = nullptr;
-	
+
 	QtNodes::NodePainterDelegate* mCurrentNodeDecorator = nullptr;
-	QtNodes::Node* mCurrentNode = nullptr;
+	QtNodes::Node*                mCurrentNode          = nullptr;
 };
 
 #endif  // CHIGRAPHGUI_DEBUGGER_DEBUGGER_PLUGIN_HPP

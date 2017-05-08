@@ -25,7 +25,7 @@ public:
 	QWidget*           toolView() override { return this; }
 	Qt::DockWidgetArea defaultArea() const override { return Qt::RightDockWidgetArea; }
 	QString            label() override { return i18n("Function Details"); }
-	QString dockObjectName() override { return QStringLiteral("function-details"); }
+	QString            dockObjectName() override { return QStringLiteral("function-details"); }
 
 	chi::GraphFunction* chiFunc() const;
 
