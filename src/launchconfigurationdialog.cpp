@@ -143,7 +143,7 @@ LaunchConfigurationDialog::LaunchConfigurationDialog(LaunchConfigurationManager&
 		// working directory
 		{
 			mWdEdit = new KUrlRequester();
-			mWdEdit->setAcceptMode(QFileDialog::AcceptMode::AcceptOpen);
+			//mWdEdit->setAcceptMode(QFileDialog::AcceptMode::AcceptOpen);
 			mWdEdit->setMode(KFile::Directory);
 			connect(mWdEdit, &KUrlRequester::textChanged, this, &LaunchConfigurationDialog::wdChanged);
 			layout->addRow(i18n("Working Directory"), mWdEdit);

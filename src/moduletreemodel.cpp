@@ -109,7 +109,7 @@ QModelIndex ModuleTreeModel::index(int row, int column, const QModelIndex& paren
 	if (parent.isValid()) {
 		parentItem = static_cast<WorkspaceTree*>(parent.internalPointer());
 	} else {
-		parentItem = tree.get();
+		return createIndex(row, column, tree.get());
 	}
 
 	if (row < parentItem->children.size()) {
@@ -120,7 +120,7 @@ QModelIndex ModuleTreeModel::index(int row, int column, const QModelIndex& paren
 
 QModelIndex ModuleTreeModel::parent(const QModelIndex& index) const {
 	if (!index.isValid()) { return {}; }
-
+	
 	auto childItem  = static_cast<WorkspaceTree*>(index.internalPointer());
 	auto parentItem = childItem->parent;
 

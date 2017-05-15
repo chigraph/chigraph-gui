@@ -48,7 +48,7 @@ include(KDECMakeSettings)
 include(FeatureSummary)
 
 # find qt
-find_package(Qt5 5.6.0 REQUIRED COMPONENTS Gui Script Xml Core Widgets Network PrintSupport)
+find_package(Qt5 5.6.0 REQUIRED COMPONENTS Gui Script Xml Core Widgets Network PrintSupport Svg)
 find_package(Qt5 5.6.0 COMPONENTS DBus)
 
 find_package(KF5 REQUIRED COMPONENTS Archive TextEditor JobWidgets DBusAddons KIO Crash Sonnet SyntaxHighlighting Parts GuiAddons ItemViews Config ConfigWidgets Auth Codecs Completion GlobalAccel Service WindowSystem CoreAddons I18n XmlGui WidgetsAddons TextWidgets IconThemes)
@@ -157,7 +157,7 @@ if(WIN32)
 	add_custom_target(copydlls ALL)
 	foreach(QTLIB
 		Qt5::Widgets Qt5::Core Qt5::Gui Qt5::Script
-		Qt5::Network Qt5::DBus Qt5::PrintSupport Qt5::Xml
+		Qt5::Network Qt5::DBus Qt5::Svg Qt5::PrintSupport Qt5::Xml
 		KF5::Crash KF5::Parts KF5::KIOCore KF5::KIOWidgets
 		KF5::JobWidgets KF5::TextEditor KF5::SyntaxHighlighting
 		KF5::DBusAddons KF5::Archive KF5::ConfigWidgets
@@ -173,12 +173,31 @@ if(WIN32)
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			$<TARGET_FILE:${QTLIB}>
 			$<TARGET_FILE_DIR:chigraphgui>
+		COMMENT "Copying ${QTLIB} from $<TARGET_FILE:${QTLIB}> to $<TARGET_FILE_DIR:chigraphgui>"
 		)
 		
 	install(FILES $<TARGET_FILE:${QTLIB}> DESTINATION bin)
 	
 	endforeach()
 	
+	
+	# copy iconv.dll
+	add_custom_command(
+	TARGET copydlls POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		${CMAKE_CURRENT_SOURCE_DIR}/../third_party/iconv-win64/bin/iconv.dll
+		$<TARGET_FILE_DIR:chigraphgui>
+	COMMENT "Copying iconv from ${CMAKE_CURRENT_SOURCE_DIR}/../third_party/iconv-win64/bin/iconv.dll to $<TARGET_FILE_DIR:chigraphgui>"
+	)
+
+	# copy libintl.dll
+	add_custom_command(
+	TARGET copydlls POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		${CMAKE_CURRENT_SOURCE_DIR}/../third_party/gettext-win64/bin/libintl.dll
+		$<TARGET_FILE_DIR:chigraphgui>
+	COMMENT "Copying libitnl from ${CMAKE_CURRENT_SOURCE_DIR}/../third_party/gettext-win64/bin/libintl.dll to $<TARGET_FILE_DIR:chigraphgui>"
+	)
 	
 endif()
 
