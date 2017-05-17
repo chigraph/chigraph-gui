@@ -62,6 +62,8 @@ public:
 	static std::unique_ptr<ModuleTreeModel> createFromContext(chi::Context& context,
 	                                                          Filter        filter = Filter::All);
 
+	void updateModule(const boost::filesystem::path& name);
+	
 	QModelIndex indexFromName(const boost::filesystem::path& name, WorkspaceTree::eType type);
 
 	int columnCount(const QModelIndex& parent) const override;
@@ -72,6 +74,8 @@ public:
 	void fetchMore(const QModelIndex& index) override;
 	int rowCount(const QModelIndex& index) const override;
 	QVariant data(const QModelIndex& index, int role) const override;
+	Qt::ItemFlags flags(const QModelIndex &index) const override;
+	bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 	std::unique_ptr<WorkspaceTree> tree;
 	chi::Context*                  mCtx;
 	Filter                         mFilter;

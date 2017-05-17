@@ -75,6 +75,33 @@ std::unique_ptr<ModuleTreeModel> ModuleTreeModel::createFromContext(chi::Context
 	return std::make_unique<ModuleTreeModel>(std::move(tree), context, filter);
 }
 
+
+void ModuleTreeModel::updateModule(const boost::filesystem::path& name) {
+	auto idx = indexFromName(name, WorkspaceTree::MODULE);
+	
+	if (!idx.isValid()) {
+		return;
+	}
+	
+	auto tree = static_cast<WorkspaceTree*>(idx.internalPointer());
+	
+	// don't even bother
+	if (tree->module == nullptr) {
+		return;
+	}
+	
+	// delete all subs
+	beginRemoveRows(idx, 0, tree->children.size() - 1);
+	tree->children.clear();
+	endRemoveRows();
+	
+	beginInsertRows(idx, 0, tree->module->functions().size() + tree->module->structs().size() - 1);
+	tree->module = nullptr;
+	fetchMore(idx);
+	endInsertRows();
+}
+
+
 QModelIndex ModuleTreeModel::indexFromName(const boost::filesystem::path& name,
                                            WorkspaceTree::eType           type) {
 	auto currentItem = tree->children[0].get();
@@ -237,3 +264,39 @@ QVariant ModuleTreeModel::data(const QModelIndex& index, int role) const {
 	default: return {};
 	}
 }
+
+Qt::ItemFlags ModuleTreeModel::flags(const QModelIndex& index) const
+{
+	if (!index.isValid()) { return {}; }
+
+	auto item = static_cast<WorkspaceTree*>(index.internalPointer());
+
+	Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+	
+	if (item->type == WorkspaceTree::FUNCTION) {
+		flags |= Qt::ItemIsEditable;
+	}
+	
+	return flags;
+}
+
+bool ModuleTreeModel::setData(const QModelIndex& index, const QVariant& value, int role) {
+	if (!index.isValid()) { return {}; }
+	
+	if (role == Qt::EditRole) {
+		auto item = static_cast<WorkspaceTree*>(index.internalPointer());
+		
+		// for now, this only edits function names
+		if (item->type != WorkspaceTree::FUNCTION) {
+			return false;
+		}
+		
+		// set the function name
+		item->func->setName(value.toString().toStdString());
+		item->name = QString::fromStdString(item->func->name());
+		
+		dataChanged(index, index, {Qt::DisplayRole});
+		return true;
+	}
+}
+

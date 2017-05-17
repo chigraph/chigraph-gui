@@ -51,6 +51,7 @@ public slots:
 
 private slots:
 	void newModule();
+	void newFunction();
 
 private:
 	void updateDirtyStatus(chi::GraphModule& updated, bool dirty);

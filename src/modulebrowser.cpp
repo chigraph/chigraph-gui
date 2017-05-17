@@ -32,6 +32,7 @@ ModuleBrowser::ModuleBrowser(QWidget* parent) : QTreeView(parent) {
 	newFunctionAction = actionCollection()->addAction(
 	    QStringLiteral("new-function"), new QAction(QIcon::fromTheme(QStringLiteral("message-new")),
 	                                                i18n("New Function"), nullptr));
+	connect(newFunctionAction, &QAction::triggered, this, &ModuleBrowser::newFunction);
 
 	newStructAction = actionCollection()->addAction(
 	    QStringLiteral("new-struct"),
@@ -47,6 +48,7 @@ ModuleBrowser::ModuleBrowser(QWidget* parent) : QTreeView(parent) {
 
 	setAnimated(true);
 	setSortingEnabled(true);
+	setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
 	header()->close();
 	connect(this, &QTreeView::doubleClicked, this, [this](const QModelIndex& index) {
 		auto item = static_cast<WorkspaceTree*>(index.internalPointer());
@@ -135,6 +137,39 @@ void ModuleBrowser::newModule() {
 	// create a new module dialog
 	auto dialog = new NewModuleDialog(this, context(), startingDir);
 	dialog->exec();
+}
+
+void ModuleBrowser::newFunction() {
+	fs::path owningModule;
+	
+	auto idx = currentIndex();
+	if (idx.isValid()) {
+		auto item = static_cast<WorkspaceTree*>(idx.internalPointer());
+		
+		if (item->type != WorkspaceTree::MODULE) {
+			return;
+		}
+		
+		owningModule = item->fullName();
+	}
+	
+	// get the module from the context
+	chi::ChiModule* mod;
+	auto res = context().loadModule(owningModule, chi::LoadSettings::Default, &mod);
+	
+	if (!res) {
+		KMessageBox::detailedError(this, "Failed to load module", QString::fromStdString(res.dump()));
+		return;
+	}
+	
+	chi::GraphModule* gMod = static_cast<chi::GraphModule*>(mod);
+	// add the function TODO: detect if "New Function" is already taken
+	auto func = gMod->getOrCreateFunction("New Function", {}, {}, {""}, {""});
+	
+	// update the model
+	mModel->updateModule(owningModule);
+	
+	
 }
 
 void ModuleBrowser::updateDirtyStatus(chi::GraphModule& updated, bool dirty) {
