@@ -54,14 +54,14 @@ function build_framework
     mkdir $foldername/build -Force
     cd $foldername/build
        
-	$gtdir = "$scriptsdir/../third_party/libintl-win32"
-	$zlibdir = "$scriptsdir/../third_party/zlib-win32"
+	$gtdir = "$scriptsdir/../third_party/gettext-win64"
+	$zlibdir = "$scriptsdir/../third_party/zlib-win64"
 	$fbdir = "$scriptsdir/../third_party/flexbison-win32"
 	
 	cmake .. -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=$buildtype -DCMAKE_INSTALL_PREFIX="$kf5dir" -DCMAKE_PREFIX_PATH="$kf5dir;$qtdir" `
 		-DGETTEXT_MSGMERGE_EXECUTABLE="$gtdir/bin/msgmerge.exe" -DGETTEXT_MSGFMT_EXECUTABLE="$gtdir/bin/msgfmt.exe" `
 		-DLibIntl_INCLUDE_DIRS="$gtdir/include" -DLibIntl_LIBRARIES="$gtdir/lib/libintl.lib" -DZLIB_LIBRARY="$zlibdir/lib/zlibstatic.lib" `
-		-DZLIB_INCLUDE_DIR="$zlibdir/include" -DFLEX_EXECUTABLE="$fbdir/bin/flex.exe" -DBISON_EXECUTABLE="$fbdir/bin/bison.exe" `
+		-DZLIB_INCLUDE_DIR="$zlibdir/include" -DFLEX_EXECUTABLE="$fbdir/bin/flex.exe" -DBISON_EXECUTABLE="$fbdir/bin/bison.exe" -DBASH_EXE=BASH_EXE-NOTFOUND `
 		"$cmakeargs" 
 
 	if($LastExitCode) {

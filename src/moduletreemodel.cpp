@@ -147,11 +147,11 @@ QModelIndex ModuleTreeModel::index(int row, int column, const QModelIndex& paren
 
 QModelIndex ModuleTreeModel::parent(const QModelIndex& index) const {
 	if (!index.isValid()) { return {}; }
-
+	
 	auto childItem  = static_cast<WorkspaceTree*>(index.internalPointer());
 	auto parentItem = childItem->parent;
 
-	if (parentItem == nullptr) return {};
+	if (parentItem == tree.get()) { return{}; }
 
 	return createIndex(parentItem->row, 0, parentItem);
 }

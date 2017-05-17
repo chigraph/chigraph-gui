@@ -1,0 +1,17 @@
+flexbison-win32.tar.xz
+flexbison-win32/
+
+gettext-win64.tar.xz
+gettext-win64/
+
+iconv-win64.tar.xz
+iconv-win64/
+
+zlib-win64.tar.xz
+zlib-win64
+
+kf5-5.30.0-debug-msvc14-win64.tar.xz
+kf5-debug/
+
+kf5-5.30.0-release-msvc14-win64.tar.xz
+kf5-release/
