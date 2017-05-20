@@ -3,7 +3,7 @@
 #include <chi/GraphModule.hpp>
 #include <chi/NodeInstance.hpp>
 
-#include "../functiontabview.hpp"
+#include "../centraltabview.hpp"
 #include "../mainwindow.hpp"
 
 class BreakpointView::BreakpointItem : public QTreeWidgetItem {

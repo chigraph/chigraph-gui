@@ -22,11 +22,11 @@ LaunchConfigurationDialog::LaunchConfigurationDialog(LaunchConfigurationManager&
 
 	// config list
 	mConfigList = new QListWidget;
+	mConfigList->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditTrigger::EditKeyPressed);
 	
 	// init actions
 	auto renameAction =
 		new QAction(QIcon::fromTheme(QStringLiteral("edit-rename")), i18n("Rename"), nullptr);
-	renameAction->setShortcut(Qt::Key_F2);
 	connect(renameAction, &QAction::triggered, this,
 			[this] { mConfigList->openPersistentEditor(mConfigList->currentItem()); });
 
@@ -87,7 +87,6 @@ LaunchConfigurationDialog::LaunchConfigurationDialog(LaunchConfigurationManager&
 		
 		layout->addWidget(buttonWidget);
 
-		mConfigList->setEditTriggers(QAbstractItemView::SelectedClicked);
 		layout->addWidget(mConfigList);
 
 		// populate it

@@ -79,7 +79,7 @@ private:
 	std::shared_ptr<QtNodes::DataModelRegistry> createRegistry();
 
 	// stores invalid nodes so we can clear their state when they become valid again
-	std::vector<QtNodes::Node*> mInvalidNodes;
+	std::vector<chi::NodeInstance*> mInvalidNodes;
 };
 
 #endif  // CHIGGUI_FUNCTIONVIEW_HPP

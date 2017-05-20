@@ -7,6 +7,7 @@
 #include <chi/GraphModule.hpp>
 #include <chi/GraphStruct.hpp>
 #include <chi/Result.hpp>
+#include <chi/NodeInstance.hpp>
 
 #include <KMessageBox>
 
@@ -95,7 +96,8 @@ void ModuleTreeModel::updateModule(const boost::filesystem::path& name) {
 	tree->children.clear();
 	endRemoveRows();
 	
-	beginInsertRows(idx, 0, tree->module->functions().size() + tree->module->structs().size() - 1);
+	beginInsertRows(idx, 0, (mFilter & FunctionBit ? tree->module->functions().size() - 1 : 0) +
+							(mFilter & StructBit   ? tree->module->structs().size() - 1   : 0));
 	tree->module = nullptr;
 	fetchMore(idx);
 	endInsertRows();
@@ -104,7 +106,7 @@ void ModuleTreeModel::updateModule(const boost::filesystem::path& name) {
 
 QModelIndex ModuleTreeModel::indexFromName(const boost::filesystem::path& name,
                                            WorkspaceTree::eType           type) {
-	auto currentItem = tree->children[0].get();
+	auto currentItem = mTree->children[0].get();
 
 	for (auto iter = name.begin(); iter != name.end(); ++iter) {
 		bool isLastItem   = iter == --name.end();
@@ -136,7 +138,7 @@ QModelIndex ModuleTreeModel::index(int row, int column, const QModelIndex& paren
 	if (parent.isValid()) {
 		parentItem = static_cast<WorkspaceTree*>(parent.internalPointer());
 	} else {
-		parentItem = tree.get();
+		parentItem = tree();
 	}
 
 	if (row < parentItem->children.size()) {
@@ -151,7 +153,7 @@ QModelIndex ModuleTreeModel::parent(const QModelIndex& index) const {
 	auto childItem  = static_cast<WorkspaceTree*>(index.internalPointer());
 	auto parentItem = childItem->parent;
 
-	if (parentItem == tree.get()) { return{}; }
+	if (parentItem == tree()) { return{}; }
 
 	return createIndex(parentItem->row, 0, parentItem);
 }
@@ -236,7 +238,7 @@ int ModuleTreeModel::rowCount(const QModelIndex& index) const {
 	if (index.isValid()) {
 		parentItem = static_cast<WorkspaceTree*>(index.internalPointer());
 	} else {
-		parentItem = tree.get();
+		parentItem = tree();
 	}
 
 	return parentItem->children.size();
@@ -273,7 +275,7 @@ Qt::ItemFlags ModuleTreeModel::flags(const QModelIndex& index) const
 
 	Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 	
-	if (item->type == WorkspaceTree::FUNCTION) {
+	if (item->type == WorkspaceTree::FUNCTION || item->type == WorkspaceTree::STRUCT) {
 		flags |= Qt::ItemIsEditable;
 	}
 	
@@ -286,14 +288,40 @@ bool ModuleTreeModel::setData(const QModelIndex& index, const QVariant& value, i
 	if (role == Qt::EditRole) {
 		auto item = static_cast<WorkspaceTree*>(index.internalPointer());
 		
-		// for now, this only edits function names
-		if (item->type != WorkspaceTree::FUNCTION) {
+		if (value.toString().isEmpty()) {
 			return false;
 		}
 		
-		// set the function name
-		item->func->setName(value.toString().toStdString());
-		item->name = QString::fromStdString(item->func->name());
+		switch(item->type) {
+			case WorkspaceTree::FUNCTION:
+			{
+				auto oldName = item->func->name();
+				
+				// set the function name
+				auto nodesToUpdate = item->func->setName(value.toString().toStdString());
+				item->name = QString::fromStdString(item->func->name());
+				
+				emit functionRenamed(*item->func, oldName, nodesToUpdate);
+				
+			}
+			break;
+			case WorkspaceTree::STRUCT:
+			{
+				
+				auto oldName = item->str->name();
+				
+				// set the struct name
+				auto nodesToUpdate = item->str->setName(value.toString().toStdString());
+				item->name = QString::fromStdString(item->str->name());
+				
+				emit structRenamed(*item->str, oldName, nodesToUpdate);
+				
+			}
+			break;
+			default:
+				return false;
+	
+		}
 		
 		dataChanged(index, index, {Qt::DisplayRole});
 		return true;

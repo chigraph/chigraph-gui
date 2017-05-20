@@ -25,7 +25,7 @@
 
 class ModuleBrowser;
 class ThemeManager;
-class FunctionTabView;
+class CentralTabView;
 
 class MainWindow : public KXmlGuiWindow {
 	Q_OBJECT
@@ -34,10 +34,12 @@ public:
 	~MainWindow();
 
 	chi::Context&    context() const { return *mChigContext; }
-	FunctionTabView& tabView() const { return *mFunctionTabs; }
+	CentralTabView& tabView() const { return *mFunctionTabs; }
 
 	LaunchConfigurationManager& launchManager() { return *mLaunchManager; }
 
+	/// Load a module into the window. 
+	/// \exepcts `!name.isEmpty()`
 	std::pair<chi::Result, chi::GraphModule*> loadModule(const QString& name);
 
 private:
@@ -72,7 +74,7 @@ private:
 	KSelectAction* mConfigSelectAction;
 
 	// the tabs for open functions
-	FunctionTabView* mFunctionTabs = nullptr;
+	CentralTabView* mFunctionTabs = nullptr;
 
 	// context & module
 	std::unique_ptr<chi::Context> mChigContext   = nullptr;

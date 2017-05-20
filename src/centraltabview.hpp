@@ -17,12 +17,13 @@
 class FunctionView;
 class StructEdit;
 
-class FunctionTabView : public QTabWidget, public KXMLGUIClient {
+class CentralTabView : public QTabWidget, public KXMLGUIClient {
 	Q_OBJECT
 public:
-	FunctionTabView(QWidget* parent = nullptr);
+	CentralTabView(QWidget* parent = nullptr);
 
 	void selectNewFunction(chi::GraphFunction& func);
+	void selectNewStruct(chi::GraphStruct& str);
 	void centerOnNode(chi::NodeInstance& inst);
 	void selectNode(chi::NodeInstance& inst);
 
@@ -30,17 +31,27 @@ public:
 	void refreshModule(chi::GraphModule& mod);
 
 	FunctionView* viewFromFunction(chi::GraphFunction& func);
-	FunctionView* viewFromName(const QString& fullName);
-	FunctionView* viewFromName(const boost::filesystem::path& mod, const std::string& function);
+	FunctionView* viewFromFunctionName(const QString& fullName);
+	FunctionView* viewFromFunctionName(const boost::filesystem::path& mod, const std::string& function);
 
+	StructEdit* viewFromStruct(chi::GraphStruct& str);
+	StructEdit* viewFromStructName(const QString& fullName);
+	StructEdit* viewFromStructName(const boost::filesystem::path& mod, const std::string& module);
+	
 	void closeView(FunctionView* view);
+	void closeView(StructEdit* view);
 
 	FunctionView* currentView();
 
 signals:
 	void dirtied(chi::GraphModule& mod);
 	void functionViewChanged(FunctionView* func, bool newlyOpened);
+	void structViewChanged(StructEdit* func, bool newlyOpened);
 
+public slots:
+	void functionRenamed(chi::GraphFunction& func, const std::string& oldName, const std::vector<chi::NodeInstance*>& changed);
+	void structRenamed(chi::GraphStruct& str, const std::string& oldName, const std::vector<chi::NodeInstance*>& changed);
+	
 private:
 	void closeTab(int idx);
 

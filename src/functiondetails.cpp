@@ -12,6 +12,8 @@
 FunctionDetails::FunctionDetails(QWidget* parent) : QWidget{parent} {
 	setXMLFile("chigraphfunctiondetailsui.rc");
 
+	setEnabled(false);
+	
 	auto layout = new QVBoxLayout;
 	setLayout(layout);
 

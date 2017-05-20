@@ -1,12 +1,14 @@
 #include "mainwindow.hpp"
 #include "chigraphplugin.hpp"
 #include "functiondetails.hpp"
-#include "functiontabview.hpp"
+#include "centraltabview.hpp"
 #include "functionview.hpp"
 #include "launchconfigurationdialog.hpp"
 #include "localvariables.hpp"
 #include "modulebrowser.hpp"
 #include "subprocessoutputview.hpp"
+#include "moduletreemodel.hpp"
+#include "structedit.hpp"
 
 #include <KActionCollection>
 #include <KActionMenu>
@@ -59,10 +61,10 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	mChigContext   = std::make_unique<chi::Context>(qApp->arguments()[0].toStdString().c_str());
 	mLaunchManager = std::make_unique<LaunchConfigurationManager>(*mChigContext);
 
-	mFunctionTabs = new FunctionTabView;
+	mFunctionTabs = new CentralTabView;
 	mFunctionTabs->setMovable(true);
 	mFunctionTabs->setTabsClosable(true);
-	connect(mFunctionTabs, &FunctionTabView::dirtied, this, &MainWindow::moduleDirtied);
+	connect(mFunctionTabs, &CentralTabView::dirtied, this, &MainWindow::moduleDirtied);
 	insertChildClient(mFunctionTabs);
 
 	setCentralWidget(mFunctionTabs);
@@ -76,13 +78,17 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	addDockWidget(mModuleBrowser->defaultArea(), docker);
 	connect(this, &MainWindow::workspaceOpened, mModuleBrowser, &ModuleBrowser::loadWorkspace);
 	connect(mModuleBrowser, &ModuleBrowser::functionSelected, &tabView(),
-	        &FunctionTabView::selectNewFunction);
+	        &CentralTabView::selectNewFunction);
+	connect(mModuleBrowser, &ModuleBrowser::structSelected, &tabView(), &CentralTabView::selectNewStruct);
 	connect(this, &MainWindow::newModuleCreated, mModuleBrowser,
 	        [this](chi::GraphModule& mod) { mModuleBrowser->loadWorkspace(mod.context()); });
 	connect(this, &MainWindow::workspaceOpened, docker, [docker](chi::Context& ctx) {
 		docker->setWindowTitle(i18n("Modules") + " - " +
 		                       QString::fromStdString(ctx.workspacePath().string()));
 	});
+	connect(mModuleBrowser, &ModuleBrowser::functionRenamed, mFunctionTabs, &CentralTabView::functionRenamed);
+	connect(mModuleBrowser, &ModuleBrowser::structRenamed, mFunctionTabs, &CentralTabView::structRenamed);
+
 
 	docker = new QDockWidget(i18n("Output"), this);
 	docker->setObjectName("Output");
@@ -101,14 +107,21 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	scroll->setWidgetResizable(true);
 	docker->setWidget(scroll);
 	addDockWidget(Qt::RightDockWidgetArea, docker);
-	connect(mFunctionTabs, &FunctionTabView::functionViewChanged, functionDetails,
+	connect(mFunctionTabs, &CentralTabView::functionViewChanged, functionDetails,
 	        [this, docker, functionDetails](FunctionView* view, bool) {
 
+				functionDetails->setEnabled(true);
 		        functionDetails->loadFunction(view);
 		        docker->setWindowTitle(i18n("Function Details") + " - " +
 		                               QString::fromStdString(view->function()->name()));
 
 		    });
+	connect(mFunctionTabs, &CentralTabView::structViewChanged, functionDetails, 
+		[this, docker, functionDetails](StructEdit*, bool) {
+			functionDetails->setEnabled(false);
+			
+			docker->setWindowTitle(i18n("Function Details"));
+		});
 	connect(functionDetails, &FunctionDetails::dirtied, this,
 	        [this, functionDetails] { moduleDirtied(functionDetails->chiFunc()->module()); });
 
@@ -187,11 +200,18 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 			KMessageBox::error(this, i18n("Select a launch configuration"), i18n("run: error"));
 			return;
 		}
+		
+		auto moduleName = launchManager().currentConfiguration().module();
+		
+		if (moduleName.isEmpty()) {
+			KMessageBox::error(this, i18n("No module set in launch configuration: ") + launchManager().currentConfiguration().name());
+			return;
+		}
 
 		// get the module
 		chi::Result       res;
 		chi::GraphModule* mod;
-		std::tie(res, mod) = loadModule(launchManager().currentConfiguration().module());
+		std::tie(res, mod) = loadModule(moduleName);
 
 		if (!res || !mod) {
 			KMessageBox::detailedError(this, i18n("Failed to load module"),
@@ -239,7 +259,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	        [this](const QString& str) {
 		        launchManager().setCurrentConfiguration(launchManager().configByName(str));
 		    });
-	updateUsableConfigs();
+	
 	if (launchManager().currentConfiguration().valid()) {
 		mConfigSelectAction->setCurrentAction(launchManager().currentConfiguration().name(),
 		                                      Qt::CaseSensitive);
@@ -258,6 +278,8 @@ MainWindow::~MainWindow() {
 }
 
 std::pair<chi::Result, chi::GraphModule*> MainWindow::loadModule(const QString& name) {
+	assert(!name.isEmpty() && "Name passed to loadModule should not be empty");
+	
 	chi::ChiModule* mod;
 	auto res = context().loadModule(name.toStdString(), chi::LoadSettings::Default, &mod);
 	if (!res) { return {res, nullptr}; }

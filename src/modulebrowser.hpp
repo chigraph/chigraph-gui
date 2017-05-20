@@ -39,10 +39,16 @@ public:
 	~ModuleBrowser();
 
 	std::unordered_set<chi::GraphModule*> dirtyModules();
+	
+	ModuleTreeModel* model() { return mModel.get(); }
 
 signals:
 	void functionSelected(chi::GraphFunction& func);
 	void structSelected(chi::GraphStruct& str);
+	
+	void functionRenamed(chi::GraphFunction& func, const std::string& oldName, const std::vector<chi::NodeInstance*> updatedNodes);
+	void structRenamed(chi::GraphStruct& str, const std::string& oldName, const std::vector<chi::NodeInstance*> updatedNodes);
+	
 
 public slots:
 	void loadWorkspace(chi::Context& context);
@@ -52,6 +58,7 @@ public slots:
 private slots:
 	void newModule();
 	void newFunction();
+	void newStruct();
 
 private:
 	void updateDirtyStatus(chi::GraphModule& updated, bool dirty);

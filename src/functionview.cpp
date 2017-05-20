@@ -349,6 +349,7 @@ void FunctionView::refreshGuiForNode(Node& node) {
 			conns[mScene->createConnection(*mNodeMap[conn.first], remoteID, thisNode, localID)
 			          .get()] = {{{inst, localID}, {conn.first, remoteID}}};
 		}
+		++id;
 	}
 }
 
@@ -427,7 +428,10 @@ void FunctionView::updateValidationStates() {
 
 	// clear validation states of the other nodes
 	for (auto n : mInvalidNodes) {
-		auto castedModel = dynamic_cast<ChigraphNodeModel*>(n->nodeDataModel());
+		auto guiNode = guiNodeFromChiNode(n);
+		auto castedModel = dynamic_cast<ChigraphNodeModel*>(guiNode->nodeDataModel());
+		assert(castedModel);
+		
 		castedModel->setErrorState(QtNodes::NodeValidationState::Valid, {});
 	}
 	mInvalidNodes.clear();
@@ -454,8 +458,9 @@ void FunctionView::updateValidationStates() {
 					castedModel->setErrorState(isError ? QtNodes::NodeValidationState::Error
 					                                   : QtNodes::NodeValidationState::Warning,
 					                           QString::fromStdString(overview));
+					
+					mInvalidNodes.push_back(node);
 				}
-				mInvalidNodes.push_back(guiNode);
 			}
 		}
 	}

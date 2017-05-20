@@ -14,7 +14,7 @@
 #include <thread>
 
 #include "../chigraphnodemodel.hpp"
-#include "../functiontabview.hpp"
+#include "../centraltabview.hpp"
 #include "../mainwindow.hpp"
 
 #include <../src/Node.hpp>
@@ -66,7 +66,7 @@ DebuggerPlugin::DebuggerPlugin() {
 	mBreakpointView = new BreakpointView();
 	mVariableView   = new VariableView();
 
-	connect(&MainWindow::instance()->tabView(), &FunctionTabView::functionViewChanged, this,
+	connect(&MainWindow::instance()->tabView(), &CentralTabView::functionViewChanged, this,
 	        [this](FunctionView* view, bool isNew) {
 
 		        // only connect to it if it was just opened

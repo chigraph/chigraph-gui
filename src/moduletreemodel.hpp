@@ -40,6 +40,7 @@ struct WorkspaceTree {
 };
 
 class ModuleTreeModel : public QAbstractItemModel {
+	Q_OBJECT
 public:
 	static QIcon iconForItemType(WorkspaceTree::eType type);
 
@@ -56,7 +57,7 @@ public:
 
 	ModuleTreeModel(std::unique_ptr<WorkspaceTree> t, chi::Context& ctx,
 	                Filter filter = Filter::All)
-	    : tree{std::move(t)}, mCtx{&ctx}, mFilter{filter} {}
+	    : mTree{std::move(t)}, mCtx{&ctx}, mFilter{filter} {}
 
 	// create a model from just the context
 	static std::unique_ptr<ModuleTreeModel> createFromContext(chi::Context& context,
@@ -76,7 +77,15 @@ public:
 	QVariant data(const QModelIndex& index, int role) const override;
 	Qt::ItemFlags flags(const QModelIndex &index) const override;
 	bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
-	std::unique_ptr<WorkspaceTree> tree;
+	
+	WorkspaceTree* tree() const { return mTree.get(); }
+	
+signals:
+	void functionRenamed(chi::GraphFunction& func, const std::string& oldName, const std::vector<chi::NodeInstance*> updatedNodes);
+	void structRenamed(chi::GraphStruct& str, const std::string& oldName, const std::vector<chi::NodeInstance*> updatedNodes);
+	
+private:
+	std::unique_ptr<WorkspaceTree> mTree;
 	chi::Context*                  mCtx;
 	Filter                         mFilter;
 };

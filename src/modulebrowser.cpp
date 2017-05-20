@@ -37,6 +37,8 @@ ModuleBrowser::ModuleBrowser(QWidget* parent) : QTreeView(parent) {
 	newStructAction = actionCollection()->addAction(
 	    QStringLiteral("new-struct"),
 	    new QAction(QIcon::fromTheme(QStringLiteral("window-new")), i18n("New Struct"), nullptr));
+	
+	connect(newStructAction, &QAction::triggered, this, &ModuleBrowser::newStruct);
 
 	deleteAction = actionCollection()->addAction(
 	    QStringLiteral("remove-item"),
@@ -108,9 +110,15 @@ void ModuleBrowser::loadWorkspace(chi::Context& context) {
 	mContext = &context;
 
 	mModel = ModuleTreeModel::createFromContext(context);
-	mTree  = mModel->tree.get();
+	mTree  = mModel->tree();
+	
+	connect(mModel.get(), &ModuleTreeModel::functionRenamed, this, &ModuleBrowser::functionRenamed);
+	connect(mModel.get(), &ModuleTreeModel::structRenamed, this, &ModuleBrowser::structRenamed);
 
 	setModel(mModel.get());
+	
+	// expand src
+	expand(mModel->index(0, 0, {}));
 }
 
 void ModuleBrowser::moduleDirtied(chi::GraphModule& dirtied) {
@@ -170,6 +178,37 @@ void ModuleBrowser::newFunction() {
 	mModel->updateModule(owningModule);
 	
 	
+}
+
+void ModuleBrowser::newStruct() {
+	fs::path owningModule;
+	
+	auto idx = currentIndex();
+	if (idx.isValid()) {
+		auto item = static_cast<WorkspaceTree*>(idx.internalPointer());
+		
+		if (item->type != WorkspaceTree::MODULE) {
+			return;
+		}
+		
+		owningModule = item->fullName();
+	}
+	
+	// get the module from the context
+	chi::ChiModule* mod;
+	auto res = context().loadModule(owningModule, chi::LoadSettings::Default, &mod);
+	
+	if (!res) {
+		KMessageBox::detailedError(this, "Failed to load module", QString::fromStdString(res.dump()));
+		return;
+	}
+	
+	auto gMod = static_cast<chi::GraphModule*>(mod);
+	
+	// TODO: rename this to something that's garunteed to not exist
+	gMod->getOrCreateStruct("New Struct");
+	
+	mModel->updateModule(owningModule);
 }
 
 void ModuleBrowser::updateDirtyStatus(chi::GraphModule& updated, bool dirty) {

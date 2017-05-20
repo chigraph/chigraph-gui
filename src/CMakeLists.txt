@@ -72,7 +72,7 @@ set(GUI_SRCS
 	localvariables.cpp
 	functioninouts.cpp
 	typeselector.cpp
-	functiontabview.cpp
+	centraltabview.cpp
 	launchconfigurationmanager.cpp
 	launchconfigurationdialog.cpp
 	structedit.cpp
@@ -99,7 +99,7 @@ set(GUI_HEADERS
 	localvariables.hpp
 	functioninouts.hpp
 	typeselector.hpp
-	functiontabview.hpp
+	centraltabview.hpp
 	launchconfigurationmanager.hpp
 	launchconfigurationdialog.hpp
 	structedit.hpp
