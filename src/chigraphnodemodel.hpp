@@ -3,8 +3,7 @@
 #ifndef CHIG_GUI_CHIGNODEGUI_HPP
 #define CHIG_GUI_CHIGNODEGUI_HPP
 
-#include <nodes/DataModelRegistry>
-#include <nodes/NodeDataModel>
+#include <nodes/FlowSceneModel>
 
 #include <chi/NodeInstance.hpp>
 #include <chi/NodeType.hpp>
@@ -23,98 +22,63 @@
 
 #include <memory>
 
-class FunctionView;
+class ChigraphFlowSceneModel : public QtNodes::FlowSceneModel {
+  QStringList modelRegistry() const override
 
-class ChigraphNodeModelPaintDelegate : public QtNodes::NodePainterDelegate {
-	void paint(QPainter* painter, QtNodes::NodeGeometry const& geom,
-	           QtNodes::NodeDataModel const* model) override {
-		for (auto& decorator : mDecorators) { decorator->paint(painter, geom, model); }
-	}
+  QString nodeTypeCatergory(QString const& /*name*/) const { return {}; }
+  QString converterNode(NodeDataType const& /*lhs*/, NodeDataType const& ) const { return {}; }
 
-public:
-	QtNodes::NodePainterDelegate* addDecorator(
-	    std::unique_ptr<QtNodes::NodePainterDelegate>&& decorator) {
-		mDecorators.push_back(std::move(decorator));
-		return mDecorators[mDecorators.size() - 1].get();
-	}
+  // Retrieval functions
+  //////////////////////
 
-	void removeDecorator(QtNodes::NodePainterDelegate* decorator);
+  QList<QUuid> nodeUUids() const override;
+  NodeIndex nodeIndex(const QUuid& ID) const override;
+  QString nodeTypeIdentifier(NodeIndex const& index) const override;
+  QString nodeCaption(NodeIndex const& index) const override;
+  QPointF nodeLocation(NodeIndex const& index) const override;
+  QWidget* nodeWidget(NodeIndex const& index) const override;
+  bool nodeResizable(NodeIndex const& index) const override;
+  NodeValidationState nodeValidationState(NodeIndex const& index) const override;
+  
+  /// Get the validation error/warning
+  QString nodeValidationMessage(NodeIndex const& index) const override
 
-	void clearDecorators() { mDecorators.clear(); }
+  /// Get the painter delegate
+  NodePainterDelegate* nodePainterDelegate(NodeIndex const& index) const override
+  
+  /// Get the style
+  NodeStyle nodeStyle(NodeIndex const& index) const { return {}; }
+  
+  /// Get the count of DataPorts
+  unsigned int nodePortCount(NodeIndex const& index, PortType portType) const override
 
-private:
-	std::vector<std::unique_ptr<QtNodes::NodePainterDelegate>> mDecorators;
+  /// Get the port caption
+  QString nodePortCaption(NodeIndex const& index, PortIndex portID, PortType portType) const override
+
+  /// Get the port data type
+  NodeDataType nodePortDataType(NodeIndex const& index, PortIndex portID, PortType portType) const override
+
+  /// Port Policy
+  ConnectionPolicy nodePortConnectionPolicy(NodeIndex const& index, PortIndex portID, PortType portType) const override
+
+  /// Get a connection at a port
+  std::vector<std::pair<NodeIndex, PortIndex>> nodePortConnections(NodeIndex const& index, PortIndex portID, PortType portTypes) const override
+
+  // Mutation functions
+  /////////////////////
+
+  /// Remove a connection
+  bool removeConnection(NodeIndex const& /*leftNode*/, PortIndex /*leftPortID*/, NodeIndex const& /*rightNode*/, PortIndex /*rightPortID*/) { return false; }
+
+  /// Add a connection
+  bool addConnection(NodeIndex const& /*leftNode*/, PortIndex /*leftPortID*/, NodeIndex const& /*rightNode*/, PortIndex /*rightPortID*/) { return false; }
+
+  /// Remove a node
+  bool removeNode(NodeIndex const& /*index*/) { return false; }
+
+  /// Add a  -- return {} if it fails
+  QUuid addNode(QString const& /*typeID*/, QPointF const& /*pos*/) { return QUuid{}; }
+
+  /// Move a node to a new location
+  bool moveNode(NodeIndex const& /*index*/, QPointF /*newLocation*/) { return false; }
 };
-
-class ChigraphNodeModel : public QtNodes::NodeDataModel {
-public:
-	ChigraphNodeModel(chi::NodeInstance* inst_, FunctionView* fview_);
-
-	chi::NodeInstance& instance() const { return *mInst; }
-
-	void setErrorState(QtNodes::NodeValidationState state, QString message);
-
-	ChigraphNodeModelPaintDelegate& paintDelegate() { return *mPainterDelegate; }
-
-	// convenieence function for decorators
-	QtNodes::NodePainterDelegate* addDecorator(
-	    std::unique_ptr<QtNodes::NodePainterDelegate>&& decorator);
-	void removeDecorator(QtNodes::NodePainterDelegate* decorator);
-	void clearDecorators();
-
-	// NodeDataModel interface
-	QString caption() const override {
-		auto str = QString::fromStdString(mInst->type().description());
-		return str;
-	}
-	QString name() const override { return QString::fromStdString(mInst->type().qualifiedName()); }
-	std::unique_ptr<NodeDataModel> clone() const override {
-		auto newInst = new chi::NodeInstance(*mInst);
-		return std::make_unique<ChigraphNodeModel>(newInst, mFunctionView);
-	}
-
-	virtual unsigned int nPorts(QtNodes::PortType portType) const override;
-
-	virtual QtNodes::NodeDataType dataType(QtNodes::PortType  pType,
-	                                       QtNodes::PortIndex pIndex) const override;
-
-	virtual void setInData(std::shared_ptr<QtNodes::NodeData>, QtNodes::PortIndex) override {}
-	virtual std::shared_ptr<QtNodes::NodeData> outData(QtNodes::PortIndex /*port*/) override {
-		return nullptr;
-	}
-	virtual QWidget* embeddedWidget() override;
-
-	QtNodes::NodeValidationState validationState() const override;
-
-	QString validationMessage() const override;
-
-	// We don't need saving...chigraph has its own serialization
-	QJsonObject save() const override { return {}; }
-
-	NodeConnectionPolicy nodeConnectionPolicy(QtNodes::PortType  portType,
-	                                          QtNodes::PortIndex portIndex) const override {
-		// good defaults
-		if (portType == QtNodes::PortType::In) {
-			if (portIndex < instance().inputExecConnections.size()) {
-				return NodeConnectionPolicy::Many;
-			}
-			return NodeConnectionPolicy::One;
-		}
-		if (portIndex < instance().outputExecConnections.size()) {
-			return NodeConnectionPolicy::One;
-		}
-		return NodeConnectionPolicy::Many;
-	}
-
-	QtNodes::NodePainterDelegate* painterDelegate() const override { return mPainterDelegate; }
-
-private:
-	QtNodes::NodeValidationState    mValidationState = QtNodes::NodeValidationState::Valid;
-	QString                         mValidationMessage;
-	chi::NodeInstance*              mInst;
-	FunctionView*                   mFunctionView;
-	QWidget*                        mEmbedded = nullptr;
-	ChigraphNodeModelPaintDelegate* mPainterDelegate;
-};
-
-#endif  // CHIG_GUI_CHIGNODEGUI_HPP

@@ -28,7 +28,7 @@ PUBLIC
 	KF5::XmlGui
 	KF5::TextEditor
 	
-	chigraphnodes
+	nodes
 
 	chigraphdebugger
 )

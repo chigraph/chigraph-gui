@@ -1,7 +1,7 @@
 #include "debuggerplugin.hpp"
 #include "currentnodedecorator.hpp"
 
-#include <chi/Result.hpp>
+#include <chi/Support/Result.hpp>
 
 #include <KActionCollection>
 #include <KLocalizedString>
