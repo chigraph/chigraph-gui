@@ -4,7 +4,7 @@
 #include <chi/Context.hpp>
 #include <chi/DataType.hpp>
 #include <chi/GraphFunction.hpp>
-#include <chi/Result.hpp>
+#include <chi/Support/Result.hpp>
 
 #include <KLocalizedString>
 #include <KMessageBox>

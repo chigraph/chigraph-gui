@@ -110,6 +110,7 @@ void ExecParamListWidget::setFunction(FunctionView* func, Type ty) {
 void ExecParamListWidget::refreshEntry() {
 	auto entry = mFunc->function()->entryNode();
 	if (entry == nullptr) { return; }
+	
 	mFunc->refreshGuiForNode(*entry);
 }
 void ExecParamListWidget::refreshExits() {

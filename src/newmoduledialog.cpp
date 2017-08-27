@@ -9,7 +9,7 @@
 
 #include <chi/Context.hpp>
 #include <chi/GraphModule.hpp>
-#include <chi/Result.hpp>
+#include <chi/Support/Result.hpp>
 
 #include "chiitemselectwidget.hpp"
 #include "mainwindow.hpp"

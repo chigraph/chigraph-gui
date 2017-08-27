@@ -100,11 +100,11 @@ void LocalVariables::deleteReferencingNodes(const std::string& name) {
 	auto setNodes = mFunctionView->function()->nodesWithType(
 	    mFunctionView->function()->module().fullName(), "_set_" + name);
 	for (const auto& node : setNodes) {
-		mFunctionView->scene().removeNode(*mFunctionView->guiNodeFromChiNode(node));
+		mFunctionView->model().removeNode(mFunctionView->model().nodeIndex(*node));
 	}
 	auto getNodes = mFunctionView->function()->nodesWithType(
 	    mFunctionView->function()->module().fullName(), "_get_" + name);
 	for (const auto& node : getNodes) {
-		mFunctionView->scene().removeNode(*mFunctionView->guiNodeFromChiNode(node));
+		mFunctionView->model().removeNode(mFunctionView->model().nodeIndex(*node));
 	}
 }

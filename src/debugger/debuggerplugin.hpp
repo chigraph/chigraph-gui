@@ -58,7 +58,7 @@ private:
 	QThread*                              mThread = nullptr;
 
 	QtNodes::NodePainterDelegate* mCurrentNodeDecorator = nullptr;
-	QtNodes::Node*                mCurrentNode          = nullptr;
+	chi::NodeInstance*            mCurrentNode          = nullptr;
 };
 
 #endif  // CHIGRAPHGUI_DEBUGGER_DEBUGGER_PLUGIN_HPP

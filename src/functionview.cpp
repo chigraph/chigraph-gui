@@ -9,7 +9,7 @@
 #include <chi/FunctionValidator.hpp>
 #include <chi/GraphModule.hpp>
 #include <chi/NodeInstance.hpp>
-#include <chi/Result.hpp>
+#include <chi/Support/Result.hpp>
 
 #include <../src/Node.hpp>
 #include <../src/NodeGraphicsObject.hpp>
@@ -34,8 +34,10 @@ FunctionView::FunctionView(chi::GraphFunction& func_, QWidget* parent)
 
 	hlayout->setMargin(0);
 	hlayout->setSpacing(0);
+	
+	mModel = new ChigraphFlowSceneModel(*function());
 
-	mScene = new FlowScene(createRegistry());
+	mScene = new FlowScene(mModel);
 
 	mView = new FlowView(mScene);
 	mView->setSceneRect(-320000, -320000, 640000, 640000);
@@ -43,62 +45,6 @@ FunctionView::FunctionView(chi::GraphFunction& func_, QWidget* parent)
 	mView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	hlayout->addWidget(mView);
-
-	// create nodes
-	for (auto& node : mFunction->nodes()) {
-		auto& guinode =
-		    mScene->createNode(std::make_unique<ChigraphNodeModel>(node.second.get(), this));
-
-		mScene->setNodePosition(guinode, {node.second->x(), node.second->y()});
-
-		mNodeMap[node.second.get()] = &guinode;
-	}
-
-	// create connections
-	for (auto& node : mFunction->nodes()) {
-		auto thisNode = mNodeMap[node.second.get()];
-
-		size_t connId = 0;
-		for (auto& conn : node.second->inputDataConnections) {
-			if (conn.first == nullptr) { continue; }
-			auto inData = mNodeMap[conn.first];
-
-			auto guiconn = mScene
-			                   ->createConnection(
-			                       *thisNode, connId + node.second->inputExecConnections.size(),
-			                       *inData, conn.second + conn.first->outputExecConnections.size())
-			                   .get();
-
-			conns[guiconn] = {
-			    {{conn.first, conn.second + conn.first->outputExecConnections.size()},
-			     {node.second.get(), connId + node.second->inputExecConnections.size()}}};
-
-			++connId;
-		}
-
-		connId = 0;
-		for (auto& conn : node.second->outputExecConnections) {
-			auto outExecNode = mNodeMap[conn.first];
-
-			if (outExecNode != nullptr) {
-				auto guiconn =
-				    mScene->createConnection(*outExecNode, conn.second, *thisNode, connId).get();
-
-				conns[guiconn] = {{{node.second.get(), connId}, {conn.first, conn.second}}};
-			}
-			++connId;
-		}
-	}
-
-	// finally connect to know when new stuff is made
-	connect(mScene, &FlowScene::nodeCreated, this, &FunctionView::nodeAdded);
-	connect(mScene, &FlowScene::nodeDeleted, this, &FunctionView::nodeDeleted);
-
-	connect(mScene, &FlowScene::connectionCreated, this, &FunctionView::connectionAdded);
-	connect(mScene, &FlowScene::connectionDeleted, this, &FunctionView::connectionDeleted);
-
-	connect(mScene, &FlowScene::nodeMoved, this, &FunctionView::nodeMoved);
-	connect(mScene, &FlowScene::nodeDoubleClicked, this, &FunctionView::nodeDoubleClicked);
 
 	// validate the function
 	updateValidationStates();

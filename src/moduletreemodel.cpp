@@ -6,7 +6,7 @@
 #include <chi/GraphFunction.hpp>
 #include <chi/GraphModule.hpp>
 #include <chi/GraphStruct.hpp>
-#include <chi/Result.hpp>
+#include <chi/Support/Result.hpp>
 #include <chi/NodeInstance.hpp>
 
 #include <KMessageBox>

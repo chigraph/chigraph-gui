@@ -5,10 +5,13 @@
 
 #include <nodes/NodeDataModel>
 
+// TODO: better solution
+#include <../src/NodeGraphicsObject.hpp>
+
 class CurrentNodeDecorator : public QtNodes::NodePainterDelegate {
-	void paint(QPainter* painter, const QtNodes::NodeGeometry& geom,
-	           QtNodes::NodeDataModel const* model) override {
-		painter->drawRect(QRect(geom.width() / 2, 0, 10, 10));
+	void paint(QPainter* painter,
+               QtNodes::NodeGraphicsObject const& ngo) override {
+		painter->drawRect(QRect(ngo.geometry().width() / 2, 0, 10, 10));
 	}
 };
 

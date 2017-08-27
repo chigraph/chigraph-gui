@@ -1,7 +1,7 @@
 #include "modulebrowser.hpp"
 
 #include <chi/GraphStruct.hpp>
-#include <chi/Result.hpp>
+#include <chi/Support/Result.hpp>
 
 #include <QDebug>
 #include <QDir>

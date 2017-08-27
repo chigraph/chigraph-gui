@@ -9,7 +9,7 @@
 
 ChiItemSelectionDialog::ChiItemSelectionDialog(chi::Context& ctx, boost::filesystem::path* toFill,
                                                WorkspaceTree::eType type, QWidget* parent)
-    : QDialog{parent}, mToFill{toFill}, mType{type} {
+    : QDialog{parent},  mType{type}, mToFill{toFill} {
 	assert(toFill != nullptr);
 
 	auto layout = new QVBoxLayout;
@@ -25,6 +25,9 @@ ChiItemSelectionDialog::ChiItemSelectionDialog(chi::Context& ctx, boost::filesys
 		case WorkspaceTree::FUNCTION: return ModuleTreeModel::Functions;
 		case WorkspaceTree::FOLDER: return ModuleTreeModel::Folders;
 		}
+		// panic as a defult
+		Q_ASSERT(false);
+		return ModuleTreeModel::All;
 	}();
 
 	// get model and set it

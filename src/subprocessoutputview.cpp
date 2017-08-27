@@ -10,7 +10,7 @@
 
 #include <chi/Context.hpp>
 #include <chi/LLVMVersion.hpp>
-#include <chi/Result.hpp>
+#include <chi/Support/Result.hpp>
 
 #if LLVM_VERSION_LESS_EQUAL(3, 9)
 #include <llvm/Bitcode/ReaderWriter.h>

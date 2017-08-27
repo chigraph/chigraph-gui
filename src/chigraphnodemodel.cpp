@@ -1,248 +1,122 @@
 #include "chigraphnodemodel.hpp"
 
-#include "functionview.hpp"
+#include <chi/GraphFunction.hpp>
+#include <chi/GraphModule.hpp>
 
-#include "../src/NodeGraphicsObject.hpp"
+ChigraphFlowSceneModel::ChigraphFlowSceneModel(chi::GraphFunction& func) 
+	: mFunc{&func} {
+	
+}
 
-#include <chi/Context.hpp>
-#include <chi/DataType.hpp>
-#include <chi/Result.hpp>
-
-#include <KActionCollection>
-#include <KTextEditor/Document>
-#include <KTextEditor/Editor>
-#include <KTextEditor/View>
-
-using namespace QtNodes;
-
-class EditCodeDialog : public QDialog {
-public:
-	EditCodeDialog(chi::NodeInstance* inst, FunctionView* fview) {
-		setWindowTitle(i18n("Edit C Call Node"));
-
-		auto layout = new QVBoxLayout;
-		setLayout(layout);
-
-		auto lineEdit = new QLineEdit;
-		layout->addWidget(lineEdit);
-		lineEdit->setText(QString::fromStdString(inst->type().toJSON()["function"]));
-
-		// get KTextEditor stuff
-		KTextEditor::Editor* editor = KTextEditor::Editor::instance();
-		// create a new document
-		KTextEditor::Document* doc = editor->createDocument(this);
-		doc->setText(QString::fromStdString(inst->type().toJSON()["code"]));
-		doc->setHighlightingMode("C");
-
-		// create a widget to display the document
-		KTextEditor::View* textEdit = doc->createView(nullptr);
-		// delete save and saveAs actions
-		{
-			for (const auto& action : textEdit->actionCollection()->actions()) {
-				QString name = action->text();
-			}
-			auto saveAction = textEdit->actionCollection()->action("file_save");
-			textEdit->actionCollection()->removeAction(saveAction);
-			auto saveAsAction = textEdit->actionCollection()->action("file_save_as");
-			textEdit->actionCollection()->removeAction(saveAsAction);
-		}
-		textEdit->setMinimumHeight(200);
-		layout->addWidget(textEdit);
-
-		auto okButton = new QPushButton;
-		layout->addWidget(okButton);
-		okButton->setText(i18n("Ok"));
-		connect(okButton, &QPushButton::clicked, this, [this, doc, lineEdit, inst, fview] {
-			std::string function = lineEdit->text().toStdString();
-			std::string code     = doc->text().toStdString();
-
-			std::unique_ptr<chi::NodeType> ty;
-			auto res = static_cast<chi::GraphModule&>(inst->type().module())
-			               .createNodeTypeFromCCode(code, function, {}, &ty);
-			if (!res) {
-				KMessageBox::detailedError(this, "Failed to compile C node",
-				                           QString::fromStdString(res.dump()));
-
-				return;
-			}
-			inst->setType(std::move(ty));
-
-			close();
-
-		});
-
-		connect(this, &QDialog::accepted, this, [fview, inst] { fview->refreshGuiForNode(*inst); });
+QStringList ChigraphFlowSceneModel::modelRegistry() const {
+	
+	QStringList ret;
+	
+	auto& mod = mFunc->module();
+	auto& ctx = mFunc->context();
+	
+	// add dependencies
+	for (const auto& dep : mod.dependencies()) {
+		
 	}
-};
-
-ChigraphNodeModel::ChigraphNodeModel(chi::NodeInstance* inst_, FunctionView* fview_)
-    : mInst{inst_}, mFunctionView{fview_} {
-	if (mInst->type().name() == "const-bool") {
-		QCheckBox* box     = new QCheckBox("");
-		bool       checked = mInst->type().toJSON();
-		box->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
-
-		connect(box, &QCheckBox::stateChanged, this, [this](int newState) {
-			std::unique_ptr<chi::NodeType> newType;
-
-			mInst->context().nodeTypeFromModule("lang", "const-bool", newState == Qt::Checked,
-			                                    &newType);
-
-			mInst->setType(std::move(newType));
-		});
-
-		box->setMaximumSize(box->sizeHint());
-		mEmbedded = box;
-	} else if (mInst->type().name() == "strliteral") {
-		auto        edit = new QLineEdit();
-		std::string s    = mInst->type().toJSON();
-		edit->setText(QString::fromStdString(s));
-
-		edit->setMaximumSize(edit->sizeHint());
-
-		connect(edit, &QLineEdit::textChanged, this, [this](const QString& s) {
-			std::unique_ptr<chi::NodeType> newType;
-
-			mInst->context().nodeTypeFromModule("lang", "strliteral", s.toUtf8().constData(),
-			                                    &newType);
-
-			mInst->setType(std::move(newType));
-
-		});
-
-		mEmbedded = edit;
-	} else if (mInst->type().name() == "const-int") {
-		auto edit = new QLineEdit();
-		edit->setValidator(new QIntValidator);
-		int val = mInst->type().toJSON();
-		edit->setText(QString::number(val));
-
-		edit->setMaximumSize(edit->sizeHint());
-
-		connect(edit, &QLineEdit::textChanged, this, [this](const QString& s) {
-			std::unique_ptr<chi::NodeType> newType;
-
-			mInst->context().nodeTypeFromModule("lang", "const-int", s.toInt(), &newType);
-
-			mInst->setType(std::move(newType));
-
-		});
-
-		mEmbedded = edit;
-	} else if (mInst->type().name() == "c-call") {
-		QPushButton* butt = new QPushButton(i18n("Edit code"));
-		connect(butt, &QPushButton::clicked, this, [this] {
-			auto dialog = new EditCodeDialog(mInst, mFunctionView);
-
-			dialog->exec();
-		});
-
-		butt->setMaximumSize(butt->sizeHint());
-
-		mEmbedded = butt;
-	} else if (mInst->type().name() == "const-float") {
-		auto edit = new QLineEdit();
-		edit->setValidator(new QDoubleValidator);
-		double val = mInst->type().toJSON();
-		edit->setText(QString::number(val));
-
-		edit->setMaximumSize(edit->sizeHint());
-
-		connect(edit, &QLineEdit::textChanged, this, [this](const QString& s) {
-			std::unique_ptr<chi::NodeType> newType;
-
-			mInst->context().nodeTypeFromModule("lang", "const-float", s.toDouble(), &newType);
-
-			mInst->setType(std::move(newType));
-
-		});
-
-		mEmbedded = edit;
-	}
-
-	mPainterDelegate = new ChigraphNodeModelPaintDelegate;
 }
 
-void ChigraphNodeModel::setErrorState(QtNodes::NodeValidationState state, QString message) {
-	mValidationState   = state;
-	mValidationMessage = message;
+QString ChigraphFlowSceneModel::nodeTypeCatergory(QString const& name) const {
+	
+}
+QString ChigraphFlowSceneModel::converterNode(QtNodes::NodeDataType const& lhs, QtNodes::NodeDataType const& rhs) const {
+	
 }
 
-unsigned int ChigraphNodeModel::nPorts(PortType portType) const {
-	if (portType == PortType::In) {
-		return mInst->type().execInputs().size() + mInst->type().dataInputs().size();
-	}
-	if (portType == PortType::Out) {
-		return mInst->type().execOutputs().size() + mInst->type().dataOutputs().size();
-	}
-
-	return 1;  // ?
+QList<QUuid> ChigraphFlowSceneModel::nodeUUids() const {
+	
+}
+QtNodes::NodeIndex ChigraphFlowSceneModel::nodeIndex(const QUuid& ID) const {
+	
+}
+QString ChigraphFlowSceneModel::nodeTypeIdentifier(QtNodes::NodeIndex const& index) const {
+	
+}
+QString ChigraphFlowSceneModel::nodeCaption(QtNodes::NodeIndex const& index) const {
+	
+}
+QPointF ChigraphFlowSceneModel::nodeLocation(QtNodes::NodeIndex const& index) const {
+	
+}
+QWidget* ChigraphFlowSceneModel::nodeWidget(QtNodes::NodeIndex const& index) const {
+	
+}
+bool ChigraphFlowSceneModel::nodeResizable(QtNodes::NodeIndex const& index) const {
+	
+}
+QtNodes::NodeValidationState ChigraphFlowSceneModel::nodeValidationState(QtNodes::NodeIndex const& index) const {
+	
 }
 
-NodeDataType ChigraphNodeModel::dataType(PortType pType, PortIndex pIndex) const {
-	if (pType == PortType::In) {
-		std::pair<std::string, std::string> idandname;
-		if (pIndex >= int(mInst->type().execInputs().size())) {
-			if (pIndex - mInst->type().execInputs().size() >= mInst->type().dataInputs().size()) {
-				return {};
-			}
-
-			idandname = {
-			    mInst->type()
-			        .dataInputs()[pIndex - mInst->type().execInputs().size()]
-			        .type.qualifiedName(),
-			    mInst->type().dataInputs()[pIndex - mInst->type().execInputs().size()].name};
-
-		} else {
-			idandname = {"exec", mInst->type().execInputs()[pIndex]};
-		}
-		return {QString::fromStdString(idandname.first), QString::fromStdString(idandname.second)};
-	}
-	if (pType == PortType::Out) {
-		std::pair<std::string, std::string> idandname;
-		if (pIndex >= int(mInst->type().execOutputs().size())) {
-			auto dataOutput =
-			    mInst->type().dataOutputs()[pIndex - mInst->type().execOutputs().size()];
-			idandname = {dataOutput.type.qualifiedName(), dataOutput.name};
-
-		} else {
-			idandname = {"exec", mInst->type().execOutputs()[pIndex]};
-		}
-		return {QString::fromStdString(idandname.first), QString::fromStdString(idandname.second)};
-	}
-
-	return {};
+/// Get the validation error/warning
+QString ChigraphFlowSceneModel::nodeValidationMessage(QtNodes::NodeIndex const& index) const {
+	
 }
 
-QtNodes::NodeValidationState ChigraphNodeModel::validationState() const { return mValidationState; }
-
-QString ChigraphNodeModel::validationMessage() const { return mValidationMessage; }
-
-QWidget* ChigraphNodeModel::embeddedWidget() { return mEmbedded; }
-
-void ChigraphNodeModel::removeDecorator(QtNodes::NodePainterDelegate* decorator) {
-	paintDelegate().removeDecorator(decorator);
-	mFunctionView->refreshGuiForNode(instance());
+/// Get the painter delegate
+QtNodes::NodePainterDelegate* ChigraphFlowSceneModel::nodePainterDelegate(QtNodes::NodeIndex const& index) const {
+	
 }
 
-void ChigraphNodeModel::clearDecorators() {
-	paintDelegate().clearDecorators();
-	mFunctionView->refreshGuiForNode(instance());
+/// Get the style
+QtNodes::NodeStyle ChigraphFlowSceneModel::nodeStyle(QtNodes::NodeIndex const& index) const {
+	
 }
 
-QtNodes::NodePainterDelegate* ChigraphNodeModel::addDecorator(
-    std::unique_ptr<QtNodes::NodePainterDelegate>&& decorator) {
-	auto ret = paintDelegate().addDecorator(std::move(decorator));
-	mFunctionView->refreshGuiForNode(instance());
-
-	return ret;
+/// Get the count of DataPorts
+unsigned int ChigraphFlowSceneModel::nodePortCount(QtNodes::NodeIndex const& index, QtNodes::PortType portType) const {
+	
 }
 
-void ChigraphNodeModelPaintDelegate::removeDecorator(QtNodes::NodePainterDelegate* decorator) {
-	auto iter = std::find_if(mDecorators.begin(), mDecorators.end(),
-	                         [decorator](auto& uptr) { return uptr.get() == decorator; });
+/// Get the port caption
+QString ChigraphFlowSceneModel::nodePortCaption(QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portType) const {
+	
+}
 
-	if (iter == mDecorators.end()) { return; }
+/// Get the port data type
+QtNodes::NodeDataType ChigraphFlowSceneModel::nodePortDataType(QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portType) const {
+	
+}
 
-	mDecorators.erase(iter);
+/// Port Policy
+QtNodes::ConnectionPolicy ChigraphFlowSceneModel::nodePortConnectionPolicy(QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portType) const {
+	
+}
+
+/// Get a connection at a port
+std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> ChigraphFlowSceneModel::nodePortConnections(QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portTypes) const {
+	
+}
+
+// Mutation functions
+/////////////////////
+
+/// Remove a connection
+bool ChigraphFlowSceneModel::removeConnection(QtNodes::NodeIndex const& leftNode, QtNodes::PortIndex /*leftPortID*/, QtNodes::NodeIndex const& /*rightNode*/, QtNodes::PortIndex /*rightPortID*/) {
+	
+}
+
+/// Add a connection
+bool ChigraphFlowSceneModel::addConnection(QtNodes::NodeIndex const& leftNode, QtNodes::PortIndex leftPortID, QtNodes::NodeIndex const& rightNode, QtNodes::PortIndex rightPortID) {
+	
+}
+
+/// Remove a node
+bool ChigraphFlowSceneModel::removeNode(QtNodes::NodeIndex const& index) {
+	
+}
+
+/// Add a  -- return {} if it fails
+QUuid ChigraphFlowSceneModel::addNode(QString const& typeID, QPointF const& pos) {
+	
+}
+
+/// Move a node to a new location
+bool ChigraphFlowSceneModel::moveNode(QtNodes::NodeIndex const& index, QPointF newLocation) {
+	
 }

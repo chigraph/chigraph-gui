@@ -72,41 +72,33 @@ DebuggerPlugin::DebuggerPlugin() {
 		        // only connect to it if it was just opened
 		        if (!isNew) { return; }
 
-		        connect(&view->scene(), &QtNodes::FlowScene::connectionHovered, this,
-		                [this, view](QtNodes::Connection& conn, const QPoint& point) {
+		        connect(&view->model(), &ChigraphFlowSceneModel::connectionWasHovered, this,
+		                [this, view](QtNodes::NodeIndex const& lhs, QtNodes::PortIndex lPortIndex, QtNodes::NodeIndex const& rhs, QtNodes::PortIndex /*rPortIndex*/, QPoint const& pos, bool /*entered*/) {
 
 			                // only print value when it's stopped
 			                if (!stopped()) { return; }
+			                
+			                auto leftChiNode = reinterpret_cast<chi::NodeInstance*>(lhs.internalPointer());
 
-			                // get the node and data output ID from connection
-
-			                auto leftGuiNode = conn.getNode(QtNodes::PortType::Out);
-			                if (leftGuiNode == nullptr) { return; }
-
-			                auto leftChiNode = view->chiNodeFromGuiNode(leftGuiNode);
-			                if (leftChiNode == nullptr) { return; }
-
-			                // this is the abosolute ID, as used in nodeeditor. Execs first, then
-			                // datas
-			                auto absConnID = conn.getPortIndex(QtNodes::PortType::Out);
-
+							Q_ASSERT(lPortIndex >= 0);
+							
 			                // if it's an exec output, then return
 			                if (!leftChiNode->type().pure() &&
-			                    absConnID <= leftChiNode->outputExecConnections.size()) {
+			                    (size_t)lPortIndex <= leftChiNode->outputExecConnections.size()) {
 				                return;
 			                }
 
 			                auto dataConnID =
 			                    leftChiNode->type().pure()
-			                        ? absConnID
-			                        : absConnID - leftChiNode->outputExecConnections.size();
+			                        ? lPortIndex
+			                        : lPortIndex - leftChiNode->outputExecConnections.size();
 
 			                // get the LLDB value
 			                auto value = mDebugger->inspectNodeOutput(*leftChiNode, dataConnID);
 			                if (!value.IsValid()) { return; }
 
 			                // display it
-			                QToolTip::showText(point,
+			                QToolTip::showText(pos,
 			                                   QString::fromLatin1(value.GetValue()) + " : " +
 			                                       QString::fromLatin1(value.GetSummary()));
 			            });
@@ -173,22 +165,6 @@ void DebuggerPlugin::debugStart() {
 			        if (node == nullptr) { return; }
 
 			        window->tabView().centerOnNode(*node);
-
-			        // clear the last triangle
-			        if (mCurrentNodeDecorator != nullptr && mCurrentNode != nullptr) {
-				        static_cast<ChigraphNodeModel&>(*mCurrentNode->nodeDataModel())
-				            .removeDecorator(mCurrentNodeDecorator);
-			        }
-
-			        // draw a triangle above it
-			        auto guiNode = window->tabView().currentView()->guiNodeFromChiNode(node);
-			        if (guiNode == nullptr) { return; }
-			        mCurrentNode = guiNode;
-
-			        auto& nodeModel = static_cast<ChigraphNodeModel&>(*guiNode->nodeDataModel());
-
-			        mCurrentNodeDecorator =
-			            nodeModel.addDecorator(std::make_unique<CurrentNodeDecorator>());
 
 		        } else {
 			        variableView().setDisabled(true);
