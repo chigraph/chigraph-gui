@@ -54,9 +54,6 @@ public:
 	/// Get the painter delegate
 	QtNodes::NodePainterDelegate* nodePainterDelegate(QtNodes::NodeIndex const& index) const override;
 	
-	/// Get the style
-	QtNodes::NodeStyle nodeStyle(QtNodes::NodeIndex const& index) const override;
-	
 	/// Get the count of DataPorts
 	unsigned int nodePortCount(QtNodes::NodeIndex const& index, QtNodes::PortType portType) const override;
 
@@ -76,7 +73,7 @@ public:
 	/////////////////////
 
 	/// Remove a connection
-	bool removeConnection(QtNodes::NodeIndex const& leftNode, QtNodes::PortIndex /*leftPortID*/, QtNodes::NodeIndex const& /*rightNode*/, QtNodes::PortIndex /*rightPortID*/) override;
+	bool removeConnection(QtNodes::NodeIndex const& leftNode, QtNodes::PortIndex leftPortID, QtNodes::NodeIndex const& rightNode, QtNodes::PortIndex rightPortID) override;
 
 	/// Add a connection
 	bool addConnection(QtNodes::NodeIndex const& leftNode, QtNodes::PortIndex leftPortID, QtNodes::NodeIndex const& rightNode, QtNodes::PortIndex rightPortID) override;
@@ -106,6 +103,7 @@ signals:
 private:
 	
 	chi::GraphFunction* mFunc;
+	std::unordered_map<chi::NodeInstance*, QWidget*> mEmbeddedWidgets;
 	
 };
 
