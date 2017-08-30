@@ -225,7 +225,7 @@ void CentralTabView::closeTab(int idx) {
 	if (strIter != mOpenStructs.end()) {
 		mOpenStructs.erase(strIter);
 	}
-	assert(funcIter != mOpenFunctions.end() || strIter != mOpenStructs.end() && "Internal error: a tab index was not in mOpenFunctions or mOpenStructs");
+	assert((funcIter != mOpenFunctions.end() || strIter != mOpenStructs.end()) && "Internal error: a tab index was not in mOpenFunctions or mOpenStructs");
 	
 	removeTab(idx);
 }

@@ -19,7 +19,7 @@ namespace {
 	
 class EditCodeDialog : public QDialog {
 public:
-	EditCodeDialog(chi::NodeInstance* inst, FunctionView* fview) {
+	EditCodeDialog(chi::NodeInstance* inst, ChigraphFlowSceneModel* fview) {
 		setWindowTitle(i18n("Edit C Call Node"));
 
 		auto layout = new QVBoxLayout;
@@ -73,7 +73,7 @@ public:
 
 		});
 
-		connect(this, &QDialog::accepted, this, [fview, inst] { fview->refreshGuiForNode(*inst); });
+		connect(this, &QDialog::accepted, this, [fview, inst] { emit fview->nodePortUpdated(fview->nodeIndex(*inst)); });
 	}
 };
 
@@ -141,8 +141,8 @@ ChigraphFlowSceneModel::ChigraphFlowSceneModel(chi::GraphFunction& func)
 			mEmbeddedWidgets[&inst] = edit;
 		} else if (inst.type().name() == "c-call") {
 			QPushButton* butt = new QPushButton(i18n("Edit code"));
-			connect(butt, &QPushButton::clicked, this, [this] {
-				auto dialog = new EditCodeDialog(&inst, mFunctionView);
+			connect(butt, &QPushButton::clicked, this, [this, &inst] {
+				auto dialog = new EditCodeDialog(&inst, this);
 
 				dialog->exec();
 			});
@@ -292,27 +292,33 @@ unsigned int ChigraphFlowSceneModel::nodePortCount(QtNodes::NodeIndex const& ind
 QString ChigraphFlowSceneModel::nodePortCaption(QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portType) const {
 	auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
 	
+	// make the casts safe
+	Q_ASSERT(portID >= 0);
+	
 	if (portType == QtNodes::PortType::In) {
-		return QString::fromStdString(portID < inst->inputExecConnections.size() ? inst->type().execInputs()[portID] : inst->type().dataInputs()[portID].name);
+		return QString::fromStdString((size_t)portID < inst->inputExecConnections.size() ? inst->type().execInputs()[portID] : inst->type().dataInputs()[portID].name);
 	}
-	return QString::fromStdString(portID < inst->outputExecConnections.size() ? inst->type().execOutputs()[portID] : inst->type().dataOutputs()[portID].name);
+	return QString::fromStdString((size_t)portID < inst->outputExecConnections.size() ? inst->type().execOutputs()[portID] : inst->type().dataOutputs()[portID].name);
 }
 
 /// Get the port data type
 QtNodes::NodeDataType ChigraphFlowSceneModel::nodePortDataType(QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portType) const {
 	auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
 	
+	// make casts safe
+	Q_ASSERT(portID >= 0);
+	
 	if (portType == QtNodes::PortType::In) {
-		if (portID < inst->inputExecConnections.size()) {
+		if ((size_t)portID < inst->inputExecConnections.size()) {
 			return QtNodes::NodeDataType{"_exec", ""};
 		}
-		auto typeName = QString::fromStdString(inst->type().dataInputs()[portID].type.qualifiedName());
+		auto typeName = QString::fromStdString(inst->type().dataInputs()[portID - inst->inputExecConnections.size()].type.qualifiedName());
 		return QtNodes::NodeDataType{typeName, typeName};
 	}
-	if (portID < inst->inputExecConnections.size()) {
+	if ((size_t)portID < inst->inputExecConnections.size()) {
 		return QtNodes::NodeDataType{"_exec", ""};
 	}
-	auto typeName = QString::fromStdString(inst->type().dataInputs()[portID].type.qualifiedName());
+	auto typeName = QString::fromStdString(inst->type().dataInputs()[portID - inst->inputExecConnections.size()].type.qualifiedName());
 	return QtNodes::NodeDataType{typeName, typeName};
 }
 
@@ -320,15 +326,48 @@ QtNodes::NodeDataType ChigraphFlowSceneModel::nodePortDataType(QtNodes::NodeInde
 QtNodes::ConnectionPolicy ChigraphFlowSceneModel::nodePortConnectionPolicy(QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portType) const {
 	auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
 	
+	// make casts safe
+	Q_ASSERT(portID >= 0);
+	
 	if (portType == QtNodes::PortType::In) {
-		return portID < inst->inputExecConnections.size() ? QtNodes::ConnectionPolicy::Many : QtNodes::ConnectionPolicy::One;
+		return (size_t)portID < inst->inputExecConnections.size() ? QtNodes::ConnectionPolicy::Many : QtNodes::ConnectionPolicy::One;
 	}
-	return portID < inst->outputExecConnections.size() ? QtNodes::ConnectionPolicy::One : QtNodes::ConnectionPolicy::Many;
+	return (size_t)portID < inst->outputExecConnections.size() ? QtNodes::ConnectionPolicy::One : QtNodes::ConnectionPolicy::Many;
 }
 
 /// Get a connection at a port
-std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> ChigraphFlowSceneModel::nodePortConnections(QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portTypes) const {
+std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> ChigraphFlowSceneModel::nodePortConnections(QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portType) const {
+	auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
 	
+	Q_ASSERT(portID >= 0);
+	
+	std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> ret;
+	
+	if (portType == QtNodes::PortType::In) {
+		if ((size_t)portID < inst->inputExecConnections.size()) {
+			for (const auto& conn : inst->inputExecConnections[portID]) {
+				ret.emplace_back(nodeIndex(*conn.first), conn.second);
+			}
+			return ret;
+		}
+		
+		const auto& connpair = inst->inputDataConnections[portID - inst->inputExecConnections.size()];
+		if (connpair.first != nullptr) {
+			ret.emplace_back(nodeIndex(*connpair.first), connpair.second);
+		}
+		return ret;
+	}
+	if ((size_t)portID < inst->outputExecConnections.size()) {
+		const auto& connpair = inst->outputExecConnections[portID];
+		if (connpair.first != nullptr) {
+			ret.emplace_back(nodeIndex(*connpair.first), connpair.second);
+		}
+		return ret;
+	}
+	for (const auto& conn : inst->outputDataConnections[portID - inst->outputExecConnections.size()]) {
+		ret.emplace_back(nodeIndex(*conn.first), conn.second);
+	}
+	return ret;
 }
 
 // Mutation functions

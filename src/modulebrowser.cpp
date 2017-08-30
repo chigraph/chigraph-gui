@@ -172,7 +172,9 @@ void ModuleBrowser::newFunction() {
 	
 	chi::GraphModule* gMod = static_cast<chi::GraphModule*>(mod);
 	// add the function TODO: detect if "New Function" is already taken
-	auto func = gMod->getOrCreateFunction("New Function", {}, {}, {""}, {""});
+	LLVM_ATTRIBUTE_UNUSED auto func = gMod->getOrCreateFunction("New Function", {}, {}, {""}, {""});
+	Q_ASSERT(func);
+	
 	
 	// update the model
 	mModel->updateModule(owningModule);

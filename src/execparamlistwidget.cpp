@@ -12,27 +12,27 @@
 
 #include "functionview.hpp"
 
-namespace {
-
-QStringList createTypeOptions(const chi::GraphModule& mod) {
-	QStringList ret;
-
-	// add the module
-	for (const auto& ty : mod.typeNames()) {
-		ret << QString::fromStdString(mod.fullName() + ":" + ty);
-	}
-
-	// and its dependencies
-	for (auto dep : mod.dependencies()) {
-		auto depMod = mod.context().moduleByFullName(dep);
-		for (const auto& type : depMod->typeNames()) {
-			ret << QString::fromStdString(depMod->fullName() + ":" + type);
-		}
-	}
-	return ret;
-}
-
-}  // anon namespace
+// namespace {
+// 
+// QStringList createTypeOptions(const chi::GraphModule& mod) {
+// 	QStringList ret;
+// 
+// 	// add the module
+// 	for (const auto& ty : mod.typeNames()) {
+// 		ret << QString::fromStdString(mod.fullName() + ":" + ty);
+// 	}
+// 
+// 	// and its dependencies
+// 	for (auto dep : mod.dependencies()) {
+// 		auto depMod = mod.context().moduleByFullName(dep);
+// 		for (const auto& type : depMod->typeNames()) {
+// 			ret << QString::fromStdString(depMod->fullName() + ":" + type);
+// 		}
+// 	}
+// 	return ret;
+// }
+// 
+// }  // anon namespace
 
 ExecParamListWidget::ExecParamListWidget(QWidget* parent) : QWidget(parent) {}
 

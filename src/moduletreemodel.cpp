@@ -140,8 +140,12 @@ QModelIndex ModuleTreeModel::index(int row, int column, const QModelIndex& paren
 	} else {
 		parentItem = tree();
 	}
+	
+	
+	// make cast valid
+	Q_ASSERT(row >= 0);
 
-	if (row < parentItem->children.size()) {
+	if ((size_t)row < parentItem->children.size()) {
 		return createIndex(row, column, parentItem->children[row].get());
 	}
 	return {};
