@@ -45,9 +45,6 @@ FunctionView::FunctionView(chi::GraphFunction& func_, QWidget* parent)
 	mView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	hlayout->addWidget(mView);
-
-	// validate the function
-	updateValidationStates();
 }
 
 std::vector<chi::NodeInstance*> FunctionView::selectedNodes() {

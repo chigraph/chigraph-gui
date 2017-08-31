@@ -26,8 +26,6 @@ public:
 		emit mModel->nodePortUpdated(mModel->nodeIndex(inst));
 	}
 
-	void refreshRegistry();
-
 	chi::GraphFunction* function() const { return mFunction; }
 
 	QtNodes::FlowScene& scene() const { return *mScene; }
@@ -43,7 +41,6 @@ signals:
 	void functionDoubleClicked(chi::GraphFunction& func);
 
 private:
-	void updateValidationStates();
 
 	QtNodes::FlowScene* mScene;
 	QtNodes::FlowView*  mView;

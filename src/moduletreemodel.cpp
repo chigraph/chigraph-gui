@@ -267,6 +267,7 @@ QVariant ModuleTreeModel::data(const QModelIndex& index, int role) const {
 			bold.setBold(true);
 			return bold;
 		}
+		return {};
 	default: return {};
 	}
 }
@@ -330,5 +331,7 @@ bool ModuleTreeModel::setData(const QModelIndex& index, const QVariant& value, i
 		dataChanged(index, index, {Qt::DisplayRole});
 		return true;
 	}
+	
+	return false;
 }
 

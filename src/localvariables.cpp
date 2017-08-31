@@ -30,8 +30,6 @@ void LocalVariables::loadFunction(FunctionView* func) {
 			auto stdstr = newText.toStdString();
 			mFunctionView->function()->renameLocalVariable(
 			    mFunctionView->function()->localVariables()[id].name, stdstr);
-			// update the registry
-			mFunctionView->refreshRegistry();
 			// update the nodes
 			refreshReferencingNodes(stdstr);
 			dirtied();
@@ -47,7 +45,6 @@ void LocalVariables::loadFunction(FunctionView* func) {
 			        auto localName = mFunctionView->function()->localVariables()[id].name;
 
 			        mFunctionView->function()->retypeLocalVariable(localName, newType);
-			        mFunctionView->refreshRegistry();
 			        refreshReferencingNodes(localName);
 			        dirtied();
 
@@ -62,7 +59,6 @@ void LocalVariables::loadFunction(FunctionView* func) {
 			deleteReferencingNodes(name);
 
 			mFunctionView->function()->removeLocalVariable(name);
-			mFunctionView->refreshRegistry();
 
 			// refresh the local vars panel
 			loadFunction(mFunctionView);
@@ -79,7 +75,6 @@ void LocalVariables::loadFunction(FunctionView* func) {
 		chi::DataType ty = mFunctionView->function()->context().langModule()->typeFromName("i32");
 
 		mFunctionView->function()->getOrCreateLocalVariable("", ty);
-		mFunctionView->refreshRegistry();
 
 		loadFunction(mFunctionView);
 		dirtied();

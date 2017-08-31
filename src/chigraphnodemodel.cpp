@@ -211,7 +211,9 @@ QList<QUuid> ChigraphFlowSceneModel::nodeUUids() const {
 	QList<QUuid> ret;
 	
 	for (const auto& node : mFunc->nodes()) {
-		ret << QUuid(QByteArray(reinterpret_cast<const char*>(node.second->id().data), 16));
+		
+		
+		ret << QUuid::fromRfc4122(QByteArray(reinterpret_cast<const char*>(node.second->id().data), 16));
 	}
 	
 	return ret;
@@ -220,12 +222,13 @@ QtNodes::NodeIndex ChigraphFlowSceneModel::nodeIndex(const QUuid& ID) const {
 	// create a boost::uuid
 	boost::uuids::uuid uuid;
 	
-	auto QuuidByteArray = ID.toByteArray();
+	auto QuuidByteArray = ID.toRfc4122();
+	
 	std::copy(QuuidByteArray.begin(), QuuidByteArray.end(), uuid.begin());
 	
 	// find the node
 	auto iter = mFunc->nodes().find(uuid);
-	if (iter != mFunc->nodes().end()) {
+	if (iter == mFunc->nodes().end()) {
 		return {};
 	}
 	
@@ -285,7 +288,7 @@ unsigned int ChigraphFlowSceneModel::nodePortCount(QtNodes::NodeIndex const& ind
 	if (portType == QtNodes::PortType::In) {
 		return inst->inputExecConnections.size() + inst->inputDataConnections.size();
 	}
-	return inst->outputExecConnections.size() + inst->outputExecConnections.size();
+	return inst->outputExecConnections.size() + inst->outputDataConnections.size();
 }
 
 /// Get the port caption
@@ -315,10 +318,10 @@ QtNodes::NodeDataType ChigraphFlowSceneModel::nodePortDataType(QtNodes::NodeInde
 		auto typeName = QString::fromStdString(inst->type().dataInputs()[portID - inst->inputExecConnections.size()].type.qualifiedName());
 		return QtNodes::NodeDataType{typeName, typeName};
 	}
-	if ((size_t)portID < inst->inputExecConnections.size()) {
+	if ((size_t)portID < inst->outputExecConnections.size()) {
 		return QtNodes::NodeDataType{"_exec", ""};
 	}
-	auto typeName = QString::fromStdString(inst->type().dataInputs()[portID - inst->inputExecConnections.size()].type.qualifiedName());
+	auto typeName = QString::fromStdString(inst->type().dataOutputs()[portID - inst->outputExecConnections.size()].type.qualifiedName());
 	return QtNodes::NodeDataType{typeName, typeName};
 }
 

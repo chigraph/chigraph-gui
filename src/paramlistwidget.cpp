@@ -117,6 +117,4 @@ void ParamListWidget::refreshExits() {
 	for (const auto& exit : mFunc->function()->nodesWithType("lang", "exit")) {
 		mFunc->refreshGuiForNode(*exit);
 	}
-
-	mFunc->refreshRegistry();
 }
