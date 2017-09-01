@@ -219,6 +219,8 @@ QList<QUuid> ChigraphFlowSceneModel::nodeUUids() const {
 	return ret;
 }
 QtNodes::NodeIndex ChigraphFlowSceneModel::nodeIndex(const QUuid& ID) const {
+	Q_ASSERT(!ID.isNull());
+	
 	// create a boost::uuid
 	boost::uuids::uuid uuid;
 	
@@ -299,9 +301,9 @@ QString ChigraphFlowSceneModel::nodePortCaption(QtNodes::NodeIndex const& index,
 	Q_ASSERT(portID >= 0);
 	
 	if (portType == QtNodes::PortType::In) {
-		return QString::fromStdString((size_t)portID < inst->inputExecConnections.size() ? inst->type().execInputs()[portID] : inst->type().dataInputs()[portID].name);
+		return QString::fromStdString((size_t)portID < inst->inputExecConnections.size() ? inst->type().execInputs()[portID] : inst->type().dataInputs()[portID - inst->inputExecConnections.size()].name);
 	}
-	return QString::fromStdString((size_t)portID < inst->outputExecConnections.size() ? inst->type().execOutputs()[portID] : inst->type().dataOutputs()[portID].name);
+	return QString::fromStdString((size_t)portID < inst->outputExecConnections.size() ? inst->type().execOutputs()[portID] : inst->type().dataOutputs()[portID - inst->outputExecConnections.size()].name);
 }
 
 /// Get the port data type
@@ -340,6 +342,8 @@ QtNodes::ConnectionPolicy ChigraphFlowSceneModel::nodePortConnectionPolicy(QtNod
 
 /// Get a connection at a port
 std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> ChigraphFlowSceneModel::nodePortConnections(QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portType) const {
+	Q_ASSERT(index.isValid());
+
 	auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
 	
 	Q_ASSERT(portID >= 0);
@@ -351,6 +355,7 @@ std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> ChigraphFlowScene
 			for (const auto& conn : inst->inputExecConnections[portID]) {
 				ret.emplace_back(nodeIndex(*conn.first), conn.second);
 			}
+			Q_ASSERT(std::all_of(ret.begin(), ret.end(), [](auto pair){ return pair.first.isValid(); }));
 			return ret;
 		}
 		
@@ -358,6 +363,7 @@ std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> ChigraphFlowScene
 		if (connpair.first != nullptr) {
 			ret.emplace_back(nodeIndex(*connpair.first), connpair.second);
 		}
+		Q_ASSERT(std::all_of(ret.begin(), ret.end(), [](auto pair){ return pair.first.isValid(); }));
 		return ret;
 	}
 	if ((size_t)portID < inst->outputExecConnections.size()) {
@@ -365,11 +371,16 @@ std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> ChigraphFlowScene
 		if (connpair.first != nullptr) {
 			ret.emplace_back(nodeIndex(*connpair.first), connpair.second);
 		}
+		Q_ASSERT(std::all_of(ret.begin(), ret.end(), [](auto pair){ return pair.first.isValid(); }));
 		return ret;
 	}
 	for (const auto& conn : inst->outputDataConnections[portID - inst->outputExecConnections.size()]) {
 		ret.emplace_back(nodeIndex(*conn.first), conn.second);
 	}
+	
+	// make sure they're all valid
+	Q_ASSERT(std::all_of(ret.begin(), ret.end(), [](auto pair){ return pair.first.isValid(); }));
+	
 	return ret;
 }
 

@@ -37,7 +37,7 @@ public:
 	// Retrieval functions
 	//////////////////////
 	
-	QtNodes::NodeIndex nodeIndex(const chi::NodeInstance& node) const { return nodeIndex(QUuid(QByteArray(reinterpret_cast<const char*>(node.id().data), 16))); }
+	QtNodes::NodeIndex nodeIndex(const chi::NodeInstance& node) const { return nodeIndex(QUuid::fromRfc4122(QByteArray(reinterpret_cast<const char*>(node.id().data), 16))); }
 
 	QList<QUuid> nodeUUids() const override;
 	QtNodes::NodeIndex nodeIndex(const QUuid& ID) const override;
