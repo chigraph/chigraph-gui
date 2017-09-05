@@ -361,7 +361,7 @@ std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> ChigraphFlowScene
 		
 		const auto& connpair = inst->inputDataConnections[portID - inst->inputExecConnections.size()];
 		if (connpair.first != nullptr) {
-			ret.emplace_back(nodeIndex(*connpair.first), connpair.second + connpair.first->inputExecConnections.size());
+			ret.emplace_back(nodeIndex(*connpair.first), connpair.second + connpair.first->outputExecConnections.size());
 		}
 		Q_ASSERT(std::all_of(ret.begin(), ret.end(), [](auto pair){ return pair.first.isValid(); }));
 		return ret;
@@ -375,7 +375,7 @@ std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> ChigraphFlowScene
 		return ret;
 	}
 	for (const auto& conn : inst->outputDataConnections[portID - inst->outputExecConnections.size()]) {
-		ret.emplace_back(nodeIndex(*conn.first), conn.second + conn.first->outputExecConnections.size());
+		ret.emplace_back(nodeIndex(*conn.first), conn.second + conn.first->inputExecConnections.size());
 	}
 	
 	// make sure they're all valid
@@ -388,8 +388,41 @@ std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> ChigraphFlowScene
 /////////////////////
 
 /// Remove a connection
-bool ChigraphFlowSceneModel::removeConnection(QtNodes::NodeIndex const& leftNode, QtNodes::PortIndex /*leftPortID*/, QtNodes::NodeIndex const& /*rightNode*/, QtNodes::PortIndex /*rightPortID*/) {
-	return false;
+bool ChigraphFlowSceneModel::removeConnection(QtNodes::NodeIndex const& leftNode, QtNodes::PortIndex leftPortID, QtNodes::NodeIndex const& rightNode, QtNodes::PortIndex rightPortID) {
+	Q_ASSERT(leftNode.isValid());
+	Q_ASSERT(rightNode.isValid());
+	
+	// make casts safe
+	Q_ASSERT(leftPortID >= 0);
+	Q_ASSERT(rightPortID >= 0);
+	
+	auto leftInst = reinterpret_cast<chi::NodeInstance*>(leftNode.internalPointer());
+	auto rightInst = reinterpret_cast<chi::NodeInstance*>(rightNode.internalPointer());
+	
+	if ((size_t)leftPortID < leftInst->outputExecConnections.size()) {
+		auto res = chi::disconnectExec(*leftInst, (size_t)leftPortID);
+		
+		if (!res) {
+			
+			KMessageBox::detailedError(nullptr, i18n("Failed to disconnect exec"), QString::fromStdString(res.dump()));
+			
+			return false; 
+			
+		}
+		
+		emit connectionRemoved(leftNode, leftPortID, rightNode, rightPortID);
+		return true;
+	}
+	
+	auto res = chi::disconnectData(*leftInst, size_t(leftPortID - leftInst->outputExecConnections.size()), *rightInst);
+	if (!res) { 
+		
+		KMessageBox::detailedError(nullptr, i18n("Failed to disconnect data"), QString::fromStdString(res.dump()));
+		return false; 
+		
+	}
+	emit connectionRemoved(leftNode, leftPortID, rightNode, rightPortID);
+	return true;
 }
 
 /// Add a connection
@@ -399,15 +432,62 @@ bool ChigraphFlowSceneModel::addConnection(QtNodes::NodeIndex const& leftNode, Q
 
 /// Remove a node
 bool ChigraphFlowSceneModel::removeNode(QtNodes::NodeIndex const& index) {
-	return false;
+	Q_ASSERT(index.isValid());
+
+	auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
+	
+	// don't remove it if it's an entry node
+	if (inst->type().qualifiedName() == "lang:entry") {
+		return false;
+	}
+	
+	auto res = inst->function().removeNode(*inst);
+	
+	if (!res) { return false; }
+	emit nodeRemoved(index.id());
+	return true;
 }
 
 /// Add a  -- return {} if it fails
 QUuid ChigraphFlowSceneModel::addNode(QString const& typeID, QPointF const& pos) {
-	return {};
+	// see if it's a valid typeid
+	
+	// parse the typeID
+	std::string modName;
+	std::string tyName;
+	std::tie(modName, tyName) = chi::parseColonPair(typeID.toStdString());
+	
+	auto& ctx = mFunc->context();
+	
+	std::unique_ptr<chi::NodeType> nodeType;
+	auto res = ctx.nodeTypeFromModule(modName, tyName, {}, &nodeType);
+	
+	if (!res) {
+		return {};
+	}
+	
+	// create the node
+	chi::NodeInstance* inst;
+	res += mFunc->insertNode(std::move(nodeType), 0.f, 0.f, boost::uuids::random_generator()(), &inst);
+	if (!res) { return {}; }
+	
+	auto quuid = QUuid::fromRfc4122(QByteArray(reinterpret_cast<const char*>(inst->id().data), 16));
+	
+	emit nodeAdded(quuid);
+	
+	return quuid;
 }
 
 /// Move a node to a new location
 bool ChigraphFlowSceneModel::moveNode(QtNodes::NodeIndex const& index, QPointF newLocation) {
-	return false;
+	Q_ASSERT(index.isValid());
+
+	auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
+	
+	inst->setX(newLocation.x());
+	inst->setY(newLocation.y());
+	
+	emit nodeMoved(index);
+	
+	return true;
 }
