@@ -33,7 +33,7 @@ NewModuleDialog::NewModuleDialog(QWidget* parent, chi::Context& context,
 
 	auto buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok);
 	connect(buttonBox, &QDialogButtonBox::accepted, this, [this, &context] {
-		if (mFolderWidget->item().empty() || mNameEdit->text().isEmpty()) { return; }
+		if (mNameEdit->text().isEmpty()) { return; }
 
 		// create the new module
 		auto fullPath = mFolderWidget->item() / mNameEdit->text().toStdString();

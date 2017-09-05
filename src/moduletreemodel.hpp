@@ -20,7 +20,6 @@ struct WorkspaceTree {
 	chi::GraphFunction*                         func   = nullptr;
 	chi::GraphStruct*                           str    = nullptr;
 	QString                                     name;
-	bool                                        dirty = false;
 	int                                         row   = 0;
 	eType                                       type;
 
@@ -32,6 +31,10 @@ struct WorkspaceTree {
 		while (parent != nullptr) {
 			ret    = parent->name.toStdString() / ret;
 			parent = parent->parent;
+		}
+		
+		if (ret.string().size() <= 4) {
+			return "";
 		}
 		ret = ret.string().substr(4);  // remove src/ at the beginning
 
