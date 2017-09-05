@@ -43,6 +43,20 @@ FunctionView::FunctionView(chi::GraphFunction& func_, QWidget* parent)
 	mView->setSceneRect(-320000, -320000, 640000, 640000);
 	mView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	mView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	
+	connect(mModel, &ChigraphFlowSceneModel::nodeWasDoubleClicked, this, [this] (QtNodes::NodeIndex const& index, QPoint const&) {
+		auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
+		
+		auto& module = inst->type().module();
+		// cast to a GraphModule
+		auto* castedModule = dynamic_cast<chi::GraphModule*>(&module);
+		if (castedModule == nullptr) { return; }
+		
+		auto func = castedModule->functionFromName(inst->type().name());
+		if (func == nullptr) { return; }
+		
+		emit functionDoubleClicked(*func);
+	});
 
 	hlayout->addWidget(mView);
 }
