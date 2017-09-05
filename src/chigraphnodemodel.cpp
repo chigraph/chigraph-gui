@@ -427,7 +427,34 @@ bool ChigraphFlowSceneModel::removeConnection(QtNodes::NodeIndex const& leftNode
 
 /// Add a connection
 bool ChigraphFlowSceneModel::addConnection(QtNodes::NodeIndex const& leftNode, QtNodes::PortIndex leftPortID, QtNodes::NodeIndex const& rightNode, QtNodes::PortIndex rightPortID) {
-	return false;
+	Q_ASSERT(leftNode.isValid());
+	Q_ASSERT(rightNode.isValid());
+	
+	// make casts safe
+	Q_ASSERT(leftPortID >= 0);
+	Q_ASSERT(rightPortID >= 0);
+	
+	auto leftInst = reinterpret_cast<chi::NodeInstance*>(leftNode.internalPointer());
+	auto rightInst = reinterpret_cast<chi::NodeInstance*>(rightNode.internalPointer());
+	
+	if ((size_t)leftPortID < leftInst->outputExecConnections.size()) {
+		// then it's an exec connection
+		auto ret = chi::connectExec(*leftInst, leftPortID, *rightInst, rightPortID);
+		
+		if (!ret) {
+			return false;
+		}
+		
+		emit connectionAdded(leftNode, leftPortID, rightNode, rightPortID);
+		return true;
+	}
+	// then it's data
+	auto ret = chi::connectData(*leftInst, leftPortID - leftInst->outputExecConnections.size(), *rightInst, rightPortID - leftInst->inputExecConnections.size());
+	
+	if (!ret) { return false; }
+	
+	emit connectionAdded(leftNode, leftPortID, rightNode, rightPortID);
+	return true;
 }
 
 /// Remove a node
