@@ -196,7 +196,7 @@ void ModuleTreeModel::fetchMore(const QModelIndex& index) {
 
 	// load it
 	chi::ChiModule* mod;
-	chi::Result     res = mCtx->loadModule(p, chi::LoadSettings::Default, &mod);
+	chi::Result     res = mCtx->loadModule(p, &mod);
 	if (!res) {
 		KMessageBox::detailedError(nullptr,
 		                           R"(Failed to load JsonModule from file ")" +

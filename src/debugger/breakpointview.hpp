@@ -3,7 +3,7 @@
 
 #include <KLocalizedString>
 
-#include <chi/Debugger.hpp>
+#include <chi/Debugger/Debugger.hpp>
 
 #include "../toolview.hpp"
 

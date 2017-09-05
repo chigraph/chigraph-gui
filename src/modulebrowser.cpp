@@ -163,7 +163,7 @@ void ModuleBrowser::newFunction() {
 	
 	// get the module from the context
 	chi::ChiModule* mod;
-	auto res = context().loadModule(owningModule, chi::LoadSettings::Default, &mod);
+	auto res = context().loadModule(owningModule, &mod);
 	
 	if (!res) {
 		KMessageBox::detailedError(this, "Failed to load module", QString::fromStdString(res.dump()));
@@ -198,7 +198,7 @@ void ModuleBrowser::newStruct() {
 	
 	// get the module from the context
 	chi::ChiModule* mod;
-	auto res = context().loadModule(owningModule, chi::LoadSettings::Default, &mod);
+	auto res = context().loadModule(owningModule, &mod);
 	
 	if (!res) {
 		KMessageBox::detailedError(this, "Failed to load module", QString::fromStdString(res.dump()));

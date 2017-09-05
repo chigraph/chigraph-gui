@@ -361,7 +361,7 @@ std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> ChigraphFlowScene
 		
 		const auto& connpair = inst->inputDataConnections[portID - inst->inputExecConnections.size()];
 		if (connpair.first != nullptr) {
-			ret.emplace_back(nodeIndex(*connpair.first), connpair.second);
+			ret.emplace_back(nodeIndex(*connpair.first), connpair.second + connpair.first->inputExecConnections.size());
 		}
 		Q_ASSERT(std::all_of(ret.begin(), ret.end(), [](auto pair){ return pair.first.isValid(); }));
 		return ret;
@@ -375,7 +375,7 @@ std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> ChigraphFlowScene
 		return ret;
 	}
 	for (const auto& conn : inst->outputDataConnections[portID - inst->outputExecConnections.size()]) {
-		ret.emplace_back(nodeIndex(*conn.first), conn.second);
+		ret.emplace_back(nodeIndex(*conn.first), conn.second + conn.first->outputExecConnections.size());
 	}
 	
 	// make sure they're all valid

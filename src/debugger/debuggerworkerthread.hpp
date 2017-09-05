@@ -5,7 +5,7 @@
 
 #include <QObject>
 
-#include <chi/Debugger.hpp>
+#include <chi/Debugger/Debugger.hpp>
 
 #include <lldb/API/SBEvent.h>
 

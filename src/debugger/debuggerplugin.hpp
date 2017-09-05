@@ -13,7 +13,7 @@
 
 #include <nodes/FlowScene>
 
-#include <chi/Debugger.hpp>
+#include <chi/Debugger/Debugger.hpp>
 
 class DebuggerPlugin : public QObject, public ChigraphPlugin {
 	Q_OBJECT

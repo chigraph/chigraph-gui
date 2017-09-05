@@ -281,7 +281,7 @@ std::pair<chi::Result, chi::GraphModule*> MainWindow::loadModule(const QString& 
 	assert(!name.isEmpty() && "Name passed to loadModule should not be empty");
 	
 	chi::ChiModule* mod;
-	auto res = context().loadModule(name.toStdString(), chi::LoadSettings::Default, &mod);
+	auto res = context().loadModule(name.toStdString(), &mod);
 	if (!res) { return {res, nullptr}; }
 	return {res, dynamic_cast<chi::GraphModule*>(mod)};
 }
