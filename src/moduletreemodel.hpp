@@ -20,6 +20,7 @@ struct WorkspaceTree {
 	chi::GraphFunction*                         func   = nullptr;
 	chi::GraphStruct*                           str    = nullptr;
 	QString                                     name;
+	bool                                        dirty = false;
 	int                                         row   = 0;
 	eType                                       type;
 
