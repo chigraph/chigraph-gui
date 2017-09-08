@@ -22,7 +22,7 @@ public:
 
 	static boost::filesystem::path getItem(QWidget* parent, chi::Context& ctx, const QString& title,
 	                                       WorkspaceTree::eType           type,
-	                                       const boost::filesystem::path& startWithSelection);
+	                                       const boost::filesystem::path& startWithSelection = {});
 
 private slots:
 	void tryAccept(const QModelIndex& index);

@@ -449,7 +449,7 @@ bool ChigraphFlowSceneModel::addConnection(QtNodes::NodeIndex const& leftNode, Q
 		return true;
 	}
 	// then it's data
-	auto ret = chi::connectData(*leftInst, leftPortID - leftInst->outputExecConnections.size(), *rightInst, rightPortID - leftInst->inputExecConnections.size());
+	auto ret = chi::connectData(*leftInst, leftPortID - leftInst->outputExecConnections.size(), *rightInst, rightPortID - rightInst->inputExecConnections.size());
 	
 	if (!ret) { return false; }
 	

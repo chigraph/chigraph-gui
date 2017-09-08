@@ -80,6 +80,7 @@ set(GUI_SRCS
 	chiitemselectiondialog.cpp
 	chiitemselectwidget.cpp
 	newmoduledialog.cpp
+	modulepropertiesdialog.cpp
 )
 
 set(GUI_RESOURCES
@@ -107,6 +108,7 @@ set(GUI_HEADERS
 	chiitemselectiondialog.hpp
 	chiitemselectwidget.hpp
 	newmoduledialog.hpp
+	modulepropertiesdialog.hpp
 )
 
 add_executable(chigraphgui ${GUI_SRCS} ${GUI_HEADERS} ${GUI_RESOURCES})

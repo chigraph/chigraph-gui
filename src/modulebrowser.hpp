@@ -59,6 +59,7 @@ private slots:
 	void newModule();
 	void newFunction();
 	void newStruct();
+	void moduleProperties();
 
 private:
 	void updateDirtyStatus(chi::GraphModule& updated, bool dirty);
@@ -76,6 +77,7 @@ private:
 	QAction* newStructAction;
 	QAction* deleteAction;
 	QAction* renameAction;
+	QAction* modulePropertiesAction;
 };
 
 #endif  // CHIGRAPHGUI_MODULE_BROWSER_HPP

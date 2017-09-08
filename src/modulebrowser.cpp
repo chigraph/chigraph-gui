@@ -15,6 +15,7 @@
 #include "mainwindow.hpp"
 #include "moduletreemodel.hpp"
 #include "newmoduledialog.hpp"
+#include "modulepropertiesdialog.hpp"
 
 #include <boost/filesystem.hpp>
 
@@ -48,6 +49,11 @@ ModuleBrowser::ModuleBrowser(QWidget* parent) : QTreeView(parent) {
 	    QStringLiteral("rename"),
 	    new QAction(QIcon::fromTheme(QStringLiteral("edit-rename")), i18n("Rename"), nullptr));
 
+	modulePropertiesAction = actionCollection()->addAction(
+		QStringLiteral("module-properties"),
+		new QAction(QIcon::fromTheme(QStringLiteral("document-properties")), i18n("Module Properties"), nullptr));
+	connect(modulePropertiesAction, &QAction::triggered, this, &ModuleBrowser::moduleProperties);
+	
 	setAnimated(true);
 	setSortingEnabled(true);
 	setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
@@ -82,6 +88,7 @@ ModuleBrowser::ModuleBrowser(QWidget* parent) : QTreeView(parent) {
 			contextMenu.addAction(newFunctionAction);
 			contextMenu.addAction(newStructAction);
 			contextMenu.addAction(deleteAction);
+			contextMenu.addAction(modulePropertiesAction);
 			break;
 		case WorkspaceTree::FOLDER:
 			contextMenu.addAction(renameAction);
@@ -211,6 +218,33 @@ void ModuleBrowser::newStruct() {
 	gMod->getOrCreateStruct("New Struct");
 	
 	mModel->updateModule(owningModule);
+}
+
+void ModuleBrowser::moduleProperties() {
+	fs::path owningModule;
+	
+	auto idx = currentIndex();
+	if (idx.isValid()) {
+		auto item = static_cast<WorkspaceTree*>(idx.internalPointer());
+		
+		if (item->type != WorkspaceTree::MODULE) {
+			return;
+		}
+		
+		owningModule = item->fullName();
+	}
+	
+	// load the module
+	chi::ChiModule* mod;
+	auto res = context().loadModule(owningModule, &mod);
+	if (!res) { qDebug() << "Failed to load module " << QString::fromStdString(owningModule.string()); }
+	
+	auto castedMod = static_cast<chi::GraphModule*>(mod);
+	
+	
+	auto dialog = new ModulePropertiesDialog(this, *castedMod);
+	dialog->exec();
+	
 }
 
 void ModuleBrowser::updateDirtyStatus(chi::GraphModule& updated, bool dirty) {
