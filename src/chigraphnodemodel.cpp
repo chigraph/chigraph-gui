@@ -77,6 +77,96 @@ public:
 	}
 };
 
+} // namespace
+
+QWidget* ChigraphFlowSceneModel::createEmbeddedWidget(chi::NodeInstance& inst) {
+
+	if (inst.type().name() == "const-bool") {
+		QCheckBox* box     = new QCheckBox("");
+		bool       checked = inst.type().toJSON();
+		box->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
+
+		connect(box, &QCheckBox::stateChanged, this, [this, &inst](int newState) {
+			std::unique_ptr<chi::NodeType> newType;
+
+			inst.context().nodeTypeFromModule("lang", "const-bool", newState == Qt::Checked,
+												&newType);
+
+			inst.setType(std::move(newType));
+		});
+
+		box->setMaximumSize(box->sizeHint());
+		return box;
+	}
+	if (inst.type().name() == "strliteral") {
+		auto        edit = new QLineEdit();
+		std::string s    = inst.type().toJSON();
+		edit->setText(QString::fromStdString(s));
+
+		edit->setMaximumSize(edit->sizeHint());
+
+		connect(edit, &QLineEdit::textChanged, this, [this, &inst](const QString& s) {
+			std::unique_ptr<chi::NodeType> newType;
+
+			inst.context().nodeTypeFromModule("lang", "strliteral", s.toUtf8().constData(),
+												&newType);
+
+			inst.setType(std::move(newType));
+
+		});
+
+		return edit;
+	} 
+	if (inst.type().name() == "const-int") {
+		auto edit = new QLineEdit();
+		edit->setValidator(new QIntValidator);
+		int val = inst.type().toJSON();
+		edit->setText(QString::number(val));
+
+		edit->setMaximumSize(edit->sizeHint());
+
+		connect(edit, &QLineEdit::textChanged, this, [this, &inst](const QString& s) {
+			std::unique_ptr<chi::NodeType> newType;
+
+			inst.context().nodeTypeFromModule("lang", "const-int", s.toInt(), &newType);
+
+			inst.setType(std::move(newType));
+
+		});
+
+		return edit;
+	} 
+	if (inst.type().name() == "c-call") {
+		QPushButton* butt = new QPushButton(i18n("Edit code"));
+		connect(butt, &QPushButton::clicked, this, [this, &inst] {
+			auto dialog = new EditCodeDialog(&inst, this);
+
+			dialog->exec();
+		});
+
+		butt->setMaximumSize(butt->sizeHint());
+
+		return butt;
+	} 
+	if (inst.type().name() == "const-float") {
+		auto edit = new QLineEdit();
+		edit->setValidator(new QDoubleValidator);
+		double val = inst.type().toJSON();
+		edit->setText(QString::number(val));
+
+		edit->setMaximumSize(edit->sizeHint());
+
+		connect(edit, &QLineEdit::textChanged, this, [this, &inst](const QString& s) {
+			std::unique_ptr<chi::NodeType> newType;
+
+			inst.context().nodeTypeFromModule("lang", "const-float", s.toDouble(), &newType);
+
+			inst.setType(std::move(newType));
+		});
+
+		return edit;
+	}
+	return nullptr;
 }
 
 ChigraphFlowSceneModel::ChigraphFlowSceneModel(chi::GraphFunction& func) 
@@ -87,86 +177,10 @@ ChigraphFlowSceneModel::ChigraphFlowSceneModel(chi::GraphFunction& func)
 	for (const auto& node : mFunc->nodes()) {
 		auto& inst = *node.second;
 		
-		if (inst.type().name() == "const-bool") {
-			QCheckBox* box     = new QCheckBox("");
-			bool       checked = inst.type().toJSON();
-			box->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
-
-			connect(box, &QCheckBox::stateChanged, this, [this, &inst](int newState) {
-				std::unique_ptr<chi::NodeType> newType;
-
-				inst.context().nodeTypeFromModule("lang", "const-bool", newState == Qt::Checked,
-													&newType);
-
-				inst.setType(std::move(newType));
-			});
-
-			box->setMaximumSize(box->sizeHint());
-			mEmbeddedWidgets[&inst] = box;
-		} else if (inst.type().name() == "strliteral") {
-			auto        edit = new QLineEdit();
-			std::string s    = inst.type().toJSON();
-			edit->setText(QString::fromStdString(s));
-
-			edit->setMaximumSize(edit->sizeHint());
-
-			connect(edit, &QLineEdit::textChanged, this, [this, &inst](const QString& s) {
-				std::unique_ptr<chi::NodeType> newType;
-
-				inst.context().nodeTypeFromModule("lang", "strliteral", s.toUtf8().constData(),
-													&newType);
-
-				inst.setType(std::move(newType));
-
-			});
-
-			mEmbeddedWidgets[&inst] = edit;
-		} else if (inst.type().name() == "const-int") {
-			auto edit = new QLineEdit();
-			edit->setValidator(new QIntValidator);
-			int val = inst.type().toJSON();
-			edit->setText(QString::number(val));
-
-			edit->setMaximumSize(edit->sizeHint());
-
-			connect(edit, &QLineEdit::textChanged, this, [this, &inst](const QString& s) {
-				std::unique_ptr<chi::NodeType> newType;
-
-				inst.context().nodeTypeFromModule("lang", "const-int", s.toInt(), &newType);
-
-				inst.setType(std::move(newType));
-
-			});
-
-			mEmbeddedWidgets[&inst] = edit;
-		} else if (inst.type().name() == "c-call") {
-			QPushButton* butt = new QPushButton(i18n("Edit code"));
-			connect(butt, &QPushButton::clicked, this, [this, &inst] {
-				auto dialog = new EditCodeDialog(&inst, this);
-
-				dialog->exec();
-			});
-
-			butt->setMaximumSize(butt->sizeHint());
-
-			mEmbeddedWidgets[&inst] = butt;
-		} else if (inst.type().name() == "const-float") {
-			auto edit = new QLineEdit();
-			edit->setValidator(new QDoubleValidator);
-			double val = inst.type().toJSON();
-			edit->setText(QString::number(val));
-
-			edit->setMaximumSize(edit->sizeHint());
-
-			connect(edit, &QLineEdit::textChanged, this, [this, &inst](const QString& s) {
-				std::unique_ptr<chi::NodeType> newType;
-
-				inst.context().nodeTypeFromModule("lang", "const-float", s.toDouble(), &newType);
-
-				inst.setType(std::move(newType));
-			});
-
-			mEmbeddedWidgets[&inst] = edit;
+		auto widget = createEmbeddedWidget(inst);
+		
+		if (widget != nullptr) {
+			mEmbeddedWidgets[&inst] = widget;
 		}
 	}
 }
@@ -499,6 +513,12 @@ QUuid ChigraphFlowSceneModel::addNode(QString const& typeID, QPointF const& pos)
 	if (!res) { return {}; }
 	
 	auto quuid = QUuid::fromRfc4122(QByteArray(reinterpret_cast<const char*>(inst->id().data), 16));
+	
+	// create a widget
+	auto widget = createEmbeddedWidget(*inst);
+	if (widget != nullptr) {
+		mEmbeddedWidgets[inst] = widget;
+	}
 	
 	emit nodeAdded(quuid);
 	

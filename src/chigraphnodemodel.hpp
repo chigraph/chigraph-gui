@@ -102,6 +102,8 @@ signals:
 
 private:
 	
+	QWidget* createEmbeddedWidget(chi::NodeInstance& inst);
+	
 	chi::GraphFunction* mFunc;
 	std::unordered_map<chi::NodeInstance*, QWidget*> mEmbeddedWidgets;
 	
