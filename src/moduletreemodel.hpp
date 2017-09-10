@@ -80,7 +80,7 @@ public:
 	int rowCount(const QModelIndex& index) const override;
 	QVariant data(const QModelIndex& index, int role) const override;
 	Qt::ItemFlags flags(const QModelIndex &index) const override;
-	bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+	bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 	
 	WorkspaceTree* tree() const { return mTree.get(); }
 	

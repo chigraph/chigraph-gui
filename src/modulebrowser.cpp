@@ -253,13 +253,6 @@ void ModuleBrowser::updateDirtyStatus(chi::GraphModule& updated, bool dirty) {
 	QModelIndex    idx;  // get the idx of it so we can emit dataChanged
 	std::tie(item, idx) = idxFromModuleName(updated.fullName());
 
-	// when we save, it reloads the module, invalidating these pointers
-	if (!dirty) {
-		item->module = nullptr;
-		item->children.clear();
-		setExpanded(idx, false);
-	}
-
 	mModel->dataChanged(idx, idx);
 
 	if (item->name.toStdString() !=
