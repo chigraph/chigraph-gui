@@ -65,6 +65,11 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	mFunctionTabs->setMovable(true);
 	mFunctionTabs->setTabsClosable(true);
 	connect(mFunctionTabs, &CentralTabView::dirtied, this, &MainWindow::moduleDirtied);
+	connect(this, &MainWindow::workspaceOpened, mFunctionTabs, [this] (chi::Context&) {
+		while(auto v = mFunctionTabs->currentView()) {
+			mFunctionTabs->closeView(v);
+		}
+	});
 	insertChildClient(mFunctionTabs);
 
 	setCentralWidget(mFunctionTabs);
@@ -161,10 +166,11 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	mOpenRecentAction->loadEntries(KSharedConfig::openConfig()->group("Recent Files"));
 
 	auto newAction = actColl->addAction(KStandardAction::New, QStringLiteral("new"));
-	newAction->setWhatsThis(QStringLiteral("Create a new chigraph module"));
+	newAction->setWhatsThis(i18n("Create a new chigraph workspace"));
+	connect(newAction, &QAction::triggered, this, &MainWindow::newWorkspace);
 
 	auto saveAction = actColl->addAction(KStandardAction::Save, QStringLiteral("save"));
-	saveAction->setWhatsThis(QStringLiteral("Save the chigraph module"));
+	saveAction->setWhatsThis(i18n("Save the chigraph module"));
 	connect(saveAction, &QAction::triggered, this, &MainWindow::save);
 
 	auto cancelAction = new QAction(nullptr);
@@ -242,6 +248,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 
 	auto runConfigDialogAction = new QAction(this);
 	runConfigDialogAction->setText(i18n("Configure Launches"));
+	runConfigDialogAction->setIcon(QIcon::fromTheme(QStringLiteral("run-build-configure")));
 	actColl->addAction(QStringLiteral("configure-launches"), runConfigDialogAction);
 	connect(runConfigDialogAction, &QAction::triggered, this, [this] {
 		LaunchConfigurationDialog d(launchManager());
@@ -286,6 +293,24 @@ std::pair<chi::Result, chi::GraphModule*> MainWindow::loadModule(const QString& 
 	return {res, dynamic_cast<chi::GraphModule*>(mod)};
 }
 
+void MainWindow::newWorkspace() {
+	// open a dialog 
+	auto newWorkspaceDir = QFileDialog::getExistingDirectory(this, i18n("New Chigraph Workspace"), QDir::homePath(), {});
+	
+	if (newWorkspaceDir.isEmpty()) {
+		return;
+	}
+	
+	// create the file
+	QFile f{newWorkspaceDir + "/.chigraphworkspace"};
+	f.open(QIODevice::ReadWrite);
+	
+	auto url = QUrl::fromLocalFile(newWorkspaceDir);
+	mOpenRecentAction->addUrl(url);
+	openWorkspace(url);
+	
+}
+
 void MainWindow::save() {
 	auto currentFunc = tabView().currentView();
 	if (!currentFunc) { return; }
@@ -304,7 +329,7 @@ void MainWindow::openWorkspaceDialog() {
 	QString workspace =
 	    QFileDialog::getExistingDirectory(this, i18n("Chigraph Workspace"), QDir::homePath(), {});
 
-	if (workspace == "") { return; }
+	if (workspace.isEmpty()) { return; }
 
 	QUrl url = QUrl::fromLocalFile(workspace);
 
@@ -314,11 +339,20 @@ void MainWindow::openWorkspaceDialog() {
 }
 
 void MainWindow::openWorkspace(const QUrl& url) {
-	mChigContext   = std::make_unique<chi::Context>(url.toLocalFile().toStdString());
+	auto ctx = std::make_unique<chi::Context>(url.toLocalFile().toStdString());
+	
+	// make sure it actually was a context
+	if (!ctx->hasWorkspace()) {
+		KMessageBox::error(this, i18n("Path ") + url.toLocalFile() + i18n(" wasn't a chigraph workspace"), i18n("Error loading workspace"));
+		
+		return;
+	}
+	
+	mChigContext   = std::move(ctx);
 	mLaunchManager = std::make_unique<LaunchConfigurationManager>(*mChigContext);
 	updateUsableConfigs();
 
-	workspaceOpened(*mChigContext);
+	emit workspaceOpened(*mChigContext);
 }
 
 void MainWindow::moduleDirtied(chi::GraphModule& mod) { mModuleBrowser->moduleDirtied(mod); }
