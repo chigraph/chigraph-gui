@@ -23,6 +23,7 @@ public:
 	void centerOnNode(chi::NodeInstance& inst);
 	
 	void refreshGuiForNode(chi::NodeInstance& inst) {
+		
 		emit mModel->nodePortUpdated(mModel->nodeIndex(inst));
 	}
 
