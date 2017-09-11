@@ -212,6 +212,21 @@ void CentralTabView::structRenamed(chi::GraphStruct& str, const std::string& old
 	}
 }
 
+void CentralTabView::functionDeleted(chi::GraphModule& mod, const std::string& funcName) {
+
+	auto iter = mOpenFunctions.find(QString::fromStdString(mod.fullName() + ":" + funcName));
+	if (iter != mOpenFunctions.end()) {
+		auto view = iter->second;
+		closeView(view);
+	}
+}
+
+void CentralTabView::structDeleted(chi::GraphModule& mod, const std::string& strName) {
+	// TODO: struct editors
+	
+	return;
+}
+
 
 void CentralTabView::closeTab(int idx) {
 	auto funcIter = std::find_if(mOpenFunctions.begin(), mOpenFunctions.end(),

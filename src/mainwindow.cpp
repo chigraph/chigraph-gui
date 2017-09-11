@@ -93,6 +93,8 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	});
 	connect(mModuleBrowser, &ModuleBrowser::functionRenamed, mFunctionTabs, &CentralTabView::functionRenamed);
 	connect(mModuleBrowser, &ModuleBrowser::structRenamed, mFunctionTabs, &CentralTabView::structRenamed);
+	connect(mModuleBrowser, &ModuleBrowser::functionDeleted, mFunctionTabs, &CentralTabView::functionDeleted);
+	connect(mModuleBrowser, &ModuleBrowser::structDeleted, mFunctionTabs, &CentralTabView::structDeleted);
 
 
 	docker = new QDockWidget(i18n("Output"), this);

@@ -207,6 +207,12 @@ QStringList ChigraphFlowSceneModel::modelRegistry() const {
 		ret << QString::fromStdString(mod.fullName() + ":" + nodeType);
 	}
 	
+	// add local variables
+	for (const auto& var : mFunc->localVariables()) {
+		ret << QString::fromStdString(mod.fullName() + ":_get_" + var.name);
+		ret << QString::fromStdString(mod.fullName() + ":_set_" + var.name);
+	}
+	
 	return ret;
 	
 }
@@ -500,10 +506,20 @@ QUuid ChigraphFlowSceneModel::addNode(QString const& typeID, QPointF const& pos)
 	
 	auto& ctx = mFunc->context();
 	
+	// create json if it's a local var
+	nlohmann::json json;
+	if (tyName.substr(0, 5) == "_get_" || tyName.substr(0, 5) == "_set_") {
+		auto local = mFunc->localVariableFromName(tyName.substr(5));
+		Q_ASSERT(local.valid());
+		
+		json = local.type.qualifiedName();
+	}
+	
 	std::unique_ptr<chi::NodeType> nodeType;
-	auto res = ctx.nodeTypeFromModule(modName, tyName, {}, &nodeType);
+	auto res = ctx.nodeTypeFromModule(modName, tyName, json, &nodeType);
 	
 	if (!res) {
+		qDebug() << "Failed to create node type: " << QString::fromStdString(res.dump());
 		return {};
 	}
 	

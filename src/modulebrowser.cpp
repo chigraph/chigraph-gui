@@ -44,6 +44,7 @@ ModuleBrowser::ModuleBrowser(QWidget* parent) : QTreeView(parent) {
 	deleteAction = actionCollection()->addAction(
 	    QStringLiteral("remove-item"),
 	    new QAction(QIcon::fromTheme(QStringLiteral("entry-delete")), i18n("Delete"), nullptr));
+	connect(deleteAction, &QAction::triggered, this, &ModuleBrowser::deleteItem);
 
 	renameAction = actionCollection()->addAction(
 	    QStringLiteral("rename"),
@@ -179,14 +180,19 @@ void ModuleBrowser::newFunction() {
 	
 	chi::GraphModule* gMod = static_cast<chi::GraphModule*>(mod);
 	// add the function TODO: detect if "New Function" is already taken
-	LLVM_ATTRIBUTE_UNUSED auto func = gMod->getOrCreateFunction("New Function", {}, {}, {""}, {""});
+	auto func = gMod->getOrCreateFunction("New Function", {}, {}, {""}, {""});
 	Q_ASSERT(func);
 	
+	// add a entry node
+	std::unique_ptr<chi::NodeType> entryTy;
+	res += func->createEntryNodeType(&entryTy);
+	Q_ASSERT(!!res);
+	
+	res += func->insertNode(std::move(entryTy), 0.f, 0.f);
+	Q_ASSERT(!!res);
 	
 	// update the model
 	mModel->updateModule(owningModule);
-	
-	
 }
 
 void ModuleBrowser::newStruct() {
@@ -245,6 +251,46 @@ void ModuleBrowser::moduleProperties() {
 	auto dialog = new ModulePropertiesDialog(this, *castedMod);
 	dialog->exec();
 	
+}
+
+void ModuleBrowser::deleteItem() {
+	// see which type it is
+	auto idx = currentIndex();
+	if (!idx.isValid()) { return; }
+	
+	auto item = static_cast<WorkspaceTree*>(idx.internalPointer());
+	
+	switch(item->type) {
+		case WorkspaceTree::FUNCTION:
+		{
+			// close the function if it's still open
+			emit functionDeleted(item->func->module(), item->func->name());
+			
+			// delete it from the module
+			// TODO: do diagnostics on what this hurts
+			item->func->module().removeFunction(*item->func);
+			
+			mModel->updateModule(item->parent->fullName());
+			
+			break;
+		}
+		case WorkspaceTree::STRUCT:
+		{
+			// close the function if it's still open
+			emit structDeleted(item->str->module(), item->str->name());
+			
+			// delete it from the module
+			// TODO: do diagnostics on what this hurts
+			item->func->module().removeStruct(*item->str);
+			
+			mModel->updateModule(item->parent->fullName());
+			
+			break;
+		}
+		// TODO: implement the rest
+		default: return;
+	}
+	return;
 }
 
 void ModuleBrowser::updateDirtyStatus(chi::GraphModule& updated, bool dirty) {

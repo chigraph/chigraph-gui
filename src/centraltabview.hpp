@@ -52,6 +52,9 @@ public slots:
 	void functionRenamed(chi::GraphFunction& func, const std::string& oldName, const std::vector<chi::NodeInstance*>& changed);
 	void structRenamed(chi::GraphStruct& str, const std::string& oldName, const std::vector<chi::NodeInstance*>& changed);
 	
+	void functionDeleted(chi::GraphModule& mod, const std::string& funcName);
+	void structDeleted(chi::GraphModule& mod, const std::string& strName);
+	
 private:
 	void closeTab(int idx);
 

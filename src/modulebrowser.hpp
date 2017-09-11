@@ -49,6 +49,9 @@ signals:
 	void functionRenamed(chi::GraphFunction& func, const std::string& oldName, const std::vector<chi::NodeInstance*> updatedNodes);
 	void structRenamed(chi::GraphStruct& str, const std::string& oldName, const std::vector<chi::NodeInstance*> updatedNodes);
 	
+	void functionDeleted(chi::GraphModule& mod, const std::string& funcName);
+	void structDeleted(chi::GraphModule& mod, const std::string& strName);
+	
 
 public slots:
 	void loadWorkspace(chi::Context& context);
@@ -60,6 +63,7 @@ private slots:
 	void newFunction();
 	void newStruct();
 	void moduleProperties();
+	void deleteItem();
 
 private:
 	void updateDirtyStatus(chi::GraphModule& updated, bool dirty);
