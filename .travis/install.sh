@@ -10,7 +10,7 @@ if [ "$TRAVIS_OS_NAME" == "linux" ]; then
 		sudo apt-get install lldb-${LLVM_VERSION}-dev
 	fi
 
-	python3 ./setup.sh
+	python3 ./setup.py
 
 else
 
