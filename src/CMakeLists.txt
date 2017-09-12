@@ -208,7 +208,7 @@ endif()
 install(TARGETS chigraphgui DESTINATION bin)
 
 # install desktop file and icons
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../chigraphgui.desktop DESTINATION share/applications)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../org.chigraph.chigraphgui.desktop DESTINATION share/applications)
 
 foreach(size 16 32 64 128 256 512 1024)
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../icons/${size}x${size}/chigraph.png DESTINATION share/icons/hicolor/${size}x${size}/apps)
