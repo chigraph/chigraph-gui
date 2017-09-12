@@ -37,15 +37,9 @@ else()
 	set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../third_party/kf5-release)
 endif()
 
-find_package(ECM 1.0.0 REQUIRED NO_MODULE)
-set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 set(CMAKE_AUTORCC ON)
-
-include(KDEInstallDirs)
-include(KDECMakeSettings)
-#include(KDECompilerSettings)
-include(FeatureSummary)
+set(CMAKE_AUTOMOC ON)
 
 # find qt
 find_package(Qt5 5.6.0 REQUIRED COMPONENTS Gui Script Xml Core Widgets Network PrintSupport Svg)
