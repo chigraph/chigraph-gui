@@ -1,0 +1,29 @@
+ 
+{
+    "id": "org.chigraph.chigraphgui",
+    "branch": "master",
+    "runtime": "org.kde.Platform",
+    "runtime-version": "5.9",
+    "sdk": "org.kde.Sdk",
+    "command": "chigraphgui",
+    "tags": ["nightly"],
+    "desktop-file-name-prefix": "(Nightly) ",
+    "finish-args": ["--share=ipc", "--socket=x11", "--socket=wayland", "--filesystem=host", "--env=QT_QPA_PLATFORM=flatpak" ],
+
+    "separate-locales": false,
+    
+    "modules": [
+        {
+            "name": "chigraphgui",
+            "buildsystem": "cmake-ninja",
+            "config-opts": [
+                "-DCG_BUILD_DEBUGGER=OFF",
+                "-DBUILD_EXAMPLES=OFF",
+                "-DCG_BUILD_TESTS=OFF"
+            ],
+            "sources": [
+                { "type": "git", "url": "https://github.com/chigraph/chigraph-gui" }
+            ]
+        }
+    ]
+}
