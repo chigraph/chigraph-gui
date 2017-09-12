@@ -11,7 +11,10 @@
     "finish-args": ["--share=ipc", "--socket=x11", "--socket=wayland", "--filesystem=host", "--env=QT_QPA_PLATFORM=flatpak" ],
 
     "separate-locales": false,
-    
+    "cleanup": [
+        "/include",
+        "*.a"
+    ],
     "modules": [
         {
             "name": "chigraphgui",
