@@ -15,7 +15,7 @@
 CentralTabView::CentralTabView(QWidget* owner) : QTabWidget{owner} {
 	auto closeAction =
 	    actionCollection()->addAction(KStandardAction::Close, QStringLiteral("close-function"));
-	connect(closeAction, &QAction::triggered, this, &CentralTabView::closeTab);
+	connect(closeAction, &QAction::triggered, this, [this] { closeTab(currentIndex()); });
 
 	connect(this, &QTabWidget::tabCloseRequested, this, &CentralTabView::closeTab);
 	
@@ -199,8 +199,24 @@ void CentralTabView::functionRenamed(chi::GraphFunction& func, const std::string
 
 void CentralTabView::structRenamed(chi::GraphStruct& str, const std::string& oldName, const std::vector<chi::NodeInstance *>& changed)
 {
+    auto fullOldName = QString::fromStdString(str.module().fullName() + ":" + oldName);
+	auto fullName = QString::fromStdString(str.module().fullName() + ":" + str.name());
 	
-	// TODO: struct editors
+	// update the strcuture and rename the tab if it's open
+	auto iter = mOpenStructs.find(fullOldName);
+	if (iter != mOpenStructs.end()) {
+		auto view = iter->second;
+		mOpenStructs.erase(iter);
+		
+		mOpenStructs.emplace(fullName, view);
+		
+		// change tab text
+		auto id = indexOf(view);
+		if (id != -1) {
+			setTabText(id, fullName);
+		}
+	}
+	
 	
 	// refresh the changed nodes
 	for (const auto node : changed) {
@@ -222,8 +238,13 @@ void CentralTabView::functionDeleted(chi::GraphModule& mod, const std::string& f
 }
 
 void CentralTabView::structDeleted(chi::GraphModule& mod, const std::string& strName) {
-	// TODO: struct editors
-	
+
+  auto iter = mOpenStructs.find(QString::fromStdString(mod.fullName() + ":" + strName));
+	if (iter != mOpenStructs.end()) {
+		auto view = iter->second;
+		closeView(view);
+	}
+  
 	return;
 }
 

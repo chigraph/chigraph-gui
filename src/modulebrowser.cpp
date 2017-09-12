@@ -281,7 +281,7 @@ void ModuleBrowser::deleteItem() {
 			
 			// delete it from the module
 			// TODO: do diagnostics on what this hurts
-			item->func->module().removeStruct(*item->str);
+			item->str->module().removeStruct(*item->str);
 			
 			mModel->updateModule(item->parent->fullName());
 			
