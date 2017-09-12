@@ -6,8 +6,8 @@
 
 #include <chi/Context.hpp>
 #include <chi/GraphFunction.hpp>
-#include <chi/Support/Result.hpp>
 #include <chi/GraphStruct.hpp>
+#include <chi/Support/Result.hpp>
 
 #include "functionview.hpp"
 #include "structedit.hpp"
@@ -18,18 +18,16 @@ CentralTabView::CentralTabView(QWidget* owner) : QTabWidget{owner} {
 	connect(closeAction, &QAction::triggered, this, [this] { closeTab(currentIndex()); });
 
 	connect(this, &QTabWidget::tabCloseRequested, this, &CentralTabView::closeTab);
-	
+
 	connect(this, &QTabWidget::currentChanged, this, [this](int idx) {
 		// see if it's a function or struct
 		auto wid = widget(idx);
-		
+
 		if (auto func = qobject_cast<FunctionView*>(wid)) {
 			emit functionViewChanged(func, false);
 			return;
 		}
-		if (auto str = qobject_cast<StructEdit*>(wid)) {
-			emit structViewChanged(str, false);
-		}
+		if (auto str = qobject_cast<StructEdit*>(wid)) { emit structViewChanged(str, false); }
 	});
 
 	setXMLFile("chigraphfunctiontabviewui.rc");
@@ -61,29 +59,29 @@ void CentralTabView::selectNewFunction(chi::GraphFunction& func) {
 	functionViewChanged(view, true);
 }
 
-void CentralTabView::selectNewStruct(chi::GraphStruct& str)
-{
-	QString qualifiedStructName = QString::fromStdString(str.module().fullName() + ":" + str.name());
-	
+void CentralTabView::selectNewStruct(chi::GraphStruct& str) {
+	QString qualifiedStructName =
+	    QString::fromStdString(str.module().fullName() + ":" + str.name());
+
 	auto strViewIter = mOpenStructs.find(qualifiedStructName);
-	
+
 	if (strViewIter != mOpenStructs.end()) {
 		setCurrentWidget(strViewIter->second);
 		structViewChanged(strViewIter->second, false);
 		return;
 	}
-	
+
 	auto view = new StructEdit(str, this);
-	int idx = addTab(view, qualifiedStructName);
-	
+	int  idx  = addTab(view, qualifiedStructName);
+
 	mOpenStructs[qualifiedStructName] = view;
 	setTabText(idx, qualifiedStructName);
 	setTabIcon(idx, QIcon::fromTheme(QStringLiteral("code-class")));
-	
+
 	setCurrentWidget(view);
-	
+
 	// TODO: dirtied?
-	
+
 	structViewChanged(view, true);
 }
 
@@ -150,7 +148,7 @@ FunctionView* CentralTabView::viewFromFunctionName(const QString& fullName) {
 }
 
 FunctionView* CentralTabView::viewFromFunctionName(const boost::filesystem::path& mod,
-                                            const std::string&             function) {
+                                                   const std::string&             function) {
 	return viewFromFunctionName(QString::fromStdString(mod.string() + ":" + function));
 }
 
@@ -166,70 +164,59 @@ FunctionView* CentralTabView::currentView() {
 	return casted;
 }
 
-void CentralTabView::functionRenamed(chi::GraphFunction& func, const std::string& oldName, const std::vector<chi::NodeInstance *>& changed)
-{
+void CentralTabView::functionRenamed(chi::GraphFunction& func, const std::string& oldName,
+                                     const std::vector<chi::NodeInstance*>& changed) {
 	auto fullOldName = QString::fromStdString(func.module().fullName() + ":" + oldName);
-	auto fullName = QString::fromStdString(func.module().fullName() + ":" + func.name());
-	
+	auto fullName    = QString::fromStdString(func.module().fullName() + ":" + func.name());
+
 	// update the strcuture and rename the tab if it's open
 	auto iter = mOpenFunctions.find(fullOldName);
 	if (iter != mOpenFunctions.end()) {
 		auto view = iter->second;
 		mOpenFunctions.erase(iter);
-		
+
 		mOpenFunctions.emplace(fullName, view);
-		
+
 		// change tab text
 		auto id = indexOf(view);
-		if (id != -1) {
-			setTabText(id, fullName);
-		}
+		if (id != -1) { setTabText(id, fullName); }
 	}
-	
-	
+
 	// refresh the changed nodes
 	for (const auto node : changed) {
 		auto view = viewFromFunction(node->function());
-		
-		if (view) {
-			view->refreshGuiForNode(*node);
-		}
+
+		if (view) { view->refreshGuiForNode(*node); }
 	}
 }
 
-void CentralTabView::structRenamed(chi::GraphStruct& str, const std::string& oldName, const std::vector<chi::NodeInstance *>& changed)
-{
-    auto fullOldName = QString::fromStdString(str.module().fullName() + ":" + oldName);
-	auto fullName = QString::fromStdString(str.module().fullName() + ":" + str.name());
-	
+void CentralTabView::structRenamed(chi::GraphStruct& str, const std::string& oldName,
+                                   const std::vector<chi::NodeInstance*>& changed) {
+	auto fullOldName = QString::fromStdString(str.module().fullName() + ":" + oldName);
+	auto fullName    = QString::fromStdString(str.module().fullName() + ":" + str.name());
+
 	// update the strcuture and rename the tab if it's open
 	auto iter = mOpenStructs.find(fullOldName);
 	if (iter != mOpenStructs.end()) {
 		auto view = iter->second;
 		mOpenStructs.erase(iter);
-		
+
 		mOpenStructs.emplace(fullName, view);
-		
+
 		// change tab text
 		auto id = indexOf(view);
-		if (id != -1) {
-			setTabText(id, fullName);
-		}
+		if (id != -1) { setTabText(id, fullName); }
 	}
-	
-	
+
 	// refresh the changed nodes
 	for (const auto node : changed) {
 		auto view = viewFromFunction(node->function());
-		
-		if (view) {
-			view->refreshGuiForNode(*node);
-		}
+
+		if (view) { view->refreshGuiForNode(*node); }
 	}
 }
 
 void CentralTabView::functionDeleted(chi::GraphModule& mod, const std::string& funcName) {
-
 	auto iter = mOpenFunctions.find(QString::fromStdString(mod.fullName() + ":" + funcName));
 	if (iter != mOpenFunctions.end()) {
 		auto view = iter->second;
@@ -238,30 +225,25 @@ void CentralTabView::functionDeleted(chi::GraphModule& mod, const std::string& f
 }
 
 void CentralTabView::structDeleted(chi::GraphModule& mod, const std::string& strName) {
-
-  auto iter = mOpenStructs.find(QString::fromStdString(mod.fullName() + ":" + strName));
+	auto iter = mOpenStructs.find(QString::fromStdString(mod.fullName() + ":" + strName));
 	if (iter != mOpenStructs.end()) {
 		auto view = iter->second;
 		closeView(view);
 	}
-  
+
 	return;
 }
 
-
 void CentralTabView::closeTab(int idx) {
 	auto funcIter = std::find_if(mOpenFunctions.begin(), mOpenFunctions.end(),
-	                 [this, idx](auto& p) { return p.second == this->widget(idx); });
-	
-	if (funcIter != mOpenFunctions.end()) {
-		mOpenFunctions.erase(funcIter);
-	}
+	                             [this, idx](auto& p) { return p.second == this->widget(idx); });
+
+	if (funcIter != mOpenFunctions.end()) { mOpenFunctions.erase(funcIter); }
 	auto strIter = std::find_if(mOpenStructs.begin(), mOpenStructs.end(),
-	                 [this, idx](auto& p) { return p.second == this->widget(idx); });
-	if (strIter != mOpenStructs.end()) {
-		mOpenStructs.erase(strIter);
-	}
-	assert((funcIter != mOpenFunctions.end() || strIter != mOpenStructs.end()) && "Internal error: a tab index was not in mOpenFunctions or mOpenStructs");
-	
+	                            [this, idx](auto& p) { return p.second == this->widget(idx); });
+	if (strIter != mOpenStructs.end()) { mOpenStructs.erase(strIter); }
+	assert((funcIter != mOpenFunctions.end() || strIter != mOpenStructs.end()) &&
+	       "Internal error: a tab index was not in mOpenFunctions or mOpenStructs");
+
 	removeTab(idx);
 }

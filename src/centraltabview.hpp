@@ -32,12 +32,13 @@ public:
 
 	FunctionView* viewFromFunction(chi::GraphFunction& func);
 	FunctionView* viewFromFunctionName(const QString& fullName);
-	FunctionView* viewFromFunctionName(const boost::filesystem::path& mod, const std::string& function);
+	FunctionView* viewFromFunctionName(const boost::filesystem::path& mod,
+	                                   const std::string&             function);
 
 	StructEdit* viewFromStruct(chi::GraphStruct& str);
 	StructEdit* viewFromStructName(const QString& fullName);
 	StructEdit* viewFromStructName(const boost::filesystem::path& mod, const std::string& module);
-	
+
 	void closeView(FunctionView* view);
 	void closeView(StructEdit* view);
 
@@ -49,12 +50,14 @@ signals:
 	void structViewChanged(StructEdit* func, bool newlyOpened);
 
 public slots:
-	void functionRenamed(chi::GraphFunction& func, const std::string& oldName, const std::vector<chi::NodeInstance*>& changed);
-	void structRenamed(chi::GraphStruct& str, const std::string& oldName, const std::vector<chi::NodeInstance*>& changed);
-	
+	void functionRenamed(chi::GraphFunction& func, const std::string& oldName,
+	                     const std::vector<chi::NodeInstance*>& changed);
+	void structRenamed(chi::GraphStruct& str, const std::string& oldName,
+	                   const std::vector<chi::NodeInstance*>& changed);
+
 	void functionDeleted(chi::GraphModule& mod, const std::string& funcName);
 	void structDeleted(chi::GraphModule& mod, const std::string& strName);
-	
+
 private:
 	void closeTab(int idx);
 

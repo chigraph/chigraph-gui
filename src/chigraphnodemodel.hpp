@@ -26,57 +26,74 @@
 class ChigraphFlowSceneModel : public QtNodes::FlowSceneModel {
 	Q_OBJECT
 public:
-	
 	ChigraphFlowSceneModel(chi::GraphFunction& func);
-	
+
 	QStringList modelRegistry() const override;
 
 	QString nodeTypeCatergory(QString const& name) const override;
-	QString converterNode(QtNodes::NodeDataType const& lhs, QtNodes::NodeDataType const& rhs) const override;
-	
+	QString converterNode(QtNodes::NodeDataType const& lhs,
+	                      QtNodes::NodeDataType const& rhs) const override;
+
 	// Retrieval functions
 	//////////////////////
-	
-	QtNodes::NodeIndex nodeIndex(const chi::NodeInstance& node) const { return nodeIndex(QUuid::fromRfc4122(QByteArray(reinterpret_cast<const char*>(node.id().data), 16))); }
 
-	QList<QUuid> nodeUUids() const override;
+	QtNodes::NodeIndex nodeIndex(const chi::NodeInstance& node) const {
+		return nodeIndex(
+		    QUuid::fromRfc4122(QByteArray(reinterpret_cast<const char*>(node.id().data), 16)));
+	}
+
+	QList<QUuid>       nodeUUids() const override;
 	QtNodes::NodeIndex nodeIndex(const QUuid& ID) const override;
 	QString nodeTypeIdentifier(QtNodes::NodeIndex const& index) const override;
 	QString nodeCaption(QtNodes::NodeIndex const& index) const override;
 	QPointF nodeLocation(QtNodes::NodeIndex const& index) const override;
 	QWidget* nodeWidget(QtNodes::NodeIndex const& index) const override;
 	bool nodeResizable(QtNodes::NodeIndex const& index) const override;
-	QtNodes::NodeValidationState nodeValidationState(QtNodes::NodeIndex const& index) const override;
-	
+	QtNodes::NodeValidationState nodeValidationState(
+	    QtNodes::NodeIndex const& index) const override;
+
 	/// Get the validation error/warning
 	QString nodeValidationMessage(QtNodes::NodeIndex const& index) const override;
 
 	/// Get the painter delegate
-	QtNodes::NodePainterDelegate* nodePainterDelegate(QtNodes::NodeIndex const& index) const override;
-	
+	QtNodes::NodePainterDelegate* nodePainterDelegate(
+	    QtNodes::NodeIndex const& index) const override;
+
 	/// Get the count of DataPorts
-	unsigned int nodePortCount(QtNodes::NodeIndex const& index, QtNodes::PortType portType) const override;
+	unsigned int nodePortCount(QtNodes::NodeIndex const& index,
+	                           QtNodes::PortType         portType) const override;
 
 	/// Get the port caption
-	QString nodePortCaption(QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portType) const override;
+	QString nodePortCaption(QtNodes::NodeIndex const& index, QtNodes::PortIndex portID,
+	                        QtNodes::PortType portType) const override;
 
 	/// Get the port data type
-	QtNodes::NodeDataType nodePortDataType(QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portType) const override;
+	QtNodes::NodeDataType nodePortDataType(QtNodes::NodeIndex const& index,
+	                                       QtNodes::PortIndex        portID,
+	                                       QtNodes::PortType         portType) const override;
 
 	/// Port Policy
-	QtNodes::ConnectionPolicy nodePortConnectionPolicy(QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portType) const override;
+	QtNodes::ConnectionPolicy nodePortConnectionPolicy(QtNodes::NodeIndex const& index,
+	                                                   QtNodes::PortIndex        portID,
+	                                                   QtNodes::PortType portType) const override;
 
 	/// Get a connection at a port
-	std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> nodePortConnections(QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portType) const override;
+	std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> nodePortConnections(
+	    QtNodes::NodeIndex const& index, QtNodes::PortIndex portID,
+	    QtNodes::PortType portType) const override;
 
 	// Mutation functions
 	/////////////////////
 
 	/// Remove a connection
-	bool removeConnection(QtNodes::NodeIndex const& leftNode, QtNodes::PortIndex leftPortID, QtNodes::NodeIndex const& rightNode, QtNodes::PortIndex rightPortID) override;
+	bool removeConnection(QtNodes::NodeIndex const& leftNode, QtNodes::PortIndex leftPortID,
+	                      QtNodes::NodeIndex const& rightNode,
+	                      QtNodes::PortIndex        rightPortID) override;
 
 	/// Add a connection
-	bool addConnection(QtNodes::NodeIndex const& leftNode, QtNodes::PortIndex leftPortID, QtNodes::NodeIndex const& rightNode, QtNodes::PortIndex rightPortID) override;
+	bool addConnection(QtNodes::NodeIndex const& leftNode, QtNodes::PortIndex leftPortID,
+	                   QtNodes::NodeIndex const& rightNode,
+	                   QtNodes::PortIndex        rightPortID) override;
 
 	/// Remove a node
 	bool removeNode(QtNodes::NodeIndex const& index) override;
@@ -86,27 +103,34 @@ public:
 
 	/// Move a node to a new location
 	bool moveNode(QtNodes::NodeIndex const& index, QPointF newLocation) override;
-	
-	
-	void connectionHovered(QtNodes::NodeIndex const& lhs, QtNodes::PortIndex lPortIndex, QtNodes::NodeIndex const& rhs, QtNodes::PortIndex rPortIndex, QPoint const& pos, bool entered) override {emit connectionWasHovered(lhs, lPortIndex, rhs, rPortIndex, pos, entered);}
-  
-	void nodeHovered(QtNodes::NodeIndex const& index, QPoint const& pos, bool entered) override { emit nodeWasHovered(index, pos, entered); }
-  
-	void nodeDoubleClicked(QtNodes::NodeIndex const& index, QPoint const& pos) override { emit nodeWasDoubleClicked(index, pos);}
-	
+
+	void connectionHovered(QtNodes::NodeIndex const& lhs, QtNodes::PortIndex lPortIndex,
+	                       QtNodes::NodeIndex const& rhs, QtNodes::PortIndex rPortIndex,
+	                       QPoint const& pos, bool entered) override {
+		emit connectionWasHovered(lhs, lPortIndex, rhs, rPortIndex, pos, entered);
+	}
+
+	void nodeHovered(QtNodes::NodeIndex const& index, QPoint const& pos, bool entered) override {
+		emit nodeWasHovered(index, pos, entered);
+	}
+
+	void nodeDoubleClicked(QtNodes::NodeIndex const& index, QPoint const& pos) override {
+		emit nodeWasDoubleClicked(index, pos);
+	}
+
 signals:
-	
-	void connectionWasHovered(QtNodes::NodeIndex const& lhs, QtNodes::PortIndex lPortIndex, QtNodes::NodeIndex const& rhs, QtNodes::PortIndex rPortIndex, QPoint const& pos, bool entered);
+
+	void connectionWasHovered(QtNodes::NodeIndex const& lhs, QtNodes::PortIndex lPortIndex,
+	                          QtNodes::NodeIndex const& rhs, QtNodes::PortIndex rPortIndex,
+	                          QPoint const& pos, bool entered);
 	void nodeWasHovered(QtNodes::NodeIndex const& index, QPoint const& pos, bool entered);
 	void nodeWasDoubleClicked(QtNodes::NodeIndex const& index, QPoint const& pos);
 
 private:
-	
 	QWidget* createEmbeddedWidget(chi::NodeInstance& inst);
-	
+
 	chi::GraphFunction* mFunc;
 	std::unordered_map<chi::NodeInstance*, QWidget*> mEmbeddedWidgets;
-	
 };
 
-#endif // CHI_GUI_CHIGNODEGUI_HPP
+#endif  // CHI_GUI_CHIGNODEGUI_HPP

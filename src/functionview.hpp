@@ -21,16 +21,15 @@ public:
 	FunctionView(chi::GraphFunction& func_, QWidget* parent = nullptr);
 
 	void centerOnNode(chi::NodeInstance& inst);
-	
+
 	void refreshGuiForNode(chi::NodeInstance& inst) {
-		
 		emit mModel->nodePortUpdated(mModel->nodeIndex(inst));
 	}
 
 	chi::GraphFunction* function() const { return mFunction; }
 
 	QtNodes::FlowScene& scene() const { return *mScene; }
-	
+
 	ChigraphFlowSceneModel& model() const { return *mModel; }
 
 	std::vector<chi::NodeInstance*> selectedNodes();
@@ -42,9 +41,8 @@ signals:
 	void functionDoubleClicked(chi::GraphFunction& func);
 
 private:
-
-	QtNodes::FlowScene* mScene;
-	QtNodes::FlowView*  mView;
+	QtNodes::FlowScene*     mScene;
+	QtNodes::FlowView*      mView;
 	ChigraphFlowSceneModel* mModel;
 
 	chi::GraphFunction* mFunction;

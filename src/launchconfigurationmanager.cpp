@@ -48,7 +48,7 @@ void LaunchConfigurationManager::removeConfiguration(LaunchConfiguration config)
 	if (config.valid() && currentConfiguration().valid() && config == currentConfiguration()) {
 		setCurrentConfiguration({});
 	}
-	
+
 	// find it and remove it from the list
 	auto iter = std::find(mConfigurations.begin(), mConfigurations.end(), config);
 	if (iter == mConfigurations.end()) {

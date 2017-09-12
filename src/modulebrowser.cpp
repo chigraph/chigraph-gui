@@ -13,9 +13,9 @@
 #include <KActionCollection>
 
 #include "mainwindow.hpp"
+#include "modulepropertiesdialog.hpp"
 #include "moduletreemodel.hpp"
 #include "newmoduledialog.hpp"
-#include "modulepropertiesdialog.hpp"
 
 #include <boost/filesystem.hpp>
 
@@ -38,7 +38,7 @@ ModuleBrowser::ModuleBrowser(QWidget* parent) : QTreeView(parent) {
 	newStructAction = actionCollection()->addAction(
 	    QStringLiteral("new-struct"),
 	    new QAction(QIcon::fromTheme(QStringLiteral("window-new")), i18n("New Struct"), nullptr));
-	
+
 	connect(newStructAction, &QAction::triggered, this, &ModuleBrowser::newStruct);
 
 	deleteAction = actionCollection()->addAction(
@@ -51,10 +51,11 @@ ModuleBrowser::ModuleBrowser(QWidget* parent) : QTreeView(parent) {
 	    new QAction(QIcon::fromTheme(QStringLiteral("edit-rename")), i18n("Rename"), nullptr));
 
 	modulePropertiesAction = actionCollection()->addAction(
-		QStringLiteral("module-properties"),
-		new QAction(QIcon::fromTheme(QStringLiteral("document-properties")), i18n("Module Properties"), nullptr));
+	    QStringLiteral("module-properties"),
+	    new QAction(QIcon::fromTheme(QStringLiteral("document-properties")),
+	                i18n("Module Properties"), nullptr));
 	connect(modulePropertiesAction, &QAction::triggered, this, &ModuleBrowser::moduleProperties);
-	
+
 	setAnimated(true);
 	setSortingEnabled(true);
 	setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
@@ -119,12 +120,12 @@ void ModuleBrowser::loadWorkspace(chi::Context& context) {
 
 	mModel = ModuleTreeModel::createFromContext(context);
 	mTree  = mModel->tree();
-	
+
 	connect(mModel.get(), &ModuleTreeModel::functionRenamed, this, &ModuleBrowser::functionRenamed);
 	connect(mModel.get(), &ModuleTreeModel::structRenamed, this, &ModuleBrowser::structRenamed);
 
 	setModel(mModel.get());
-	
+
 	// expand src
 	expand(mModel->index(0, 0, {}));
 }
@@ -157,138 +158,132 @@ void ModuleBrowser::newModule() {
 
 void ModuleBrowser::newFunction() {
 	fs::path owningModule;
-	
+
 	auto idx = currentIndex();
 	if (idx.isValid()) {
 		auto item = static_cast<WorkspaceTree*>(idx.internalPointer());
-		
-		if (item->type != WorkspaceTree::MODULE) {
-			return;
-		}
-		
+
+		if (item->type != WorkspaceTree::MODULE) { return; }
+
 		owningModule = item->fullName();
 	}
-	
+
 	// get the module from the context
 	chi::ChiModule* mod;
-	auto res = context().loadModule(owningModule, &mod);
-	
+	auto            res = context().loadModule(owningModule, &mod);
+
 	if (!res) {
-		KMessageBox::detailedError(this, "Failed to load module", QString::fromStdString(res.dump()));
+		KMessageBox::detailedError(this, "Failed to load module",
+		                           QString::fromStdString(res.dump()));
 		return;
 	}
-	
+
 	chi::GraphModule* gMod = static_cast<chi::GraphModule*>(mod);
 	// add the function TODO: detect if "New Function" is already taken
 	auto func = gMod->getOrCreateFunction("New Function", {}, {}, {""}, {""});
 	Q_ASSERT(func);
-	
+
 	// add a entry node
 	std::unique_ptr<chi::NodeType> entryTy;
 	res += func->createEntryNodeType(&entryTy);
 	Q_ASSERT(!!res);
-	
+
 	res += func->insertNode(std::move(entryTy), 0.f, 0.f);
 	Q_ASSERT(!!res);
-	
+
 	// update the model
 	mModel->updateModule(owningModule);
 }
 
 void ModuleBrowser::newStruct() {
 	fs::path owningModule;
-	
+
 	auto idx = currentIndex();
 	if (idx.isValid()) {
 		auto item = static_cast<WorkspaceTree*>(idx.internalPointer());
-		
-		if (item->type != WorkspaceTree::MODULE) {
-			return;
-		}
-		
+
+		if (item->type != WorkspaceTree::MODULE) { return; }
+
 		owningModule = item->fullName();
 	}
-	
+
 	// get the module from the context
 	chi::ChiModule* mod;
-	auto res = context().loadModule(owningModule, &mod);
-	
+	auto            res = context().loadModule(owningModule, &mod);
+
 	if (!res) {
-		KMessageBox::detailedError(this, "Failed to load module", QString::fromStdString(res.dump()));
+		KMessageBox::detailedError(this, "Failed to load module",
+		                           QString::fromStdString(res.dump()));
 		return;
 	}
-	
+
 	auto gMod = static_cast<chi::GraphModule*>(mod);
-	
+
 	// TODO: rename this to something that's garunteed to not exist
 	gMod->getOrCreateStruct("New Struct");
-	
+
 	mModel->updateModule(owningModule);
 }
 
 void ModuleBrowser::moduleProperties() {
 	fs::path owningModule;
-	
+
 	auto idx = currentIndex();
 	if (idx.isValid()) {
 		auto item = static_cast<WorkspaceTree*>(idx.internalPointer());
-		
-		if (item->type != WorkspaceTree::MODULE) {
-			return;
-		}
-		
+
+		if (item->type != WorkspaceTree::MODULE) { return; }
+
 		owningModule = item->fullName();
 	}
-	
+
 	// load the module
 	chi::ChiModule* mod;
-	auto res = context().loadModule(owningModule, &mod);
-	if (!res) { qDebug() << "Failed to load module " << QString::fromStdString(owningModule.string()); }
-	
+	auto            res = context().loadModule(owningModule, &mod);
+	if (!res) {
+		qDebug() << "Failed to load module " << QString::fromStdString(owningModule.string());
+	}
+
 	auto castedMod = static_cast<chi::GraphModule*>(mod);
-	
-	
+
 	auto dialog = new ModulePropertiesDialog(this, *castedMod);
 	dialog->exec();
-	
 }
 
 void ModuleBrowser::deleteItem() {
 	// see which type it is
 	auto idx = currentIndex();
 	if (!idx.isValid()) { return; }
-	
+
 	auto item = static_cast<WorkspaceTree*>(idx.internalPointer());
-	
-	switch(item->type) {
-		case WorkspaceTree::FUNCTION:
-		{
-			// close the function if it's still open
-			emit functionDeleted(item->func->module(), item->func->name());
-			
-			// delete it from the module
-			// TODO: do diagnostics on what this hurts
-			item->func->module().removeFunction(*item->func);
-			
-			mModel->updateModule(item->parent->fullName());
-			
-			break;
-		}
-		case WorkspaceTree::STRUCT:
-		{
-			// close the function if it's still open
-			emit structDeleted(item->str->module(), item->str->name());
-			
-			// delete it from the module
-			// TODO: do diagnostics on what this hurts
-			item->str->module().removeStruct(*item->str);
-			
-			mModel->updateModule(item->parent->fullName());
-			
-			break;
-		}
-		// TODO: implement the rest
-		default: return;
+
+	switch (item->type) {
+	case WorkspaceTree::FUNCTION: {
+		// close the function if it's still open
+		emit functionDeleted(item->func->module(), item->func->name());
+
+		// delete it from the module
+		// TODO: do diagnostics on what this hurts
+		item->func->module().removeFunction(*item->func);
+
+		mModel->updateModule(item->parent->fullName());
+
+		break;
+	}
+	case WorkspaceTree::STRUCT: {
+		// close the function if it's still open
+		emit structDeleted(item->str->module(), item->str->name());
+
+		// delete it from the module
+		// TODO: do diagnostics on what this hurts
+		item->str->module().removeStruct(*item->str);
+
+		mModel->updateModule(item->parent->fullName());
+
+		break;
+	}
+	// TODO: implement the rest
+	default: return;
 	}
 	return;
 }

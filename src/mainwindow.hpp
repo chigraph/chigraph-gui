@@ -33,12 +33,12 @@ public:
 	explicit MainWindow(QWidget* parent = nullptr);
 	~MainWindow();
 
-	chi::Context&    context() const { return *mChigContext; }
+	chi::Context&   context() const { return *mChigContext; }
 	CentralTabView& tabView() const { return *mFunctionTabs; }
 
 	LaunchConfigurationManager& launchManager() { return *mLaunchManager; }
 
-	/// Load a module into the window. 
+	/// Load a module into the window.
 	/// \exepcts `!name.isEmpty()`
 	std::pair<chi::Result, chi::GraphModule*> loadModule(const QString& name);
 

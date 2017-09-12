@@ -33,10 +33,8 @@ struct WorkspaceTree {
 			ret    = parent->name.toStdString() / ret;
 			parent = parent->parent;
 		}
-		
-		if (ret.string().size() <= 4) {
-			return "";
-		}
+
+		if (ret.string().size() <= 4) { return ""; }
 		ret = ret.string().substr(4);  // remove src/ at the beginning
 
 		return ret;
@@ -68,7 +66,7 @@ public:
 	                                                          Filter        filter = Filter::All);
 
 	void updateModule(const boost::filesystem::path& name);
-	
+
 	QModelIndex indexFromName(const boost::filesystem::path& name, WorkspaceTree::eType type);
 
 	int columnCount(const QModelIndex& parent) const override;
@@ -79,15 +77,17 @@ public:
 	void fetchMore(const QModelIndex& index) override;
 	int rowCount(const QModelIndex& index) const override;
 	QVariant data(const QModelIndex& index, int role) const override;
-	Qt::ItemFlags flags(const QModelIndex &index) const override;
-	bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-	
+	Qt::ItemFlags flags(const QModelIndex& index) const override;
+	bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
+
 	WorkspaceTree* tree() const { return mTree.get(); }
-	
+
 signals:
-	void functionRenamed(chi::GraphFunction& func, const std::string& oldName, const std::vector<chi::NodeInstance*> updatedNodes);
-	void structRenamed(chi::GraphStruct& str, const std::string& oldName, const std::vector<chi::NodeInstance*> updatedNodes);
-	
+	void functionRenamed(chi::GraphFunction& func, const std::string& oldName,
+	                     const std::vector<chi::NodeInstance*> updatedNodes);
+	void structRenamed(chi::GraphStruct& str, const std::string& oldName,
+	                   const std::vector<chi::NodeInstance*> updatedNodes);
+
 private:
 	std::unique_ptr<WorkspaceTree> mTree;
 	chi::Context*                  mCtx;

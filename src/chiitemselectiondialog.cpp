@@ -9,7 +9,7 @@
 
 ChiItemSelectionDialog::ChiItemSelectionDialog(chi::Context& ctx, boost::filesystem::path* toFill,
                                                WorkspaceTree::eType type, QWidget* parent)
-    : QDialog{parent},  mType{type}, mToFill{toFill} {
+    : QDialog{parent}, mType{type}, mToFill{toFill} {
 	assert(toFill != nullptr);
 
 	auto layout = new QVBoxLayout;

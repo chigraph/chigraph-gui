@@ -37,10 +37,10 @@ private slots:
 private:
 	LaunchConfigurationManager* mManager;
 	LaunchConfiguration         currentlyEditing;
-	
+
 	std::unordered_map<QListWidgetItem*, LaunchConfiguration> idToItem;
 
-	KUrlRequester*           mWdEdit;
+	KUrlRequester*       mWdEdit;
 	ChiItemSelectWidget* mModuleEdit;
 	QLineEdit*           mArgsEdit;
 

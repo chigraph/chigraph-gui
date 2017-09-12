@@ -6,8 +6,8 @@
 #include <chi/GraphFunction.hpp>
 #include <chi/GraphModule.hpp>
 #include <chi/GraphStruct.hpp>
-#include <chi/Support/Result.hpp>
 #include <chi/NodeInstance.hpp>
+#include <chi/Support/Result.hpp>
 
 #include <KMessageBox>
 
@@ -76,33 +76,28 @@ std::unique_ptr<ModuleTreeModel> ModuleTreeModel::createFromContext(chi::Context
 	return std::make_unique<ModuleTreeModel>(std::move(tree), context, filter);
 }
 
-
 void ModuleTreeModel::updateModule(const boost::filesystem::path& name) {
 	auto idx = indexFromName(name, WorkspaceTree::MODULE);
-	
-	if (!idx.isValid()) {
-		return;
-	}
-	
+
+	if (!idx.isValid()) { return; }
+
 	auto tree = static_cast<WorkspaceTree*>(idx.internalPointer());
-	
+
 	// don't even bother
-	if (tree->module == nullptr) {
-		return;
-	}
-	
+	if (tree->module == nullptr) { return; }
+
 	// delete all subs
 	beginRemoveRows(idx, 0, tree->children.size() - 1);
 	tree->children.clear();
 	endRemoveRows();
-	
-	beginInsertRows(idx, 0, (mFilter & FunctionBit ? tree->module->functions().size() - 1 : 0) +
-							(mFilter & StructBit   ? tree->module->structs().size() - 1   : 0));
+
+	beginInsertRows(idx, 0,
+	                (mFilter & FunctionBit ? tree->module->functions().size() - 1 : 0) +
+	                    (mFilter & StructBit ? tree->module->structs().size() - 1 : 0));
 	tree->module = nullptr;
 	fetchMore(idx);
 	endInsertRows();
 }
-
 
 QModelIndex ModuleTreeModel::indexFromName(const boost::filesystem::path& name,
                                            WorkspaceTree::eType           type) {
@@ -140,8 +135,7 @@ QModelIndex ModuleTreeModel::index(int row, int column, const QModelIndex& paren
 	} else {
 		parentItem = tree();
 	}
-	
-	
+
 	// make cast valid
 	Q_ASSERT(row >= 0);
 
@@ -153,11 +147,11 @@ QModelIndex ModuleTreeModel::index(int row, int column, const QModelIndex& paren
 
 QModelIndex ModuleTreeModel::parent(const QModelIndex& index) const {
 	if (!index.isValid()) { return {}; }
-	
+
 	auto childItem  = static_cast<WorkspaceTree*>(index.internalPointer());
 	auto parentItem = childItem->parent;
 
-	if (parentItem == tree()) { return{}; }
+	if (parentItem == tree()) { return {}; }
 
 	return createIndex(parentItem->row, 0, parentItem);
 }
@@ -272,66 +266,55 @@ QVariant ModuleTreeModel::data(const QModelIndex& index, int role) const {
 	}
 }
 
-Qt::ItemFlags ModuleTreeModel::flags(const QModelIndex& index) const
-{
+Qt::ItemFlags ModuleTreeModel::flags(const QModelIndex& index) const {
 	if (!index.isValid()) { return {}; }
 
 	auto item = static_cast<WorkspaceTree*>(index.internalPointer());
 
 	Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-	
+
 	if (item->type == WorkspaceTree::FUNCTION || item->type == WorkspaceTree::STRUCT) {
 		flags |= Qt::ItemIsEditable;
 	}
-	
+
 	return flags;
 }
 
 bool ModuleTreeModel::setData(const QModelIndex& index, const QVariant& value, int role) {
 	if (!index.isValid()) { return {}; }
-	
+
 	if (role == Qt::EditRole) {
 		auto item = static_cast<WorkspaceTree*>(index.internalPointer());
-		
-		if (value.toString().isEmpty()) {
-			return false;
+
+		if (value.toString().isEmpty()) { return false; }
+
+		switch (item->type) {
+		case WorkspaceTree::FUNCTION: {
+			auto oldName = item->func->name();
+
+			// set the function name
+			auto nodesToUpdate = item->func->setName(value.toString().toStdString());
+			item->name         = QString::fromStdString(item->func->name());
+
+			emit functionRenamed(*item->func, oldName, nodesToUpdate);
+
+		} break;
+		case WorkspaceTree::STRUCT: {
+			auto oldName = item->str->name();
+
+			// set the struct name
+			auto nodesToUpdate = item->str->setName(value.toString().toStdString());
+			item->name         = QString::fromStdString(item->str->name());
+
+			emit structRenamed(*item->str, oldName, nodesToUpdate);
+
+		} break;
+		default: return false;
 		}
-		
-		switch(item->type) {
-			case WorkspaceTree::FUNCTION:
-			{
-				auto oldName = item->func->name();
-				
-				// set the function name
-				auto nodesToUpdate = item->func->setName(value.toString().toStdString());
-				item->name = QString::fromStdString(item->func->name());
-				
-				emit functionRenamed(*item->func, oldName, nodesToUpdate);
-				
-			}
-			break;
-			case WorkspaceTree::STRUCT:
-			{
-				
-				auto oldName = item->str->name();
-				
-				// set the struct name
-				auto nodesToUpdate = item->str->setName(value.toString().toStdString());
-				item->name = QString::fromStdString(item->str->name());
-				
-				emit structRenamed(*item->str, oldName, nodesToUpdate);
-				
-			}
-			break;
-			default:
-				return false;
-	
-		}
-		
+
 		dataChanged(index, index, {Qt::DisplayRole});
 		return true;
 	}
-	
+
 	return false;
 }
-

@@ -13,15 +13,15 @@
 #include "functionview.hpp"
 
 // namespace {
-// 
+//
 // QStringList createTypeOptions(const chi::GraphModule& mod) {
 // 	QStringList ret;
-// 
+//
 // 	// add the module
 // 	for (const auto& ty : mod.typeNames()) {
 // 		ret << QString::fromStdString(mod.fullName() + ":" + ty);
 // 	}
-// 
+//
 // 	// and its dependencies
 // 	for (auto dep : mod.dependencies()) {
 // 		auto depMod = mod.context().moduleByFullName(dep);
@@ -31,7 +31,7 @@
 // 	}
 // 	return ret;
 // }
-// 
+//
 // }  // anon namespace
 
 ExecParamListWidget::ExecParamListWidget(QWidget* parent) : QWidget(parent) {}
@@ -110,7 +110,7 @@ void ExecParamListWidget::setFunction(FunctionView* func, Type ty) {
 void ExecParamListWidget::refreshEntry() {
 	auto entry = mFunc->function()->entryNode();
 	if (entry == nullptr) { return; }
-	
+
 	mFunc->refreshGuiForNode(*entry);
 }
 void ExecParamListWidget::refreshExits() {

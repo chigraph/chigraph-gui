@@ -31,7 +31,8 @@ namespace fs = boost::filesystem;
 SubprocessOutputView::SubprocessOutputView(chi::GraphModule* module) : mModule(module) {
 	// compile!
 	std::unique_ptr<llvm::Module> llmod;
-	chi::Result                   res = module->context().compileModule(module->fullName(), chi::CompileSettings::Default, &llmod);
+	chi::Result                   res =
+	    module->context().compileModule(module->fullName(), chi::CompileSettings::Default, &llmod);
 
 	if (!res) {
 		KMessageBox::detailedError(this, "Failed to compile module",

@@ -1,14 +1,14 @@
 #include "mainwindow.hpp"
+#include "centraltabview.hpp"
 #include "chigraphplugin.hpp"
 #include "functiondetails.hpp"
-#include "centraltabview.hpp"
 #include "functionview.hpp"
 #include "launchconfigurationdialog.hpp"
 #include "localvariables.hpp"
 #include "modulebrowser.hpp"
-#include "subprocessoutputview.hpp"
 #include "moduletreemodel.hpp"
 #include "structedit.hpp"
+#include "subprocessoutputview.hpp"
 
 #include <KActionCollection>
 #include <KActionMenu>
@@ -65,10 +65,8 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	mFunctionTabs->setMovable(true);
 	mFunctionTabs->setTabsClosable(true);
 	connect(mFunctionTabs, &CentralTabView::dirtied, this, &MainWindow::moduleDirtied);
-	connect(this, &MainWindow::workspaceOpened, mFunctionTabs, [this] (chi::Context&) {
-		while(auto v = mFunctionTabs->currentView()) {
-			mFunctionTabs->closeView(v);
-		}
+	connect(this, &MainWindow::workspaceOpened, mFunctionTabs, [this](chi::Context&) {
+		while (auto v = mFunctionTabs->currentView()) { mFunctionTabs->closeView(v); }
 	});
 	insertChildClient(mFunctionTabs);
 
@@ -84,18 +82,22 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	connect(this, &MainWindow::workspaceOpened, mModuleBrowser, &ModuleBrowser::loadWorkspace);
 	connect(mModuleBrowser, &ModuleBrowser::functionSelected, &tabView(),
 	        &CentralTabView::selectNewFunction);
-	connect(mModuleBrowser, &ModuleBrowser::structSelected, &tabView(), &CentralTabView::selectNewStruct);
+	connect(mModuleBrowser, &ModuleBrowser::structSelected, &tabView(),
+	        &CentralTabView::selectNewStruct);
 	connect(this, &MainWindow::newModuleCreated, mModuleBrowser,
 	        [this](chi::GraphModule& mod) { mModuleBrowser->loadWorkspace(mod.context()); });
 	connect(this, &MainWindow::workspaceOpened, docker, [docker](chi::Context& ctx) {
 		docker->setWindowTitle(i18n("Modules") + " - " +
 		                       QString::fromStdString(ctx.workspacePath().string()));
 	});
-	connect(mModuleBrowser, &ModuleBrowser::functionRenamed, mFunctionTabs, &CentralTabView::functionRenamed);
-	connect(mModuleBrowser, &ModuleBrowser::structRenamed, mFunctionTabs, &CentralTabView::structRenamed);
-	connect(mModuleBrowser, &ModuleBrowser::functionDeleted, mFunctionTabs, &CentralTabView::functionDeleted);
-	connect(mModuleBrowser, &ModuleBrowser::structDeleted, mFunctionTabs, &CentralTabView::structDeleted);
-
+	connect(mModuleBrowser, &ModuleBrowser::functionRenamed, mFunctionTabs,
+	        &CentralTabView::functionRenamed);
+	connect(mModuleBrowser, &ModuleBrowser::structRenamed, mFunctionTabs,
+	        &CentralTabView::structRenamed);
+	connect(mModuleBrowser, &ModuleBrowser::functionDeleted, mFunctionTabs,
+	        &CentralTabView::functionDeleted);
+	connect(mModuleBrowser, &ModuleBrowser::structDeleted, mFunctionTabs,
+	        &CentralTabView::structDeleted);
 
 	docker = new QDockWidget(i18n("Output"), this);
 	docker->setObjectName("Output");
@@ -117,18 +119,18 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	connect(mFunctionTabs, &CentralTabView::functionViewChanged, functionDetails,
 	        [this, docker, functionDetails](FunctionView* view, bool) {
 
-				functionDetails->setEnabled(true);
+		        functionDetails->setEnabled(true);
 		        functionDetails->loadFunction(view);
 		        docker->setWindowTitle(i18n("Function Details") + " - " +
 		                               QString::fromStdString(view->function()->name()));
 
 		    });
-	connect(mFunctionTabs, &CentralTabView::structViewChanged, functionDetails, 
-		[this, docker, functionDetails](StructEdit*, bool) {
-			functionDetails->setEnabled(false);
-			
-			docker->setWindowTitle(i18n("Function Details"));
-		});
+	connect(mFunctionTabs, &CentralTabView::structViewChanged, functionDetails,
+	        [this, docker, functionDetails](StructEdit*, bool) {
+		        functionDetails->setEnabled(false);
+
+		        docker->setWindowTitle(i18n("Function Details"));
+		    });
 	connect(functionDetails, &FunctionDetails::dirtied, this,
 	        [this, functionDetails] { moduleDirtied(functionDetails->chiFunc()->module()); });
 
@@ -208,11 +210,13 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 			KMessageBox::error(this, i18n("Select a launch configuration"), i18n("run: error"));
 			return;
 		}
-		
+
 		auto moduleName = launchManager().currentConfiguration().module();
-		
+
 		if (moduleName.isEmpty()) {
-			KMessageBox::error(this, i18n("No module set in launch configuration: ") + launchManager().currentConfiguration().name());
+			KMessageBox::error(this,
+			                   i18n("No module set in launch configuration: ") +
+			                       launchManager().currentConfiguration().name());
 			return;
 		}
 
@@ -268,7 +272,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	        [this](const QString& str) {
 		        launchManager().setCurrentConfiguration(launchManager().configByName(str));
 		    });
-	
+
 	if (launchManager().currentConfiguration().valid()) {
 		mConfigSelectAction->setCurrentAction(launchManager().currentConfiguration().name(),
 		                                      Qt::CaseSensitive);
@@ -288,29 +292,27 @@ MainWindow::~MainWindow() {
 
 std::pair<chi::Result, chi::GraphModule*> MainWindow::loadModule(const QString& name) {
 	assert(!name.isEmpty() && "Name passed to loadModule should not be empty");
-	
+
 	chi::ChiModule* mod;
-	auto res = context().loadModule(name.toStdString(), &mod);
+	auto            res = context().loadModule(name.toStdString(), &mod);
 	if (!res) { return {res, nullptr}; }
 	return {res, dynamic_cast<chi::GraphModule*>(mod)};
 }
 
 void MainWindow::newWorkspace() {
-	// open a dialog 
-	auto newWorkspaceDir = QFileDialog::getExistingDirectory(this, i18n("New Chigraph Workspace"), QDir::homePath(), {});
-	
-	if (newWorkspaceDir.isEmpty()) {
-		return;
-	}
-	
+	// open a dialog
+	auto newWorkspaceDir = QFileDialog::getExistingDirectory(this, i18n("New Chigraph Workspace"),
+	                                                         QDir::homePath(), {});
+
+	if (newWorkspaceDir.isEmpty()) { return; }
+
 	// create the file
 	QFile f{newWorkspaceDir + "/.chigraphworkspace"};
 	f.open(QIODevice::ReadWrite);
-	
+
 	auto url = QUrl::fromLocalFile(newWorkspaceDir);
 	mOpenRecentAction->addUrl(url);
 	openWorkspace(url);
-	
 }
 
 void MainWindow::save() {
@@ -342,14 +344,16 @@ void MainWindow::openWorkspaceDialog() {
 
 void MainWindow::openWorkspace(const QUrl& url) {
 	auto ctx = std::make_unique<chi::Context>(url.toLocalFile().toStdString());
-	
+
 	// make sure it actually was a context
 	if (!ctx->hasWorkspace()) {
-		KMessageBox::error(this, i18n("Path ") + url.toLocalFile() + i18n(" wasn't a chigraph workspace"), i18n("Error loading workspace"));
-		
+		KMessageBox::error(this,
+		                   i18n("Path ") + url.toLocalFile() + i18n(" wasn't a chigraph workspace"),
+		                   i18n("Error loading workspace"));
+
 		return;
 	}
-	
+
 	mChigContext   = std::move(ctx);
 	mLaunchManager = std::make_unique<LaunchConfigurationManager>(*mChigContext);
 	updateUsableConfigs();

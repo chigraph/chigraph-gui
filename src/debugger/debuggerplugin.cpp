@@ -13,8 +13,8 @@
 
 #include <thread>
 
-#include "../chigraphnodemodel.hpp"
 #include "../centraltabview.hpp"
+#include "../chigraphnodemodel.hpp"
 #include "../mainwindow.hpp"
 
 #include <../src/Node.hpp>
@@ -66,44 +66,47 @@ DebuggerPlugin::DebuggerPlugin() {
 	mBreakpointView = new BreakpointView();
 	mVariableView   = new VariableView();
 
-	connect(&MainWindow::instance()->tabView(), &CentralTabView::functionViewChanged, this,
-	        [this](FunctionView* view, bool isNew) {
+	connect(
+	    &MainWindow::instance()->tabView(), &CentralTabView::functionViewChanged, this,
+	    [this](FunctionView* view, bool isNew) {
 
-		        // only connect to it if it was just opened
-		        if (!isNew) { return; }
+		    // only connect to it if it was just opened
+		    if (!isNew) { return; }
 
-		        connect(&view->model(), &ChigraphFlowSceneModel::connectionWasHovered, this,
-		                [this, view](QtNodes::NodeIndex const& lhs, QtNodes::PortIndex lPortIndex, QtNodes::NodeIndex const& rhs, QtNodes::PortIndex /*rPortIndex*/, QPoint const& pos, bool /*entered*/) {
+		    connect(
+		        &view->model(), &ChigraphFlowSceneModel::connectionWasHovered, this,
+		        [this, view](QtNodes::NodeIndex const& lhs, QtNodes::PortIndex lPortIndex,
+		                     QtNodes::NodeIndex const& rhs, QtNodes::PortIndex /*rPortIndex*/,
+		                     QPoint const&             pos, bool /*entered*/) {
 
-			                // only print value when it's stopped
-			                if (!stopped()) { return; }
-			                
-			                auto leftChiNode = reinterpret_cast<chi::NodeInstance*>(lhs.internalPointer());
+			        // only print value when it's stopped
+			        if (!stopped()) { return; }
 
-							Q_ASSERT(lPortIndex >= 0);
-							
-			                // if it's an exec output, then return
-			                if (!leftChiNode->type().pure() &&
-			                    (size_t)lPortIndex <= leftChiNode->outputExecConnections.size()) {
-				                return;
-			                }
+			        auto leftChiNode = reinterpret_cast<chi::NodeInstance*>(lhs.internalPointer());
 
-			                auto dataConnID =
-			                    leftChiNode->type().pure()
-			                        ? lPortIndex
-			                        : lPortIndex - leftChiNode->outputExecConnections.size();
+			        Q_ASSERT(lPortIndex >= 0);
 
-			                // get the LLDB value
-			                auto value = mDebugger->inspectNodeOutput(*leftChiNode, dataConnID);
-			                if (!value.IsValid()) { return; }
+			        // if it's an exec output, then return
+			        if (!leftChiNode->type().pure() &&
+			            (size_t)lPortIndex <= leftChiNode->outputExecConnections.size()) {
+				        return;
+			        }
 
-			                // display it
-			                QToolTip::showText(pos,
-			                                   QString::fromLatin1(value.GetValue()) + " : " +
-			                                       QString::fromLatin1(value.GetSummary()));
-			            });
+			        auto dataConnID = leftChiNode->type().pure()
+			                              ? lPortIndex
+			                              : lPortIndex - leftChiNode->outputExecConnections.size();
 
-		    });
+			        // get the LLDB value
+			        auto value = mDebugger->inspectNodeOutput(*leftChiNode, dataConnID);
+			        if (!value.IsValid()) { return; }
+
+			        // display it
+			        QToolTip::showText(pos,
+			                           QString::fromLatin1(value.GetValue()) + " : " +
+			                               QString::fromLatin1(value.GetSummary()));
+			    });
+
+		});
 
 	setXMLFile("chigraphguidebuggerui.rc");
 }
