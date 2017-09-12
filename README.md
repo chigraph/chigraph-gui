@@ -8,10 +8,10 @@ This is the interface for chigraph to make creating [chigraph](https://github.co
 ![screenshot](doc/looping.png)
 
 # Build Status
-| Platform  | Status                                                                           |
-| --------- | -------------------------------------------------------------------------------- |
-| OSX/macOS | [![Travis branch](https://img.shields.io/travis/chigraph/chigraph-gui/master.svg?style=flat-square)](https://travis-ci.org/chigraph/chigraph-gui) |
-| Windows   | [![AppVeyor](https://img.shields.io/appveyor/ci/guapotaco/chigraph-gui.svg?style=flat-square)](https://ci.appveyor.com/project/GuapoTaco/chigraph-gui)  |
+| Platform    | Status                                                                           |
+| ----------- | -------------------------------------------------------------------------------- |
+| linux/macOS | [![Travis branch](https://img.shields.io/travis/chigraph/chigraph-gui/master.svg?style=flat-square)](https://travis-ci.org/chigraph/chigraph-gui) |
+| Windows     | [![AppVeyor](https://img.shields.io/appveyor/ci/guapotaco/chigraph-gui.svg?style=flat-square)](https://ci.appveyor.com/project/GuapoTaco/chigraph-gui)  |
 
 ## Features
 - Easily download modules from the internet
@@ -21,6 +21,17 @@ This is the interface for chigraph to make creating [chigraph](https://github.co
 
 # Getting Involved
 - Graph a issue and run with it! You can always reach me on the gitter
+
+# Installing
+
+## Flatpak
+There's a flatpak package for chigraph, and here's how to install it:
+
+```bash
+flatpak install https://chigraph.io/flatpak/org.chigraph.chigraphgui.flatpakref
+```
+
+## Build 
 
 # Authors
 
