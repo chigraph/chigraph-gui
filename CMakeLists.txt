@@ -9,14 +9,6 @@ if (WIN32)
     set(GETTEXT_MSGFMT_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/gettext-win64/bin/msgfmt.exe CACHE FILEPATH "")
 endif()
 
-find_package(ECM 1.0.0 REQUIRED NO_MODULE)
-set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-
-include(KDEInstallDirs)
-include(KDECMakeSettings)
-#include(KDECompilerSettings)
-include(FeatureSummary)
-
 set(BUILD_EXAMPLES OFF CACHE BOOL "")
 add_subdirectory(third_party/nodeeditor)
 

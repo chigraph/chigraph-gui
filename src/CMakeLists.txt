@@ -41,6 +41,14 @@ endif()
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOMOC ON)
 
+
+find_package(ECM 1.0.0 REQUIRED NO_MODULE)
+set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+include(KDEInstallDirs)
+include(KDECMakeSettings)
+include(FeatureSummary)
+
 # find qt
 find_package(Qt5 5.6.0 REQUIRED COMPONENTS Gui Script Xml Core Widgets Network PrintSupport Svg)
 find_package(Qt5 5.6.0 COMPONENTS DBus)
