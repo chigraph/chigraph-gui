@@ -2,9 +2,6 @@
 
 set -xe
 
-sudo apt-get update
-sudo apt-get install g++-6 llvm-3.9-dev libclang-3.9-dev liblldb-3.9-dev libclang-common-3.9-dev libgit2 qt58base qt58script qt58declarative qt58tools qt58x11extras qt58svg ninja-build libedit-dev libxcb-keysyms1-dev libxml2-utils libudev-dev texinfo build-essential 
-
 QT_BASE_DIR=/opt/qt58
 export QTDIR=$QT_BASE_DIR
 export PATH=$QT_BASE_DIR/bin:$PATH
@@ -23,9 +20,11 @@ mkdir -p ~/chigraph.appdir/usr/lib
 rm -rf ~/chigraph.appdir/usr/lib64 || true
 ln -s ~/chigraph.appdir/usr/lib ~/chigraph.appdir/usr/lib64
 
+git clone --recursive --depth 5 https://github.com/chigraph/chigraph-gui /chigraph-gui
+cd /chigraph-gui
 
 # setup KF5
-./setup.sh
+python3 ./setup.py
 rsync -raPq third_party/kf5-release/* ~/chigraph.appdir/usr/
 
 # build chigraph
@@ -46,7 +45,7 @@ cp scripts/appimage/chigraph.png ~/chigraph.appdir/
 
 cp /usr/lib/llvm-3.9/bin/lldb-server ~/chigraph.appdir/usr/bin/
 
-QT_BASE_DIR=/opt/qt58
+QT_BASE_DIR=/opt/qt59
 export QTDIR=$QT_BASE_DIR
 export PATH=$QT_BASE_DIR/bin:$PATH
 

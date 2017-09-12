@@ -1,0 +1,42 @@
+​<?xml version="1.0" encoding="UTF-8"?>
+​<!-- Copyright 2013 First Lastname <your@email.com> -->
+​<component type="desktop-application">
+​  <id>org.chigraph.chigraphgui</id>
+​  <metadata_license>FSFAP</metadata_license>
+​  <project_license>Apache 2.0</project_license>
+​  <name>Chigraph GUI</name>
+​  <summary>Write chigraph code</summary>
+​
+​  <description>
+​    <p>
+​      Chigraph GUI is a graphical interface to the chigraph language
+    </p>
+​  </description>
+​
+​  <launchable type="desktop-id">org.chigraph.chigraphgui.desktop</launchable>
+​
+​  <screenshots>
+​    <screenshot type="default">
+​      <caption>If statement</caption>
+​      <image>https://raw.githubusercontent.com/chigraph/chigraph/master/doc/screenshots/if.png</image>
+​    </screenshot>
+​    <screenshot>
+​      <image>http://www.hughsie.com/en_US/preferences.png</image>
+​    </screenshot>
+​  </screenshots>
+​
+​  <url type="homepage">https://raw.githubusercontent.com/chigraph/chigraph/master/doc/screenshots/looping.png</url>
+​  <project_group>Chigraph</project_group>
+​
+​  <provides>
+​    <binary>chigraphgui</binary>
+​  </provides>
+​
+​  <releases>
+​    <release version="nightly" date="2017-09-11">
+​      <description>
+​        <p>Initial Release</p>
+​      </description>
+​    </release>
+​  </releases>
+​</component>
