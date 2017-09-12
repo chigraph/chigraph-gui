@@ -2,6 +2,6 @@
 Type=Application
 Name=Chigraph
 Exec=chigraphgui
-Icon=chigraph
+Icon=org.chigraph.chigraphgui
 Categories=Qt;KDE;Development;IDE;
 
