@@ -153,6 +153,7 @@ FunctionView* CentralTabView::viewFromFunctionName(const boost::filesystem::path
 }
 
 void CentralTabView::closeView(FunctionView* view) { closeTab(indexOf(view)); }
+void CentralTabView::closeView(StructEdit* view) { closeTab(indexOf(view)); }
 
 FunctionView* CentralTabView::currentView() {
 	auto widget = currentWidget();

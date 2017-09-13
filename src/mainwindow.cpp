@@ -331,7 +331,7 @@ void MainWindow::save() {
 
 void MainWindow::openWorkspaceDialog() {
 	QString workspace =
-	    QFileDialog::getExistingDirectory(this, i18n("Chigraph Workspace"), QDir::homePath(), {});
+	    QFileDialog::getExistingDirectory(this, i18n("Chigraph Workspace"), QDir::homePath(), QFileDialog::DontUseNativeDialog | QFileDialog::ShowDirsOnly);
 
 	if (workspace.isEmpty()) { return; }
 
