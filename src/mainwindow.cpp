@@ -331,7 +331,12 @@ void MainWindow::save() {
 
 void MainWindow::openWorkspaceDialog() {
 	QString workspace =
-	    QFileDialog::getExistingDirectory(this, i18n("Chigraph Workspace"), QDir::homePath(), QFileDialog::DontUseNativeDialog | QFileDialog::ShowDirsOnly);
+	    QFileDialog::getExistingDirectory(this, i18n("Chigraph Workspace"), QDir::homePath(), QFileDialog::ShowDirsOnly 
+	    // this is needed for flatapk so it doens't use the portal
+#ifdef CHI_FOR_FLATPAK
+	    | QFileDialog::DontUseNativeDialog
+#endif
+		);
 
 	if (workspace.isEmpty()) { return; }
 
