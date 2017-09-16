@@ -241,6 +241,8 @@ QString ChigraphFlowSceneModel::nodeTypeCatergory(QString const& name) const {
 }
 QString ChigraphFlowSceneModel::converterNode(QtNodes::NodeDataType const& lhs,
                                               QtNodes::NodeDataType const& rhs) const {
+												  
+	if (lhs.id == "_exec" || rhs.id == "_exec") { return {}; }
 	
 	// parse the types
 	std::string lModule, lTypeName, rModule, rTypeName;
