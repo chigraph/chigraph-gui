@@ -8,6 +8,7 @@
 
 #include <chi/NodeInstance.hpp>
 #include <chi/NodeType.hpp>
+#include <chi/Support/Result.hpp>
 
 #include <QCheckBox>
 #include <QDialog>
@@ -27,6 +28,7 @@ class ChigraphFlowSceneModel : public QtNodes::FlowSceneModel {
 	Q_OBJECT
 public:
 	ChigraphFlowSceneModel(chi::GraphFunction& func);
+	void updateValidation();
 
 	QStringList modelRegistry() const override;
 
@@ -130,6 +132,7 @@ private:
 	QWidget* createEmbeddedWidget(chi::NodeInstance& inst);
 
 	chi::GraphFunction* mFunc;
+	chi::Result mValidation;
 	std::unordered_map<chi::NodeInstance*, QWidget*> mEmbeddedWidgets;
 };
 

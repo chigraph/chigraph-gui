@@ -38,6 +38,7 @@ FunctionView::FunctionView(chi::GraphFunction& func_, QWidget* parent)
 	mModel = new ChigraphFlowSceneModel(*function());
 
 	mScene = new FlowScene(mModel);
+	mModel->updateValidation();
 
 	mView = new FlowView(mScene);
 	mView->setSceneRect(-320000, -320000, 640000, 640000);

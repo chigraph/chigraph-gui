@@ -6,6 +6,7 @@
 #include <chi/GraphFunction.hpp>
 #include <chi/GraphModule.hpp>
 #include <chi/NodeInstance.hpp>
+#include <chi/FunctionValidator.hpp>
 #include <chi/Support/Result.hpp>
 
 #include <nodes/NodeData>
@@ -14,6 +15,8 @@
 #include <KTextEditor/Document>
 #include <KTextEditor/Editor>
 #include <KTextEditor/View>
+
+#include <boost/range/join.hpp>
 
 namespace {
 
@@ -181,6 +184,27 @@ ChigraphFlowSceneModel::ChigraphFlowSceneModel(chi::GraphFunction& func) : mFunc
 	}
 }
 
+void ChigraphFlowSceneModel::updateValidation() {
+	
+	auto res = chi::validateFunction(*mFunc);
+	
+	auto old = mValidation;
+	mValidation = std::move(res);
+	
+	// see who's changed
+	for (const auto& inst : boost::range::join(old.result_json, mValidation.result_json)) {
+		if (inst["data"].find("Node ID") != inst["data"].end() && inst["data"]["Node ID"].is_string()) {
+			
+			std::string nodeID = inst["data"]["Node ID"];
+			auto iter = mFunc->nodes().find(boost::uuids::string_generator()(nodeID));
+			if (iter != mFunc->nodes().end()) {
+				emit nodeValidationUpdated(nodeIndex(*iter->second));
+			}
+			
+		}
+	}
+}
+
 QStringList ChigraphFlowSceneModel::modelRegistry() const {
 	QStringList ret;
 
@@ -217,8 +241,25 @@ QString ChigraphFlowSceneModel::nodeTypeCatergory(QString const& name) const {
 }
 QString ChigraphFlowSceneModel::converterNode(QtNodes::NodeDataType const& lhs,
                                               QtNodes::NodeDataType const& rhs) const {
-	// TODO: this would be pretty neat
-	return {};
+	
+	// parse the types
+	std::string lModule, lTypeName, rModule, rTypeName;
+	std::tie(lModule, lTypeName) = chi::parseColonPair(lhs.id.toStdString());
+	std::tie(rModule, rTypeName) = chi::parseColonPair(rhs.id.toStdString());
+	
+	// get the types
+	auto lType = mFunc->context().moduleByFullName(lModule)->typeFromName(lTypeName);
+	auto rType = mFunc->context().moduleByFullName(rModule)->typeFromName(rTypeName);
+	
+	if (!lType.valid() || !rType.valid()) {
+		return {};
+	}
+	
+	auto converter = mFunc->context().createConverterNodeType(lType, rType);
+	if (converter == nullptr) {
+		return {};
+	}
+	return QString::fromStdString(converter->qualifiedName());
 }
 
 QList<QUuid> ChigraphFlowSceneModel::nodeUUids() const {
@@ -275,14 +316,40 @@ bool ChigraphFlowSceneModel::nodeResizable(QtNodes::NodeIndex const& index) cons
 }
 QtNodes::NodeValidationState ChigraphFlowSceneModel::nodeValidationState(
     QtNodes::NodeIndex const& index) const {
-	// TODO: implement
+	
+	Q_ASSERT(index.isValid());
+	
+	// see if this node is in the JSON
+	for (const auto& entry : mValidation.result_json) {
+		if (entry["data"].find("Node ID") != entry["data"].end() && entry["data"]["Node ID"].is_string()) {
+			auto Uuid = QUuid(QString::fromStdString(entry["data"]["Node ID"]));
+			
+			if (Uuid == index.id()) {
+				std::string ec = entry["errorcode"];
+				if (ec[0] == 'E') {
+					return QtNodes::NodeValidationState::Error;
+				}
+				return QtNodes::NodeValidationState::Warning;
+			}
+		}
+	}
 
 	return QtNodes::NodeValidationState::Valid;
 }
 
 /// Get the validation error/warning
 QString ChigraphFlowSceneModel::nodeValidationMessage(QtNodes::NodeIndex const& index) const {
-	// TODO: implement
+	
+	// see if this node is in the JSON
+	for (const auto& entry : mValidation.result_json) {
+		if (entry["data"].find("Node ID") != entry["data"].end() && entry["data"]["Node ID"].is_string()) {
+			auto Uuid = QUuid(QString::fromStdString(entry["data"]["Node ID"]));
+			
+			if (Uuid == index.id()) {
+				return QString::fromStdString(entry["overview"]);
+			}
+		}
+	}
 
 	return {};
 }
@@ -453,6 +520,7 @@ bool ChigraphFlowSceneModel::removeConnection(QtNodes::NodeIndex const& leftNode
 		}
 
 		emit connectionRemoved(leftNode, leftPortID, rightNode, rightPortID);
+		updateValidation();
 		return true;
 	}
 
@@ -464,6 +532,7 @@ bool ChigraphFlowSceneModel::removeConnection(QtNodes::NodeIndex const& leftNode
 		return false;
 	}
 	emit connectionRemoved(leftNode, leftPortID, rightNode, rightPortID);
+	updateValidation();
 	return true;
 }
 
@@ -489,6 +558,7 @@ bool ChigraphFlowSceneModel::addConnection(QtNodes::NodeIndex const& leftNode,
 		if (!ret) { return false; }
 
 		emit connectionAdded(leftNode, leftPortID, rightNode, rightPortID);
+		updateValidation();
 		return true;
 	}
 	// then it's data
@@ -498,6 +568,7 @@ bool ChigraphFlowSceneModel::addConnection(QtNodes::NodeIndex const& leftNode,
 	if (!ret) { return false; }
 
 	emit connectionAdded(leftNode, leftPortID, rightNode, rightPortID);
+	updateValidation();
 	return true;
 }
 
@@ -514,6 +585,7 @@ bool ChigraphFlowSceneModel::removeNode(QtNodes::NodeIndex const& index) {
 
 	if (!res) { return false; }
 	emit nodeRemoved(index.id());
+	updateValidation();
 	return true;
 }
 
@@ -559,6 +631,7 @@ QUuid ChigraphFlowSceneModel::addNode(QString const& typeID, QPointF const& pos)
 
 	emit nodeAdded(quuid);
 
+	updateValidation();
 	return quuid;
 }
 
