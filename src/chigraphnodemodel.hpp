@@ -32,7 +32,7 @@ public:
 
 	QStringList modelRegistry() const override;
 
-	QString nodeTypeCatergory(QString const& name) const override;
+	QString nodeTypeCategory(QString const& name) const override;
 	QString converterNode(QtNodes::NodeDataType const& lhs,
 	                      QtNodes::NodeDataType const& rhs) const override;
 
@@ -44,13 +44,13 @@ public:
 		    QUuid::fromRfc4122(QByteArray(reinterpret_cast<const char*>(node.id().data), 16)));
 	}
 
-	QList<QUuid>       nodeUUids() const override;
-	QtNodes::NodeIndex nodeIndex(const QUuid& ID) const override;
-	QString nodeTypeIdentifier(QtNodes::NodeIndex const& index) const override;
-	QString nodeCaption(QtNodes::NodeIndex const& index) const override;
-	QPointF nodeLocation(QtNodes::NodeIndex const& index) const override;
-	QWidget* nodeWidget(QtNodes::NodeIndex const& index) const override;
-	bool nodeResizable(QtNodes::NodeIndex const& index) const override;
+	QList<QUuid>                 nodeUUids() const override;
+	QtNodes::NodeIndex           nodeIndex(const QUuid& ID) const override;
+	QString                      nodeTypeIdentifier(QtNodes::NodeIndex const& index) const override;
+	QString                      nodeCaption(QtNodes::NodeIndex const& index) const override;
+	QPointF                      nodeLocation(QtNodes::NodeIndex const& index) const override;
+	QWidget*                     nodeWidget(QtNodes::NodeIndex const& index) const override;
+	bool                         nodeResizable(QtNodes::NodeIndex const& index) const override;
 	QtNodes::NodeValidationState nodeValidationState(
 	    QtNodes::NodeIndex const& index) const override;
 
@@ -66,23 +66,23 @@ public:
 	                           QtNodes::PortType         portType) const override;
 
 	/// Get the port caption
-	QString nodePortCaption(QtNodes::NodeIndex const& index, QtNodes::PortIndex portID,
-	                        QtNodes::PortType portType) const override;
+	QString nodePortCaption(QtNodes::NodeIndex const& index, QtNodes::PortType portType,
+	                        QtNodes::PortIndex portID) const override;
 
 	/// Get the port data type
 	QtNodes::NodeDataType nodePortDataType(QtNodes::NodeIndex const& index,
-	                                       QtNodes::PortIndex        portID,
-	                                       QtNodes::PortType         portType) const override;
+	                                       QtNodes::PortType         portType,
+	                                       QtNodes::PortIndex        portID) const override;
 
 	/// Port Policy
 	QtNodes::ConnectionPolicy nodePortConnectionPolicy(QtNodes::NodeIndex const& index,
-	                                                   QtNodes::PortIndex        portID,
-	                                                   QtNodes::PortType portType) const override;
+	                                                   QtNodes::PortType         portType,
+	                                                   QtNodes::PortIndex portID) const override;
 
 	/// Get a connection at a port
 	std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> nodePortConnections(
-	    QtNodes::NodeIndex const& index, QtNodes::PortIndex portID,
-	    QtNodes::PortType portType) const override;
+	    QtNodes::NodeIndex const& index, QtNodes::PortType portType,
+	    QtNodes::PortIndex portID) const override;
 
 	// Mutation functions
 	/////////////////////
@@ -131,8 +131,8 @@ signals:
 private:
 	QWidget* createEmbeddedWidget(chi::NodeInstance& inst);
 
-	chi::GraphFunction* mFunc;
-	chi::Result mValidation;
+	chi::GraphFunction*                              mFunc;
+	chi::Result                                      mValidation;
 	std::unordered_map<chi::NodeInstance*, QWidget*> mEmbeddedWidgets;
 };
 

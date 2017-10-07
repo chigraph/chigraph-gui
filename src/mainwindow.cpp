@@ -114,6 +114,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	auto scroll = new QScrollArea;
 	scroll->setWidget(functionDetails);
 	scroll->setWidgetResizable(true);
+	scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	docker->setWidget(scroll);
 	addDockWidget(Qt::RightDockWidgetArea, docker);
 	connect(mFunctionTabs, &CentralTabView::functionViewChanged, functionDetails,

@@ -75,7 +75,9 @@ void StructEdit::makeGUI() {
 
 		makeGUI();
 	});
-	layout->addWidget(newButton, id, 1, Qt::AlignRight);
+	layout->addWidget(newButton, id, 2, Qt::AlignRight);
+
+	layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding), id + 1, 0);
 }
 
 void StructEdit::refreshReferences() {

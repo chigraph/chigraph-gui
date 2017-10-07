@@ -3,10 +3,10 @@
 #include <chi/ChiModule.hpp>
 #include <chi/Context.hpp>
 #include <chi/DataType.hpp>
+#include <chi/FunctionValidator.hpp>
 #include <chi/GraphFunction.hpp>
 #include <chi/GraphModule.hpp>
 #include <chi/NodeInstance.hpp>
-#include <chi/FunctionValidator.hpp>
 #include <chi/Support/Result.hpp>
 
 #include <nodes/NodeData>
@@ -185,22 +185,20 @@ ChigraphFlowSceneModel::ChigraphFlowSceneModel(chi::GraphFunction& func) : mFunc
 }
 
 void ChigraphFlowSceneModel::updateValidation() {
-	
 	auto res = chi::validateFunction(*mFunc);
-	
-	auto old = mValidation;
+
+	auto old    = mValidation;
 	mValidation = std::move(res);
-	
+
 	// see who's changed
 	for (const auto& inst : boost::range::join(old.result_json, mValidation.result_json)) {
-		if (inst["data"].find("Node ID") != inst["data"].end() && inst["data"]["Node ID"].is_string()) {
-			
+		if (inst["data"].find("Node ID") != inst["data"].end() &&
+		    inst["data"]["Node ID"].is_string()) {
 			std::string nodeID = inst["data"]["Node ID"];
-			auto iter = mFunc->nodes().find(boost::uuids::string_generator()(nodeID));
+			auto        iter   = mFunc->nodes().find(boost::uuids::string_generator()(nodeID));
 			if (iter != mFunc->nodes().end()) {
 				emit nodeValidationUpdated(nodeIndex(*iter->second));
 			}
-			
 		}
 	}
 }
@@ -235,32 +233,27 @@ QStringList ChigraphFlowSceneModel::modelRegistry() const {
 	return ret;
 }
 
-QString ChigraphFlowSceneModel::nodeTypeCatergory(QString const& name) const {
+QString ChigraphFlowSceneModel::nodeTypeCategory(QString const& name) const {
 	// everyting before the :
 	return name.mid(0, name.lastIndexOf(':'));
 }
 QString ChigraphFlowSceneModel::converterNode(QtNodes::NodeDataType const& lhs,
                                               QtNodes::NodeDataType const& rhs) const {
-												  
 	if (lhs.id == "_exec" || rhs.id == "_exec") { return {}; }
-	
+
 	// parse the types
 	std::string lModule, lTypeName, rModule, rTypeName;
 	std::tie(lModule, lTypeName) = chi::parseColonPair(lhs.id.toStdString());
 	std::tie(rModule, rTypeName) = chi::parseColonPair(rhs.id.toStdString());
-	
+
 	// get the types
 	auto lType = mFunc->context().moduleByFullName(lModule)->typeFromName(lTypeName);
 	auto rType = mFunc->context().moduleByFullName(rModule)->typeFromName(rTypeName);
-	
-	if (!lType.valid() || !rType.valid()) {
-		return {};
-	}
-	
+
+	if (!lType.valid() || !rType.valid()) { return {}; }
+
 	auto converter = mFunc->context().createConverterNodeType(lType, rType);
-	if (converter == nullptr) {
-		return {};
-	}
+	if (converter == nullptr) { return {}; }
 	return QString::fromStdString(converter->qualifiedName());
 }
 
@@ -318,19 +311,17 @@ bool ChigraphFlowSceneModel::nodeResizable(QtNodes::NodeIndex const& index) cons
 }
 QtNodes::NodeValidationState ChigraphFlowSceneModel::nodeValidationState(
     QtNodes::NodeIndex const& index) const {
-	
 	Q_ASSERT(index.isValid());
-	
+
 	// see if this node is in the JSON
 	for (const auto& entry : mValidation.result_json) {
-		if (entry["data"].find("Node ID") != entry["data"].end() && entry["data"]["Node ID"].is_string()) {
+		if (entry["data"].find("Node ID") != entry["data"].end() &&
+		    entry["data"]["Node ID"].is_string()) {
 			auto Uuid = QUuid(QString::fromStdString(entry["data"]["Node ID"]));
-			
+
 			if (Uuid == index.id()) {
 				std::string ec = entry["errorcode"];
-				if (ec[0] == 'E') {
-					return QtNodes::NodeValidationState::Error;
-				}
+				if (ec[0] == 'E') { return QtNodes::NodeValidationState::Error; }
 				return QtNodes::NodeValidationState::Warning;
 			}
 		}
@@ -341,15 +332,13 @@ QtNodes::NodeValidationState ChigraphFlowSceneModel::nodeValidationState(
 
 /// Get the validation error/warning
 QString ChigraphFlowSceneModel::nodeValidationMessage(QtNodes::NodeIndex const& index) const {
-	
 	// see if this node is in the JSON
 	for (const auto& entry : mValidation.result_json) {
-		if (entry["data"].find("Node ID") != entry["data"].end() && entry["data"]["Node ID"].is_string()) {
+		if (entry["data"].find("Node ID") != entry["data"].end() &&
+		    entry["data"]["Node ID"].is_string()) {
 			auto Uuid = QUuid(QString::fromStdString(entry["data"]["Node ID"]));
-			
-			if (Uuid == index.id()) {
-				return QString::fromStdString(entry["overview"]);
-			}
+
+			if (Uuid == index.id()) { return QString::fromStdString(entry["overview"]); }
 		}
 	}
 
@@ -375,8 +364,8 @@ unsigned int ChigraphFlowSceneModel::nodePortCount(QtNodes::NodeIndex const& ind
 
 /// Get the port caption
 QString ChigraphFlowSceneModel::nodePortCaption(QtNodes::NodeIndex const& index,
-                                                QtNodes::PortIndex        portID,
-                                                QtNodes::PortType         portType) const {
+                                                QtNodes::PortType         portType,
+                                                QtNodes::PortIndex        portID) const {
 	auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
 
 	// make the casts safe
@@ -396,8 +385,8 @@ QString ChigraphFlowSceneModel::nodePortCaption(QtNodes::NodeIndex const& index,
 
 /// Get the port data type
 QtNodes::NodeDataType ChigraphFlowSceneModel::nodePortDataType(QtNodes::NodeIndex const& index,
-                                                               QtNodes::PortIndex        portID,
-                                                               QtNodes::PortType portType) const {
+                                                               QtNodes::PortType         portType,
+                                                               QtNodes::PortIndex portID) const {
 	auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
 
 	// make casts safe
@@ -425,7 +414,7 @@ QtNodes::NodeDataType ChigraphFlowSceneModel::nodePortDataType(QtNodes::NodeInde
 
 /// Port Policy
 QtNodes::ConnectionPolicy ChigraphFlowSceneModel::nodePortConnectionPolicy(
-    QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portType) const {
+    QtNodes::NodeIndex const& index, QtNodes::PortType portType, QtNodes::PortIndex portID) const {
 	auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
 
 	// make casts safe
@@ -442,8 +431,8 @@ QtNodes::ConnectionPolicy ChigraphFlowSceneModel::nodePortConnectionPolicy(
 /// Get a connection at a port
 std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>>
 ChigraphFlowSceneModel::nodePortConnections(QtNodes::NodeIndex const& index,
-                                            QtNodes::PortIndex        portID,
-                                            QtNodes::PortType         portType) const {
+                                            QtNodes::PortType         portType,
+                                            QtNodes::PortIndex        portID) const {
 	Q_ASSERT(index.isValid());
 
 	auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
