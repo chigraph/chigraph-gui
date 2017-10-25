@@ -612,8 +612,14 @@ QUuid ChigraphFlowSceneModel::addNode(QString const& typeID, QPointF const& pos)
 	}
 
 	std::unique_ptr<chi::NodeType> nodeType;
-	auto                           res = ctx.nodeTypeFromModule(modName, tyName, json, &nodeType);
-
+	
+	chi::Result res;
+	if (modName == "lang" && tyName == "exit") {
+		res = mFunc->createExitNodeType(&nodeType);
+	} else {
+		res = ctx.nodeTypeFromModule(modName, tyName, json, &nodeType);
+	}
+	
 	if (!res) {
 		qDebug() << "Failed to create node type: " << QString::fromStdString(res.dump());
 		return {};
@@ -650,3 +656,4 @@ bool ChigraphFlowSceneModel::moveNode(QtNodes::NodeIndex const& index, QPointF n
 
 	return true;
 }
+
