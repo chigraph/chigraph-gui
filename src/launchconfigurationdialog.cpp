@@ -125,10 +125,10 @@ LaunchConfigurationDialog::LaunchConfigurationDialog(LaunchConfigurationManager&
 	}
 
 	// right side widget
-	auto rightWidget = new QWidget;
+	mSettingsWidget = new QWidget;
 	{
 		auto layout = new QFormLayout;
-		rightWidget->setLayout(layout);
+		mSettingsWidget->setLayout(layout);
 
 		// module
 		{
@@ -162,13 +162,17 @@ LaunchConfigurationDialog::LaunchConfigurationDialog(LaunchConfigurationManager&
 	connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
 
 	auto rootSlider = new QSplitter;
+	rootSlider->setChildrenCollapsible(false);
 	rootSlider->addWidget(leftWidget);
-	rootSlider->addWidget(rightWidget);
+	rootSlider->addWidget(mSettingsWidget);
 
 	auto rootLayout = new QVBoxLayout;
 	setLayout(rootLayout);
 	rootLayout->addWidget(rootSlider);
 	rootLayout->addWidget(buttonBox);
+
+	// disable the settings by default--none selected
+	mSettingsWidget->setEnabled(false);
 
 	// select the first one
 	if (mManager->configurations().size() > 1) { selectConfig(mManager->configurations()[0]); }
@@ -186,6 +190,8 @@ void LaunchConfigurationDialog::selectConfig(LaunchConfiguration config) {
 	if (!config.valid()) { return; }
 
 	currentlyEditing = config;
+
+	mSettingsWidget->setEnabled(true);
 
 	mWdEdit->setText(config.workingDirectory());
 	mModuleEdit->setItem(config.module().toStdString());

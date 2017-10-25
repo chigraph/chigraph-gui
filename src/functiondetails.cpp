@@ -57,6 +57,9 @@ FunctionDetails::FunctionDetails(QWidget* parent) : QWidget{parent} {
 	mLocals = new LocalVariables;
 	localslayout->addWidget(mLocals);
 	connect(mLocals, &LocalVariables::dirtied, this, &FunctionDetails::dirtied);
+
+	// add a spacer
+	layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 }
 
 void FunctionDetails::loadFunction(FunctionView* funcView) {

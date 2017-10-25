@@ -43,6 +43,7 @@ private:
 	KUrlRequester*       mWdEdit;
 	ChiItemSelectWidget* mModuleEdit;
 	QLineEdit*           mArgsEdit;
+	QWidget* mSettingsWidget;
 
 	QListWidget* mConfigList;
 };
