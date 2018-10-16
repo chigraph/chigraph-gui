@@ -11,8 +11,7 @@
 #include <chi/NodeInstance.hpp>
 #include <chi/Support/Result.hpp>
 
-#include <../src/Node.hpp>
-#include <../src/NodeGraphicsObject.hpp>
+#include <nodes/NodeGraphicsObject>
 #include <nodes/ConnectionStyle>
 
 #include "chigraphnodemodel.hpp"

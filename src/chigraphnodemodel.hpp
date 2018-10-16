@@ -33,8 +33,7 @@ public:
 	QStringList modelRegistry() const override;
 
 	QString nodeTypeCategory(QString const& name) const override;
-	QString converterNode(QtNodes::NodeDataType const& lhs,
-	                      QtNodes::NodeDataType const& rhs) const override;
+  	bool getTypeConvertable(QtNodes::TypeConverterId const& id) const override;
 
 	// Retrieval functions
 	//////////////////////
@@ -66,23 +65,22 @@ public:
 	                           QtNodes::PortType         portType) const override;
 
 	/// Get the port caption
-	QString nodePortCaption(QtNodes::NodeIndex const& index, QtNodes::PortType portType,
-	                        QtNodes::PortIndex portID) const override;
+	QString nodePortCaption(QtNodes::NodeIndex const& index,
+	                        QtNodes::PortIndex portID, QtNodes::PortType portType) const override;
 
 	/// Get the port data type
 	QtNodes::NodeDataType nodePortDataType(QtNodes::NodeIndex const& index,
-	                                       QtNodes::PortType         portType,
-	                                       QtNodes::PortIndex        portID) const override;
+	                                       QtNodes::PortIndex        portID,
+	                                       QtNodes::PortType         portType) const override;
 
 	/// Port Policy
 	QtNodes::ConnectionPolicy nodePortConnectionPolicy(QtNodes::NodeIndex const& index,
-	                                                   QtNodes::PortType         portType,
-	                                                   QtNodes::PortIndex portID) const override;
+	                                                   QtNodes::PortIndex portID,
+	                                                   QtNodes::PortType         portType) const override;
 
 	/// Get a connection at a port
 	std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>> nodePortConnections(
-	    QtNodes::NodeIndex const& index, QtNodes::PortType portType,
-	    QtNodes::PortIndex portID) const override;
+	    QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portType) const override;
 
 	// Mutation functions
 	/////////////////////

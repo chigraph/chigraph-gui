@@ -46,9 +46,19 @@ SubprocessOutputView::SubprocessOutputView(chi::GraphModule* module) : mModule(m
 	    boost::filesystem::temp_directory_path() / fs::unique_path().replace_extension(".bc");
 	{
 		std::error_code      err;
-		llvm::raw_fd_ostream os(tempBitcodeFile.string(), err, llvm::sys::fs::F_RW);
+		llvm::raw_fd_ostream os(tempBitcodeFile.string(), err, 	
+#if LLVM_VERSION_LESS_EQUAL(6, 0)
+			    llvm::sys::fs::F_RW
+#else
+				llvm::sys::fs::FA_Read | llvm::sys::fs::FA_Write
+#endif
+		);
 
-		llvm::WriteBitcodeToFile(llmod.get(), os);
+		llvm::WriteBitcodeToFile(
+#if LLVM_VERSION_AT_LEAST(7, 0)
+			*
+#endif
+			llmod.get(), os);
 	}
 
 	setReadOnly(true);

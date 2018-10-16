@@ -17,8 +17,6 @@
 #include "../chigraphnodemodel.hpp"
 #include "../mainwindow.hpp"
 
-#include <../src/Node.hpp>
-
 #include <lldb/API/SBThread.h>
 
 DebuggerPlugin::DebuggerPlugin() {

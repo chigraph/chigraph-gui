@@ -4,13 +4,14 @@
 #define CHIGRAPHGUI_DEBUGGER_CURRENT_NODE_DECORATOR_HPP
 
 #include <nodes/NodeDataModel>
-
-// TODO: better solution
-#include <../src/NodeGraphicsObject.hpp>
+#include <nodes/NodeGeometry>
 
 class CurrentNodeDecorator : public QtNodes::NodePainterDelegate {
-	void paint(QPainter* painter, QtNodes::NodeGraphicsObject const& ngo) override {
-		painter->drawRect(QRect(ngo.geometry().width() / 2, 0, 10, 10));
+
+	void paint(QPainter* painter,
+        QtNodes::NodeGeometry const& geometry,
+        QtNodes::NodeIndex const& index) override {
+		painter->drawRect(QRect(geometry.width() / 2, 0, 10, 10));
 	}
 };
 

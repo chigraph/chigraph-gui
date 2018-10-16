@@ -237,8 +237,9 @@ QString ChigraphFlowSceneModel::nodeTypeCategory(QString const& name) const {
 	// everyting before the :
 	return name.mid(0, name.lastIndexOf(':'));
 }
-QString ChigraphFlowSceneModel::converterNode(QtNodes::NodeDataType const& lhs,
-                                              QtNodes::NodeDataType const& rhs) const {
+bool ChigraphFlowSceneModel::getTypeConvertable(QtNodes::TypeConverterId const& id) const {
+	auto lhs = id.first;
+	auto rhs = id.second;
 	if (lhs.id == "_exec" || rhs.id == "_exec") { return {}; }
 
 	// parse the types
@@ -253,8 +254,7 @@ QString ChigraphFlowSceneModel::converterNode(QtNodes::NodeDataType const& lhs,
 	if (!lType.valid() || !rType.valid()) { return {}; }
 
 	auto converter = mFunc->context().createConverterNodeType(lType, rType);
-	if (converter == nullptr) { return {}; }
-	return QString::fromStdString(converter->qualifiedName());
+	if (converter == nullptr) { return false; } else {return true;}
 }
 
 QList<QUuid> ChigraphFlowSceneModel::nodeUUids() const {
@@ -364,8 +364,8 @@ unsigned int ChigraphFlowSceneModel::nodePortCount(QtNodes::NodeIndex const& ind
 
 /// Get the port caption
 QString ChigraphFlowSceneModel::nodePortCaption(QtNodes::NodeIndex const& index,
-                                                QtNodes::PortType         portType,
-                                                QtNodes::PortIndex        portID) const {
+                                                QtNodes::PortIndex        portID,
+                                                QtNodes::PortType         portType) const {
 	auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
 
 	// make the casts safe
@@ -385,8 +385,8 @@ QString ChigraphFlowSceneModel::nodePortCaption(QtNodes::NodeIndex const& index,
 
 /// Get the port data type
 QtNodes::NodeDataType ChigraphFlowSceneModel::nodePortDataType(QtNodes::NodeIndex const& index,
-                                                               QtNodes::PortType         portType,
-                                                               QtNodes::PortIndex portID) const {
+                                                               QtNodes::PortIndex portID,
+                                                               QtNodes::PortType         portType) const {
 	auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
 
 	// make casts safe
@@ -414,7 +414,7 @@ QtNodes::NodeDataType ChigraphFlowSceneModel::nodePortDataType(QtNodes::NodeInde
 
 /// Port Policy
 QtNodes::ConnectionPolicy ChigraphFlowSceneModel::nodePortConnectionPolicy(
-    QtNodes::NodeIndex const& index, QtNodes::PortType portType, QtNodes::PortIndex portID) const {
+    QtNodes::NodeIndex const& index, QtNodes::PortIndex portID, QtNodes::PortType portType) const {
 	auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
 
 	// make casts safe
@@ -431,8 +431,8 @@ QtNodes::ConnectionPolicy ChigraphFlowSceneModel::nodePortConnectionPolicy(
 /// Get a connection at a port
 std::vector<std::pair<QtNodes::NodeIndex, QtNodes::PortIndex>>
 ChigraphFlowSceneModel::nodePortConnections(QtNodes::NodeIndex const& index,
-                                            QtNodes::PortType         portType,
-                                            QtNodes::PortIndex        portID) const {
+                                            QtNodes::PortIndex        portID,
+                                            QtNodes::PortType         portType) const {
 	Q_ASSERT(index.isValid());
 
 	auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
