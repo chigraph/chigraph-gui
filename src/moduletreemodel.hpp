@@ -9,7 +9,7 @@
 
 #include <chi/Fwd.hpp>
 
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 
 struct WorkspaceTree {
 	enum eType { FUNCTION, MODULE, STRUCT, FOLDER };
@@ -25,12 +25,17 @@ struct WorkspaceTree {
 	eType                                       type;
 
 	// get full name
-	boost::filesystem::path fullName() const {
-		boost::filesystem::path ret;
+	std::filesystem::path fullName() const {
+		std::filesystem::path ret = name.toStdString();
 
-		auto parent = this;
+		auto parent = this->parent;
 		while (parent != nullptr) {
-			ret    = parent->name.toStdString() / ret;
+			// don't ` / ret` when ret is empty to avoid trailing slash
+			if (ret.empty()) {
+				ret = parent->name.toStdString();
+			} else {
+				ret = parent->name.toStdString() / ret;
+			}
 			parent = parent->parent;
 		}
 
@@ -65,18 +70,18 @@ public:
 	static std::unique_ptr<ModuleTreeModel> createFromContext(chi::Context& context,
 	                                                          Filter        filter = Filter::All);
 
-	void updateModule(const boost::filesystem::path& name);
+	void updateModule(const std::filesystem::path& name);
 
-	QModelIndex indexFromName(const boost::filesystem::path& name, WorkspaceTree::eType type);
+	QModelIndex indexFromName(const std::filesystem::path& name, WorkspaceTree::eType type);
 
-	int columnCount(const QModelIndex& parent) const override;
-	QModelIndex index(int row, int column, const QModelIndex& parent) const override;
-	QModelIndex parent(const QModelIndex& index) const override;
-	bool hasChildren(const QModelIndex& index) const override;
-	bool canFetchMore(const QModelIndex& index) const override;
-	void fetchMore(const QModelIndex& index) override;
-	int rowCount(const QModelIndex& index) const override;
-	QVariant data(const QModelIndex& index, int role) const override;
+	int           columnCount(const QModelIndex& parent) const override;
+	QModelIndex   index(int row, int column, const QModelIndex& parent) const override;
+	QModelIndex   parent(const QModelIndex& index) const override;
+	bool          hasChildren(const QModelIndex& index) const override;
+	bool          canFetchMore(const QModelIndex& index) const override;
+	void          fetchMore(const QModelIndex& index) override;
+	int           rowCount(const QModelIndex& index) const override;
+	QVariant      data(const QModelIndex& index, int role) const override;
 	Qt::ItemFlags flags(const QModelIndex& index) const override;
 	bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 

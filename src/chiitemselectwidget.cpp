@@ -19,9 +19,9 @@ ChiItemSelectWidget::ChiItemSelectWidget(chi::Context& ctx, WorkspaceTree::eType
 	setIcon(ModuleTreeModel::iconForItemType(type));
 }
 
-boost::filesystem::path ChiItemSelectWidget::item() const { return mData; }
+std::filesystem::path ChiItemSelectWidget::item() const { return mData; }
 
-void ChiItemSelectWidget::setItem(const boost::filesystem::path& newItem) {
+void ChiItemSelectWidget::setItem(const std::filesystem::path& newItem) {
 	setText(QString::fromStdString(newItem.string()));
 	mData = newItem;
 

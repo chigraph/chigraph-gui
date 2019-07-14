@@ -57,7 +57,7 @@ public:
 		auto okButton = new QPushButton;
 		layout->addWidget(okButton);
 		okButton->setText(i18n("Ok"));
-		connect(okButton, &QPushButton::clicked, this, [this, doc, lineEdit, inst, fview] {
+		connect(okButton, &QPushButton::clicked, this, [this, doc, lineEdit, inst] {
 			std::string function = lineEdit->text().toStdString();
 			std::string code     = doc->text().toStdString();
 
@@ -73,7 +73,6 @@ public:
 			inst->setType(std::move(ty));
 
 			close();
-
 		});
 
 		connect(this, &QDialog::accepted, this,
@@ -89,7 +88,7 @@ QWidget* ChigraphFlowSceneModel::createEmbeddedWidget(chi::NodeInstance& inst) {
 		bool       checked = inst.type().toJSON();
 		box->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
 
-		connect(box, &QCheckBox::stateChanged, this, [this, &inst](int newState) {
+		connect(box, &QCheckBox::stateChanged, this, [&inst](int newState) {
 			std::unique_ptr<chi::NodeType> newType;
 
 			inst.context().nodeTypeFromModule("lang", "const-bool", newState == Qt::Checked,
@@ -108,14 +107,13 @@ QWidget* ChigraphFlowSceneModel::createEmbeddedWidget(chi::NodeInstance& inst) {
 
 		edit->setMaximumSize(edit->sizeHint());
 
-		connect(edit, &QLineEdit::textChanged, this, [this, &inst](const QString& s) {
+		connect(edit, &QLineEdit::textChanged, this, [&inst](const QString& s) {
 			std::unique_ptr<chi::NodeType> newType;
 
 			inst.context().nodeTypeFromModule("lang", "strliteral", s.toUtf8().constData(),
 			                                  &newType);
 
 			inst.setType(std::move(newType));
-
 		});
 
 		return edit;
@@ -128,13 +126,12 @@ QWidget* ChigraphFlowSceneModel::createEmbeddedWidget(chi::NodeInstance& inst) {
 
 		edit->setMaximumSize(edit->sizeHint());
 
-		connect(edit, &QLineEdit::textChanged, this, [this, &inst](const QString& s) {
+		connect(edit, &QLineEdit::textChanged, this, [&inst](const QString& s) {
 			std::unique_ptr<chi::NodeType> newType;
 
 			inst.context().nodeTypeFromModule("lang", "const-int", s.toInt(), &newType);
 
 			inst.setType(std::move(newType));
-
 		});
 
 		return edit;
@@ -159,7 +156,7 @@ QWidget* ChigraphFlowSceneModel::createEmbeddedWidget(chi::NodeInstance& inst) {
 
 		edit->setMaximumSize(edit->sizeHint());
 
-		connect(edit, &QLineEdit::textChanged, this, [this, &inst](const QString& s) {
+		connect(edit, &QLineEdit::textChanged, this, [&inst](const QString& s) {
 			std::unique_ptr<chi::NodeType> newType;
 
 			inst.context().nodeTypeFromModule("lang", "const-float", s.toDouble(), &newType);
@@ -254,7 +251,11 @@ bool ChigraphFlowSceneModel::getTypeConvertable(QtNodes::TypeConverterId const& 
 	if (!lType.valid() || !rType.valid()) { return {}; }
 
 	auto converter = mFunc->context().createConverterNodeType(lType, rType);
-	if (converter == nullptr) { return false; } else {return true;}
+	if (converter == nullptr) {
+		return false;
+	} else {
+		return true;
+	}
 }
 
 QList<QUuid> ChigraphFlowSceneModel::nodeUUids() const {
@@ -385,8 +386,8 @@ QString ChigraphFlowSceneModel::nodePortCaption(QtNodes::NodeIndex const& index,
 
 /// Get the port data type
 QtNodes::NodeDataType ChigraphFlowSceneModel::nodePortDataType(QtNodes::NodeIndex const& index,
-                                                               QtNodes::PortIndex portID,
-                                                               QtNodes::PortType         portType) const {
+                                                               QtNodes::PortIndex        portID,
+                                                               QtNodes::PortType portType) const {
 	auto inst = reinterpret_cast<chi::NodeInstance*>(index.internalPointer());
 
 	// make casts safe
@@ -601,14 +602,14 @@ QUuid ChigraphFlowSceneModel::addNode(QString const& typeID, QPointF const& pos)
 	}
 
 	std::unique_ptr<chi::NodeType> nodeType;
-	
+
 	chi::Result res;
 	if (modName == "lang" && tyName == "exit") {
 		res = mFunc->createExitNodeType(&nodeType);
 	} else {
 		res = ctx.nodeTypeFromModule(modName, tyName, json, &nodeType);
 	}
-	
+
 	if (!res) {
 		qDebug() << "Failed to create node type: " << QString::fromStdString(res.dump());
 		return {};
@@ -645,4 +646,3 @@ bool ChigraphFlowSceneModel::moveNode(QtNodes::NodeIndex const& index, QPointF n
 
 	return true;
 }
-

@@ -17,7 +17,7 @@ class MainWindow;
 
 #include "toolview.hpp"
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 struct WorkspaceTree;
 class ModuleTreeModel;
@@ -67,8 +67,8 @@ private slots:
 	void deleteItem();
 
 private:
-	void updateDirtyStatus(chi::GraphModule& updated, bool dirty);
-	std::pair<WorkspaceTree*, QModelIndex> idxFromModuleName(const boost::filesystem::path& name);
+	void                                   updateDirtyStatus(chi::GraphModule& updated, bool dirty);
+	std::pair<WorkspaceTree*, QModelIndex> idxFromModuleName(const std::filesystem::path& name);
 
 	chi::Context* mContext = nullptr;
 

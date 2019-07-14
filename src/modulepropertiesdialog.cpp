@@ -35,7 +35,7 @@ ModulePropertiesDialog::ModulePropertiesDialog(QWidget* parent, chi::GraphModule
 	connect(newDepButton, &QPushButton::clicked, this, [this, depsList](bool) {
 		// open a module selection dialog
 
-		boost::filesystem::path newDep = ChiItemSelectionDialog::getItem(
+		std::filesystem::path newDep = ChiItemSelectionDialog::getItem(
 		    this, mModule->context(), i18n("Select new dependency"), WorkspaceTree::MODULE);
 
 		if (newDep.empty()) { return; }

@@ -7,7 +7,7 @@
 
 #include <chi/Fwd.hpp>
 
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 
 class ChiItemSelectWidget;
 class QLineEdit;
@@ -15,7 +15,7 @@ class QLineEdit;
 class NewModuleDialog : public QDialog {
 public:
 	NewModuleDialog(QWidget* parent, chi::Context& context,
-	                const boost::filesystem::path& folder = "");
+	                const std::filesystem::path& folder = "");
 
 private:
 	ChiItemSelectWidget* mFolderWidget;

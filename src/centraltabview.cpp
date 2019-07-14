@@ -147,7 +147,7 @@ FunctionView* CentralTabView::viewFromFunctionName(const QString& fullName) {
 	return nullptr;
 }
 
-FunctionView* CentralTabView::viewFromFunctionName(const boost::filesystem::path& mod,
+FunctionView* CentralTabView::viewFromFunctionName(const std::filesystem::path& mod,
                                                    const std::string&             function) {
 	return viewFromFunctionName(QString::fromStdString(mod.string() + ":" + function));
 }

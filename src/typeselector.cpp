@@ -51,7 +51,7 @@ TypeSelector::TypeSelector(chi::ChiModule& module, QWidget* parent)
 	setValidator(new StringListValidator(std::move(possibleTypes)));
 
 	connect(this, static_cast<void (KComboBox::*)()>(&KComboBox::returnPressed), this,
-	        [&module, this]() { typeSelected(currentType()); });
+	        [this]() { typeSelected(currentType()); });
 }
 
 void TypeSelector::setCurrentType(const chi::DataType& ty) {

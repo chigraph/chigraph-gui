@@ -1,6 +1,6 @@
 #include "moduletreemodel.hpp"
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include <chi/Context.hpp>
 #include <chi/GraphFunction.hpp>
@@ -11,11 +11,11 @@
 
 #include <KMessageBox>
 
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 QIcon ModuleTreeModel::iconForItemType(WorkspaceTree::eType type) {
 	switch (type) {
-	case WorkspaceTree::MODULE: return QIcon::fromTheme(QStringLiteral("package-available"));
+	case WorkspaceTree::MODULE: return QIcon::fromTheme(QStringLiteral("code-block"));
 	case WorkspaceTree::FUNCTION: return QIcon::fromTheme(QStringLiteral("code-context"));
 	case WorkspaceTree::STRUCT: return QIcon::fromTheme(QStringLiteral("code-class"));
 	case WorkspaceTree::FOLDER: return QIcon::fromTheme(QStringLiteral("stock_folder"));
@@ -76,7 +76,7 @@ std::unique_ptr<ModuleTreeModel> ModuleTreeModel::createFromContext(chi::Context
 	return std::make_unique<ModuleTreeModel>(std::move(tree), context, filter);
 }
 
-void ModuleTreeModel::updateModule(const boost::filesystem::path& name) {
+void ModuleTreeModel::updateModule(const std::filesystem::path& name) {
 	auto idx = indexFromName(name, WorkspaceTree::MODULE);
 
 	if (!idx.isValid()) { return; }
@@ -99,8 +99,8 @@ void ModuleTreeModel::updateModule(const boost::filesystem::path& name) {
 	endInsertRows();
 }
 
-QModelIndex ModuleTreeModel::indexFromName(const boost::filesystem::path& name,
-                                           WorkspaceTree::eType           type) {
+QModelIndex ModuleTreeModel::indexFromName(const std::filesystem::path& name,
+                                           WorkspaceTree::eType         type) {
 	auto currentItem = mTree->children[0].get();
 
 	for (auto iter = name.begin(); iter != name.end(); ++iter) {

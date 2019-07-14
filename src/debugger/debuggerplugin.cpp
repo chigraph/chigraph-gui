@@ -64,47 +64,43 @@ DebuggerPlugin::DebuggerPlugin() {
 	mBreakpointView = new BreakpointView();
 	mVariableView   = new VariableView();
 
-	connect(
-	    &MainWindow::instance()->tabView(), &CentralTabView::functionViewChanged, this,
-	    [this](FunctionView* view, bool isNew) {
+	connect(&MainWindow::instance()->tabView(), &CentralTabView::functionViewChanged, this,
+	        [this](FunctionView* view, bool isNew) {
+		        // only connect to it if it was just opened
+		        if (!isNew) { return; }
 
-		    // only connect to it if it was just opened
-		    if (!isNew) { return; }
+		        connect(&view->model(), &ChigraphFlowSceneModel::connectionWasHovered, this,
+		                [this](QtNodes::NodeIndex const& lhs, QtNodes::PortIndex lPortIndex,
+		                       QtNodes::NodeIndex const& rhs, QtNodes::PortIndex /*rPortIndex*/,
+		                       QPoint const&             pos, bool /*entered*/) {
+			                // only print value when it's stopped
+			                if (!stopped()) { return; }
 
-		    connect(
-		        &view->model(), &ChigraphFlowSceneModel::connectionWasHovered, this,
-		        [this, view](QtNodes::NodeIndex const& lhs, QtNodes::PortIndex lPortIndex,
-		                     QtNodes::NodeIndex const& rhs, QtNodes::PortIndex /*rPortIndex*/,
-		                     QPoint const&             pos, bool /*entered*/) {
+			                auto leftChiNode =
+			                    reinterpret_cast<chi::NodeInstance*>(lhs.internalPointer());
 
-			        // only print value when it's stopped
-			        if (!stopped()) { return; }
+			                Q_ASSERT(lPortIndex >= 0);
 
-			        auto leftChiNode = reinterpret_cast<chi::NodeInstance*>(lhs.internalPointer());
+			                // if it's an exec output, then return
+			                if (!leftChiNode->type().pure() &&
+			                    (size_t)lPortIndex <= leftChiNode->outputExecConnections.size()) {
+				                return;
+			                }
 
-			        Q_ASSERT(lPortIndex >= 0);
+			                auto dataConnID =
+			                    leftChiNode->type().pure()
+			                        ? lPortIndex
+			                        : lPortIndex - leftChiNode->outputExecConnections.size();
 
-			        // if it's an exec output, then return
-			        if (!leftChiNode->type().pure() &&
-			            (size_t)lPortIndex <= leftChiNode->outputExecConnections.size()) {
-				        return;
-			        }
+			                // get the LLDB value
+			                auto value = mDebugger->inspectNodeOutput(*leftChiNode, dataConnID);
+			                if (!value.IsValid()) { return; }
 
-			        auto dataConnID = leftChiNode->type().pure()
-			                              ? lPortIndex
-			                              : lPortIndex - leftChiNode->outputExecConnections.size();
-
-			        // get the LLDB value
-			        auto value = mDebugger->inspectNodeOutput(*leftChiNode, dataConnID);
-			        if (!value.IsValid()) { return; }
-
-			        // display it
-			        QToolTip::showText(pos,
-			                           QString::fromLatin1(value.GetValue()) + " : " +
-			                               QString::fromLatin1(value.GetSummary()));
-			    });
-
-		});
+			                // display it
+			                QToolTip::showText(pos, QString::fromLatin1(value.GetValue()) + " : " +
+			                                            QString::fromLatin1(value.GetSummary()));
+		                });
+	        });
 
 	setXMLFile("chigraphguidebuggerui.rc");
 }
@@ -118,8 +114,8 @@ void DebuggerPlugin::toggleBreakpoint() {
 }
 
 void DebuggerPlugin::debugStart() {
-	boost::filesystem::path chiPath =
-	    boost::filesystem::path(QApplication::applicationFilePath().toStdString()).parent_path() /
+	std::filesystem::path chiPath =
+	    std::filesystem::path(QApplication::applicationFilePath().toStdString()).parent_path() /
 	    "chi";
 #ifdef _WIN32
 	chiPath.replace_extension(".exe");
@@ -171,7 +167,7 @@ void DebuggerPlugin::debugStart() {
 			        variableView().setDisabled(true);
 			        mStopped = false;
 		        }
-		    });
+	        });
 
 	mThread->start();
 

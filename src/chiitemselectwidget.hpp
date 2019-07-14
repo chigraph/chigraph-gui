@@ -7,7 +7,7 @@
 
 #include <chi/Fwd.hpp>
 
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 
 #include "moduletreemodel.hpp"
 
@@ -16,14 +16,14 @@ class ChiItemSelectWidget : public QPushButton {
 public:
 	ChiItemSelectWidget(chi::Context& ctx, WorkspaceTree::eType type);
 
-	void setItem(const boost::filesystem::path& newItem);
+	void setItem(const std::filesystem::path& newItem);
 
-	boost::filesystem::path item() const;
+	std::filesystem::path item() const;
 
 private:
-	boost::filesystem::path mData;
+	std::filesystem::path mData;
 signals:
-	void itemChanged(const boost::filesystem::path& itemName);
+	void itemChanged(const std::filesystem::path& itemName);
 };
 
 #endif  // CHIGRAPHGUI_CHI_ITEM_SELECT_WIDGET_HPP

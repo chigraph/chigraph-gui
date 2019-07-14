@@ -7,7 +7,7 @@
 
 #include <cassert>
 
-ChiItemSelectionDialog::ChiItemSelectionDialog(chi::Context& ctx, boost::filesystem::path* toFill,
+ChiItemSelectionDialog::ChiItemSelectionDialog(chi::Context& ctx, std::filesystem::path* toFill,
                                                WorkspaceTree::eType type, QWidget* parent)
     : QDialog{parent}, mType{type}, mToFill{toFill} {
 	assert(toFill != nullptr);
@@ -48,7 +48,7 @@ ChiItemSelectionDialog::ChiItemSelectionDialog(chi::Context& ctx, boost::filesys
 	connect(mTreeView, &QTreeView::doubleClicked, this, &ChiItemSelectionDialog::tryAccept);
 }
 
-void ChiItemSelectionDialog::setCurrentItem(const boost::filesystem::path& newItem) {
+void ChiItemSelectionDialog::setCurrentItem(const std::filesystem::path& newItem) {
 	auto index = mModel->indexFromName(newItem, mType);
 	if (index.isValid()) {
 		mTreeView->scrollTo(index);
@@ -56,10 +56,10 @@ void ChiItemSelectionDialog::setCurrentItem(const boost::filesystem::path& newIt
 	}
 }
 
-boost::filesystem::path ChiItemSelectionDialog::getItem(
+std::filesystem::path ChiItemSelectionDialog::getItem(
     QWidget* parent, chi::Context& ctx, const QString& title, WorkspaceTree::eType type,
-    const boost::filesystem::path& startWithSelection) {
-	boost::filesystem::path ret;
+    const std::filesystem::path& startWithSelection) {
+	std::filesystem::path ret;
 	auto                    dialog = new ChiItemSelectionDialog(ctx, &ret, type, parent);
 	dialog->setWindowTitle(title);
 	dialog->setCurrentItem(startWithSelection);

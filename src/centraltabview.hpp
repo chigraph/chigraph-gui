@@ -12,7 +12,7 @@
 
 #include <unordered_map>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 class FunctionView;
 class StructEdit;
@@ -32,12 +32,12 @@ public:
 
 	FunctionView* viewFromFunction(chi::GraphFunction& func);
 	FunctionView* viewFromFunctionName(const QString& fullName);
-	FunctionView* viewFromFunctionName(const boost::filesystem::path& mod,
-	                                   const std::string&             function);
+	FunctionView* viewFromFunctionName(const std::filesystem::path& mod,
+	                                   const std::string&           function);
 
 	StructEdit* viewFromStruct(chi::GraphStruct& str);
 	StructEdit* viewFromStructName(const QString& fullName);
-	StructEdit* viewFromStructName(const boost::filesystem::path& mod, const std::string& module);
+	StructEdit* viewFromStructName(const std::filesystem::path& mod, const std::string& module);
 
 	void closeView(FunctionView* view);
 	void closeView(StructEdit* view);

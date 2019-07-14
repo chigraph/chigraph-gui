@@ -15,7 +15,7 @@
 #include "mainwindow.hpp"
 
 NewModuleDialog::NewModuleDialog(QWidget* parent, chi::Context& context,
-                                 const boost::filesystem::path& folder)
+                                 const std::filesystem::path& folder)
     : QDialog(parent) {
 	setWindowTitle(i18n("New Module"));
 

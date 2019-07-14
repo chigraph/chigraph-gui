@@ -8,30 +8,22 @@
 #include <KLocalizedString>
 #include <KMessageBox>
 
+#include <llvm-c/BitWriter.h>
+
 #include <chi/Context.hpp>
-#include <chi/LLVMVersion.hpp>
 #include <chi/Support/Result.hpp>
+#include <chi/Support/TempFile.hpp>
 
-#if LLVM_VERSION_LESS_EQUAL(3, 9)
-#include <llvm/Bitcode/ReaderWriter.h>
-#else
-#include <llvm/Bitcode/BitcodeReader.h>
-#include <llvm/Bitcode/BitcodeWriter.h>
-#endif
-
-#include <llvm/Support/FileSystem.h>
-#include <llvm/Support/raw_ostream.h>
-
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include <iostream>
 
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 SubprocessOutputView::SubprocessOutputView(chi::GraphModule* module) : mModule(module) {
 	// compile!
-	std::unique_ptr<llvm::Module> llmod;
-	chi::Result                   res =
+	chi::OwnedLLVMModule llmod;
+	chi::Result          res =
 	    module->context().compileModule(module->fullName(), chi::CompileSettings::Default, &llmod);
 
 	if (!res) {
@@ -42,35 +34,18 @@ SubprocessOutputView::SubprocessOutputView(chi::GraphModule* module) : mModule(m
 	}
 
 	// write it to a temporary file
-	fs::path tempBitcodeFile =
-	    boost::filesystem::temp_directory_path() / fs::unique_path().replace_extension(".bc");
-	{
-		std::error_code      err;
-		llvm::raw_fd_ostream os(tempBitcodeFile.string(), err, 	
-#if LLVM_VERSION_LESS_EQUAL(6, 0)
-			    llvm::sys::fs::F_RW
-#else
-				llvm::sys::fs::FA_Read | llvm::sys::fs::FA_Write
-#endif
-		);
-
-		llvm::WriteBitcodeToFile(
-#if LLVM_VERSION_AT_LEAST(7, 0)
-			*
-#endif
-			llmod.get(), os);
-	}
-
+	fs::path tempBitcodeFile = chi::makeTempPath(".bc");
+	LLVMWriteBitcodeToFile(*llmod, tempBitcodeFile.c_str());
 	setReadOnly(true);
 
-	boost::filesystem::path chiPath =
-	    boost::filesystem::path(QApplication::applicationFilePath().toStdString()).parent_path() /
+	std::filesystem::path chiPath =
+	    std::filesystem::path(QApplication::applicationFilePath().toStdString()).parent_path() /
 	    "chi";
 #ifdef _WIN32
 	chiPath.replace_extension(".exe");
 #endif
 
-	Q_ASSERT(boost::filesystem::is_regular_file(chiPath));
+	Q_ASSERT(std::filesystem::is_regular_file(chiPath));
 
 	// run in lli
 	mProcess = new QProcess(this);

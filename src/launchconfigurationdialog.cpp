@@ -218,7 +218,7 @@ void LaunchConfigurationDialog::argsChanged(const QString& newArgs) {
 	if (currentlyEditing.valid()) { currentlyEditing.setArguments(newArgs); }
 }
 
-void LaunchConfigurationDialog::moduleChanged(const boost::filesystem::path& newModule) {
+void LaunchConfigurationDialog::moduleChanged(const std::filesystem::path& newModule) {
 	if (currentlyEditing.valid()) {
 		currentlyEditing.setModule(QString::fromStdString(newModule.string()));
 	}

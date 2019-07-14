@@ -40,8 +40,6 @@
 #include <chi/Support/Result.hpp>
 #include <chi/Support/json.hpp>
 
-#include <llvm/Support/raw_ostream.h>
-
 #include <fstream>
 
 #include <KSharedConfig>
@@ -118,20 +116,18 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	docker->setWidget(scroll);
 	addDockWidget(Qt::RightDockWidgetArea, docker);
 	connect(mFunctionTabs, &CentralTabView::functionViewChanged, functionDetails,
-	        [this, docker, functionDetails](FunctionView* view, bool) {
-
+	        [docker, functionDetails](FunctionView* view, bool) {
 		        functionDetails->setEnabled(true);
 		        functionDetails->loadFunction(view);
 		        docker->setWindowTitle(i18n("Function Details") + " - " +
 		                               QString::fromStdString(view->function()->name()));
-
-		    });
+	        });
 	connect(mFunctionTabs, &CentralTabView::structViewChanged, functionDetails,
-	        [this, docker, functionDetails](StructEdit*, bool) {
+	        [docker, functionDetails](StructEdit*, bool) {
 		        functionDetails->setEnabled(false);
 
 		        docker->setWindowTitle(i18n("Function Details"));
-		    });
+	        });
 	connect(functionDetails, &FunctionDetails::dirtied, this,
 	        [this, functionDetails] { moduleDirtied(functionDetails->chiFunc()->module()); });
 
@@ -215,9 +211,8 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 		auto moduleName = launchManager().currentConfiguration().module();
 
 		if (moduleName.isEmpty()) {
-			KMessageBox::error(this,
-			                   i18n("No module set in launch configuration: ") +
-			                       launchManager().currentConfiguration().name());
+			KMessageBox::error(this, i18n("No module set in launch configuration: ") +
+			                             launchManager().currentConfiguration().name());
 			return;
 		}
 
@@ -245,7 +240,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 
 			        // disable it
 			        if (outputView->currentWidget() == view) { cancelAction->setEnabled(false); }
-			    });
+		        });
 		// add the tab to the beginning
 		int newTabID = outputView->insertTab(
 		    0, view, QString::fromStdString(mod->fullName()) + i18n(" (running)"));
@@ -272,7 +267,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	        static_cast<void (KSelectAction::*)(const QString&)>(&KSelectAction::triggered), this,
 	        [this](const QString& str) {
 		        launchManager().setCurrentConfiguration(launchManager().configByName(str));
-		    });
+	        });
 
 	if (launchManager().currentConfiguration().valid()) {
 		mConfigSelectAction->setCurrentAction(launchManager().currentConfiguration().name(),
@@ -332,12 +327,13 @@ void MainWindow::save() {
 
 void MainWindow::openWorkspaceDialog() {
 	QString workspace =
-	    QFileDialog::getExistingDirectory(this, i18n("Chigraph Workspace"), QDir::homePath(), QFileDialog::ShowDirsOnly 
-	    // this is needed for flatapk so it doens't use the portal
+	    QFileDialog::getExistingDirectory(this, i18n("Chigraph Workspace"), QDir::homePath(),
+	                                      QFileDialog::ShowDirsOnly
+	// this is needed for flatapk so it doens't use the portal
 #ifdef CHI_FOR_FLATPAK
-	    | QFileDialog::DontUseNativeDialog
+	                                          | QFileDialog::DontUseNativeDialog
 #endif
-		);
+	    );
 
 	if (workspace.isEmpty()) { return; }
 

@@ -20,6 +20,8 @@ set(DEBUGGER_PUBLIC_SRCS
 	variableview.hpp
 )
 
+set(CMAKE_CXX_STANDARD 17)
+
 add_library(chigraphguidebugger STATIC ${DEBUGGER_PRIVATE_SRCS} ${DEBUGGER_PUBLIC_SRCS} ${DEBUGGER_RESOURCE_FILES})
 target_link_libraries(chigraphguidebugger 
 PUBLIC

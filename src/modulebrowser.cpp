@@ -17,9 +17,9 @@
 #include "moduletreemodel.hpp"
 #include "newmoduledialog.hpp"
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 ModuleBrowser::ModuleBrowser(QWidget* parent) : QTreeView(parent) {
 	setXMLFile("chigraphmodulebrowserui.rc");
@@ -27,7 +27,7 @@ ModuleBrowser::ModuleBrowser(QWidget* parent) : QTreeView(parent) {
 	// setup actions
 	newModuleAction = actionCollection()->addAction(
 	    QStringLiteral("new-module"),
-	    new QAction(QIcon::fromTheme(QStringLiteral("package-new")), i18n("New Module"), nullptr));
+	    new QAction(QIcon::fromTheme(QStringLiteral("code-block")), i18n("New Module"), nullptr));
 	connect(newModuleAction, &QAction::triggered, this, &ModuleBrowser::newModule);
 
 	newFunctionAction = actionCollection()->addAction(
@@ -107,7 +107,6 @@ ModuleBrowser::ModuleBrowser(QWidget* parent) : QTreeView(parent) {
 			break;
 		}
 		contextMenu.exec(mapToGlobal(p));
-
 	});
 }
 

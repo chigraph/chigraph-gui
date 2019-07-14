@@ -11,6 +11,7 @@ public:
 	BreakpointItem(chi::NodeInstance& inst) : mInst{&inst} {
 		setText(0, QString::fromStdString(inst.function().qualifiedName()));
 		setText(1, QString::fromStdString(inst.stringId()));
+		setText(2, QString::number(chi::lineNumberFromNode(inst)));
 	}
 
 	chi::NodeInstance& instance() const { return *mInst; }
@@ -20,7 +21,7 @@ private:
 };
 
 BreakpointView::BreakpointView() {
-	setHeaderLabels(QStringList() << i18n("Function") << i18n("ID"));
+	setHeaderLabels(QStringList() << i18n("Function") << i18n("ID") << i18n("\"Line\""));
 
 	connect(this, &QTreeWidget::itemDoubleClicked, this, [](QTreeWidgetItem* item) {
 		auto casted = dynamic_cast<BreakpointItem*>(item);
@@ -33,6 +34,9 @@ BreakpointView::BreakpointView() {
 }
 
 void BreakpointView::addBreakpoint(chi::NodeInstance& inst) {
+	for (int i = 0; i < topLevelItemCount(); ++i) {
+		if (&static_cast<BreakpointItem*>(topLevelItem(i))->instance() == &inst) return;
+	}
 	auto item = new BreakpointItem(inst);
 	mBreakpoints.emplace(&inst, item);
 	addTopLevelItem(item);

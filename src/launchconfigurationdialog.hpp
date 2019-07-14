@@ -9,7 +9,7 @@
 
 #include "launchconfigurationmanager.hpp"
 
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 
 class KUrlRequester;
 
@@ -31,7 +31,7 @@ private slots:
 
 	void nameChanged(const QString& newName);
 	void wdChanged(const QString& newWd);
-	void moduleChanged(const boost::filesystem::path& newModule);
+	void moduleChanged(const std::filesystem::path& newModule);
 	void argsChanged(const QString& newArgs);
 
 private:
@@ -43,7 +43,7 @@ private:
 	KUrlRequester*       mWdEdit;
 	ChiItemSelectWidget* mModuleEdit;
 	QLineEdit*           mArgsEdit;
-	QWidget* mSettingsWidget;
+	QWidget*             mSettingsWidget;
 
 	QListWidget* mConfigList;
 };
