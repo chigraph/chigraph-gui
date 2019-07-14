@@ -16,8 +16,6 @@
 #include <KTextEditor/Editor>
 #include <KTextEditor/View>
 
-#include <boost/range/join.hpp>
-
 namespace {
 
 class EditCodeDialog : public QDialog {
@@ -188,16 +186,20 @@ void ChigraphFlowSceneModel::updateValidation() {
 	mValidation = std::move(res);
 
 	// see who's changed
-	for (const auto& inst : boost::range::join(old.result_json, mValidation.result_json)) {
-		if (inst["data"].find("Node ID") != inst["data"].end() &&
-		    inst["data"]["Node ID"].is_string()) {
-			std::string nodeID = inst["data"]["Node ID"];
-			auto        iter   = mFunc->nodes().find(boost::uuids::string_generator()(nodeID));
-			if (iter != mFunc->nodes().end()) {
-				emit nodeValidationUpdated(nodeIndex(*iter->second));
+	auto checkupdates = [&](const nlohmann::json& j) {
+		for (const auto& inst : j) {
+			if (inst["data"].find("Node ID") != inst["data"].end() &&
+			    inst["data"]["Node ID"].is_string()) {
+				std::string nodeID = inst["data"]["Node ID"];
+				auto        iter   = mFunc->nodes().find(*chi::Uuid::fromString(nodeID));
+				if (iter != mFunc->nodes().end()) {
+					emit nodeValidationUpdated(nodeIndex(*iter->second));
+				}
 			}
 		}
-	}
+	};
+	checkupdates(old.result_json);
+	checkupdates(mValidation.result_json);
 }
 
 QStringList ChigraphFlowSceneModel::modelRegistry() const {
@@ -263,7 +265,7 @@ QList<QUuid> ChigraphFlowSceneModel::nodeUUids() const {
 
 	for (const auto& node : mFunc->nodes()) {
 		ret << QUuid::fromRfc4122(
-		    QByteArray(reinterpret_cast<const char*>(node.second->id().data), 16));
+		    QByteArray(reinterpret_cast<const char*>(node.second->id().data().data()), 16));
 	}
 
 	return ret;
@@ -271,12 +273,8 @@ QList<QUuid> ChigraphFlowSceneModel::nodeUUids() const {
 QtNodes::NodeIndex ChigraphFlowSceneModel::nodeIndex(const QUuid& ID) const {
 	Q_ASSERT(!ID.isNull());
 
-	// create a boost::uuid
-	boost::uuids::uuid uuid;
-
 	auto QuuidByteArray = ID.toRfc4122();
-
-	std::copy(QuuidByteArray.begin(), QuuidByteArray.end(), uuid.begin());
+	auto uuid           = chi::Uuid(QuuidByteArray.begin(), QuuidByteArray.end());
 
 	// find the node
 	auto iter = mFunc->nodes().find(uuid);
@@ -617,11 +615,11 @@ QUuid ChigraphFlowSceneModel::addNode(QString const& typeID, QPointF const& pos)
 
 	// create the node
 	chi::NodeInstance* inst;
-	res +=
-	    mFunc->insertNode(std::move(nodeType), 0.f, 0.f, boost::uuids::random_generator()(), &inst);
+	res += mFunc->insertNode(std::move(nodeType), 0.f, 0.f, chi::Uuid::random(), &inst);
 	if (!res) { return {}; }
 
-	auto quuid = QUuid::fromRfc4122(QByteArray(reinterpret_cast<const char*>(inst->id().data), 16));
+	auto quuid =
+	    QUuid::fromRfc4122(QByteArray(reinterpret_cast<const char*>(inst->id().data().data()), 16));
 
 	// create a widget
 	auto widget = createEmbeddedWidget(*inst);
