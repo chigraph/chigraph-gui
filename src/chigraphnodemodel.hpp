@@ -3,13 +3,9 @@
 #ifndef CHI_GUI_CHIGNODEGUI_HPP
 #define CHI_GUI_CHIGNODEGUI_HPP
 
-#include <nodes/FlowSceneModel>
-#include <nodes/NodeIndex>
-
-#include <chi/NodeInstance.hpp>
-#include <chi/NodeType.hpp>
-#include <chi/Support/Result.hpp>
-
+#include <KLocalizedString>
+#include <KMessageBox>
+#include <KTextEdit>
 #include <QCheckBox>
 #include <QDialog>
 #include <QHBoxLayout>
@@ -17,12 +13,12 @@
 #include <QPushButton>
 #include <QTextEdit>
 #include <QValidator>
-
-#include <KLocalizedString>
-#include <KMessageBox>
-#include <KTextEdit>
-
+#include <chi/NodeInstance.hpp>
+#include <chi/NodeType.hpp>
+#include <chi/Support/Result.hpp>
 #include <memory>
+#include <nodes/FlowSceneModel>
+#include <nodes/NodeIndex>
 
 class ChigraphFlowSceneModel : public QtNodes::FlowSceneModel {
 	Q_OBJECT

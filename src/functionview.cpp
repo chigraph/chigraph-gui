@@ -1,20 +1,17 @@
 #include "functionview.hpp"
-#include "mainwindow.hpp"
-
-#include <QHBoxLayout>
 
 #include <KMessageBox>
-
+#include <QHBoxLayout>
 #include <chi/DataType.hpp>
 #include <chi/FunctionValidator.hpp>
 #include <chi/GraphModule.hpp>
 #include <chi/NodeInstance.hpp>
 #include <chi/Support/Result.hpp>
-
-#include <nodes/NodeGraphicsObject>
 #include <nodes/ConnectionStyle>
+#include <nodes/NodeGraphicsObject>
 
 #include "chigraphnodemodel.hpp"
+#include "mainwindow.hpp"
 
 using namespace QtNodes;
 
@@ -57,7 +54,7 @@ FunctionView::FunctionView(chi::GraphFunction& func_, QWidget* parent)
 		        if (func == nullptr) { return; }
 
 		        emit functionDoubleClicked(*func);
-		    });
+	        });
 
 	hlayout->addWidget(mView);
 }

@@ -3,13 +3,11 @@
 #ifndef CHIGGUI_FUNCTIONDETAILS_HPP
 #define CHIGGUI_FUNCTIONDETAILS_HPP
 
-#include <QWidget>
-
 #include <KLocalizedString>
+#include <QWidget>
+#include <chi/Fwd.hpp>
 
 #include "toolview.hpp"
-
-#include <chi/Fwd.hpp>
 
 class FunctionView;
 class FunctionInOuts;

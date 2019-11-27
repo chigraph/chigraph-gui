@@ -3,11 +3,9 @@
 #ifndef CHIGGUI_THEME_MANAER_HPP
 #define CHIGGUI_THEME_MANAER_HPP
 
-#include <QObject>
-
 #include <KActionMenu>
 #include <KSharedConfig>
-
+#include <QObject>
 #include <memory>
 
 class ThemeManager : public QObject {
@@ -16,10 +14,10 @@ class ThemeManager : public QObject {
 public:
 	explicit ThemeManager(KActionMenu* menu);
 
-	void setTheme(const QString& name);
+	void        setTheme(const QString& name);
 	QString     theme();
 	QStringList availableThemeFiles() const;
-	QIcon createSchemePreviewIcon(const KSharedConfigPtr& ptr) const;
+	QIcon       createSchemePreviewIcon(const KSharedConfigPtr& ptr) const;
 
 private:
 	void changePalette();

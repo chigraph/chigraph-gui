@@ -1,11 +1,11 @@
 #include "functioninouts.hpp"
-#include "functionview.hpp"
 
+#include <KLocalizedString>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QVBoxLayout>
 
-#include <KLocalizedString>
+#include "functionview.hpp"
 
 FunctionInOuts::FunctionInOuts(QWidget* parent) : QWidget(parent) {
 	setSizePolicy({QSizePolicy::Preferred, QSizePolicy::Preferred});

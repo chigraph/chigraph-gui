@@ -4,9 +4,7 @@
 #define CHIGRAPHGUI_CHI_ITEM_SELECT_WIDGET_HPP
 
 #include <QPushButton>
-
 #include <chi/Fwd.hpp>
-
 #include <filesystem>
 
 #include "moduletreemodel.hpp"

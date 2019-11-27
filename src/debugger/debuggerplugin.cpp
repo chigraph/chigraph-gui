@@ -1,23 +1,20 @@
 #include "debuggerplugin.hpp"
-#include "currentnodedecorator.hpp"
 
-#include <chi/Support/Result.hpp>
+#include <lldb/API/SBThread.h>
 
 #include <KActionCollection>
 #include <KLocalizedString>
-
 #include <QApplication>
 #include <QDebug>
 #include <QThread>
 #include <QToolTip>
-
+#include <chi/Support/Result.hpp>
 #include <thread>
 
 #include "../centraltabview.hpp"
 #include "../chigraphnodemodel.hpp"
 #include "../mainwindow.hpp"
-
-#include <lldb/API/SBThread.h>
+#include "currentnodedecorator.hpp"
 
 DebuggerPlugin::DebuggerPlugin() {
 	Q_INIT_RESOURCE(chigraphdebugger);

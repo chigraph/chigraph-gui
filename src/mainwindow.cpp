@@ -1,14 +1,4 @@
 #include "mainwindow.hpp"
-#include "centraltabview.hpp"
-#include "chigraphplugin.hpp"
-#include "functiondetails.hpp"
-#include "functionview.hpp"
-#include "launchconfigurationdialog.hpp"
-#include "localvariables.hpp"
-#include "modulebrowser.hpp"
-#include "moduletreemodel.hpp"
-#include "structedit.hpp"
-#include "subprocessoutputview.hpp"
 
 #include <KActionCollection>
 #include <KActionMenu>
@@ -16,8 +6,8 @@
 #include <KConfigGroup>
 #include <KLocalizedString>
 #include <KMessageBox>
+#include <KSharedConfig>
 #include <KStandardAction>
-
 #include <QAction>
 #include <QApplication>
 #include <QDebug>
@@ -31,7 +21,6 @@
 #include <QScrollArea>
 #include <QSplitter>
 #include <QTextStream>
-
 #include <chi/Context.hpp>
 #include <chi/DataType.hpp>
 #include <chi/GraphFunction.hpp>
@@ -39,11 +28,19 @@
 #include <chi/LangModule.hpp>
 #include <chi/Support/Result.hpp>
 #include <chi/Support/json.hpp>
-
 #include <fstream>
 
-#include <KSharedConfig>
+#include "centraltabview.hpp"
 #include "chigraphnodemodel.hpp"
+#include "chigraphplugin.hpp"
+#include "functiondetails.hpp"
+#include "functionview.hpp"
+#include "launchconfigurationdialog.hpp"
+#include "localvariables.hpp"
+#include "modulebrowser.hpp"
+#include "moduletreemodel.hpp"
+#include "structedit.hpp"
+#include "subprocessoutputview.hpp"
 #include "thememanager.hpp"
 
 MainWindow* MainWindow::mInstance = nullptr;

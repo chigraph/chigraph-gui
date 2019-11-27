@@ -1,12 +1,10 @@
 #include "newmoduledialog.hpp"
 
 #include <KLocalizedString>
-
 #include <QDialogButtonBox>
 #include <QFormLayout>
 #include <QLineEdit>
 #include <QVBoxLayout>
-
 #include <chi/Context.hpp>
 #include <chi/GraphModule.hpp>
 #include <chi/Support/Result.hpp>

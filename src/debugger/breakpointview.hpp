@@ -2,12 +2,10 @@
 #define CHIGRAPHGUI_DEBUGGER_BREAKPOINT_VIEW_HPP
 
 #include <KLocalizedString>
-
+#include <QTreeWidget>
 #include <chi/Debugger/Debugger.hpp>
 
 #include "../toolview.hpp"
-
-#include <QTreeWidget>
 
 class BreakpointView : public QTreeWidget, public ToolView {
 	class BreakpointItem;

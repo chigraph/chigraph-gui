@@ -5,7 +5,6 @@
 
 #include <QPlainTextEdit>
 #include <QProcess>
-
 #include <chi/GraphModule.hpp>
 
 class SubprocessOutputView : public QPlainTextEdit {

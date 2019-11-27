@@ -1,19 +1,19 @@
 #include "structedit.hpp"
-#include "centraltabview.hpp"
-#include "execparamlistwidget.hpp"
-#include "functionview.hpp"
-#include "typeselector.hpp"
 
+#include <QGridLayout>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QString>
 #include <chi/Context.hpp>
 #include <chi/GraphModule.hpp>
 #include <chi/GraphStruct.hpp>
 #include <chi/LangModule.hpp>
 #include <chi/NodeInstance.hpp>
 
-#include <QGridLayout>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QString>
+#include "centraltabview.hpp"
+#include "execparamlistwidget.hpp"
+#include "functionview.hpp"
+#include "typeselector.hpp"
 
 StructEdit::StructEdit(chi::GraphStruct& str, CentralTabView* centralTabWidget)
     : mStruct{&str}, mTabs{centralTabWidget} {
@@ -42,14 +42,12 @@ void StructEdit::makeGUI() {
 		tySelector->setCurrentType(namedType.type);
 		connect(tySelector, &TypeSelector::typeSelected, this,
 		        [this, id](const chi::DataType& newType) {
-
 			        if (!newType.valid()) { return; }
 
 			        mStruct->modifyType(id, newType, mStruct->types()[id].name);
 
 			        refreshReferences();
-
-			    });
+		        });
 		layout->addWidget(tySelector, id, 1, Qt::AlignTop);
 
 		auto deleteButton = new QPushButton(QIcon::fromTheme(QStringLiteral("list-remove")), {});

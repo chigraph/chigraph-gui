@@ -5,20 +5,16 @@
 
 #include <KStandardAction>
 #include <KXmlGuiWindow>
-
 #include <QListView>
 #include <QPlainTextEdit>
+#include <QProcess>
 #include <QTabWidget>
 #include <QUrl>
-
-#include <nodes/FlowScene>
-#include <nodes/FlowView>
-
 #include <chi/ChiModule.hpp>
 #include <chi/Context.hpp>
 #include <chi/GraphModule.hpp>
-
-#include <QProcess>
+#include <nodes/FlowScene>
+#include <nodes/FlowView>
 
 #include "functionview.hpp"
 #include "launchconfigurationmanager.hpp"

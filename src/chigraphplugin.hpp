@@ -3,10 +3,10 @@
 #ifndef CHIGRAPHGUI_CHIGRAPH_PLUGIN
 #define CHIGRAPHGUI_CHIGRAPH_PLUGIN
 
-#include "toolview.hpp"
-
 #include <QVector>
 #include <QtPlugin>
+
+#include "toolview.hpp"
 
 class ChigraphPlugin : public KXMLGUIClient {
 public:

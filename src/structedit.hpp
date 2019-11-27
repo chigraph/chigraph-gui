@@ -4,7 +4,6 @@
 #define CHIGRAPHGUI_STRUCT_EDIT_HPP
 
 #include <QWidget>
-
 #include <chi/Fwd.hpp>
 
 class CentralTabView;

@@ -1,13 +1,11 @@
 #include "launchconfigurationmanager.hpp"
 
-#include <chi/Context.hpp>
-
 #include <KConfigGroup>
 #include <KSharedConfig>
-
 #include <QDebug>
 #include <QUuid>
 #include <QVector>
+#include <chi/Context.hpp>
 
 LaunchConfiguration::LaunchConfiguration(KConfigGroup grp) : mConfigGroup{grp} {}
 

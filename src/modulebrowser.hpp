@@ -3,21 +3,18 @@
 #ifndef CHIGRAPHGUI_MODULE_BROWSER_HPP
 #define CHIGRAPHGUI_MODULE_BROWSER_HPP
 
-#include <QTreeView>
-
 #include <KLocalizedString>
+#include <QTreeView>
 
 class MainWindow;
 
 #include <chi/Fwd.hpp>
-
+#include <filesystem>
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
 
 #include "toolview.hpp"
-
-#include <filesystem>
 
 struct WorkspaceTree;
 class ModuleTreeModel;

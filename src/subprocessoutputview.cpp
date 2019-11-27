@@ -1,21 +1,17 @@
 #include "subprocessoutputview.hpp"
 
+#include <llvm-c/BitWriter.h>
+
+#include <KLocalizedString>
+#include <KMessageBox>
 #include <QApplication>
 #include <QLabel>
 #include <QPlainTextEdit>
 #include <QVBoxLayout>
-
-#include <KLocalizedString>
-#include <KMessageBox>
-
-#include <llvm-c/BitWriter.h>
-
 #include <chi/Context.hpp>
 #include <chi/Support/Result.hpp>
 #include <chi/Support/TempFile.hpp>
-
 #include <filesystem>
-
 #include <iostream>
 
 namespace fs = std::filesystem;

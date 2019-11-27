@@ -4,7 +4,6 @@
 #define CHIGGUI_TYPE_SELECTOR_HPP
 
 #include <KComboBox>
-
 #include <chi/Fwd.hpp>
 
 class TypeSelector : public KComboBox {
@@ -12,7 +11,7 @@ class TypeSelector : public KComboBox {
 public:
 	explicit TypeSelector(chi::ChiModule& module, QWidget* parent = nullptr);
 
-	void setCurrentType(const chi::DataType& ty);
+	void          setCurrentType(const chi::DataType& ty);
 	chi::DataType currentType();
 
 signals:

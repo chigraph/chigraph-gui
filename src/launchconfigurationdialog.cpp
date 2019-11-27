@@ -1,9 +1,7 @@
 #include "launchconfigurationdialog.hpp"
-#include "chiitemselectwidget.hpp"
 
 #include <KLocalizedString>
 #include <KUrlRequester>
-
 #include <QAction>
 #include <QDialogButtonBox>
 #include <QFormLayout>
@@ -14,6 +12,8 @@
 #include <QPushButton>
 #include <QSplitter>
 #include <QVBoxLayout>
+
+#include "chiitemselectwidget.hpp"
 
 LaunchConfigurationDialog::LaunchConfigurationDialog(LaunchConfigurationManager& manager)
     : mManager{&manager} {
@@ -49,7 +49,6 @@ LaunchConfigurationDialog::LaunchConfigurationDialog(LaunchConfigurationManager&
 
 		// delete it
 		delete mConfigList->takeItem(mConfigList->row(currentItem));
-
 	});
 
 	addAction(renameAction);
@@ -121,7 +120,7 @@ LaunchConfigurationDialog::LaunchConfigurationDialog(LaunchConfigurationManager&
 			        menu.addAction(deleteAction);
 
 			        menu.exec(mConfigList->mapToGlobal(point));
-			    });
+		        });
 	}
 
 	// right side widget

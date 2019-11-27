@@ -4,9 +4,7 @@
 #define CHIGRAPHGUI_CHI_ITEM_SELECTION_DIALOG_HPP
 
 #include <QDialog>
-
 #include <chi/Fwd.hpp>
-
 #include <filesystem>
 
 #include "moduletreemodel.hpp"

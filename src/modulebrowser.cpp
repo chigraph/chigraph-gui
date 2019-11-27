@@ -1,23 +1,20 @@
 #include "modulebrowser.hpp"
 
-#include <chi/GraphStruct.hpp>
-#include <chi/Support/Result.hpp>
-
+#include <KActionCollection>
 #include <QDebug>
 #include <QDir>
 #include <QDirIterator>
 #include <QHeaderView>
 #include <QMenu>
 #include <QTreeWidgetItem>
-
-#include <KActionCollection>
+#include <chi/GraphStruct.hpp>
+#include <chi/Support/Result.hpp>
+#include <filesystem>
 
 #include "mainwindow.hpp"
 #include "modulepropertiesdialog.hpp"
 #include "moduletreemodel.hpp"
 #include "newmoduledialog.hpp"
-
-#include <filesystem>
 
 namespace fs = std::filesystem;
 

@@ -1,9 +1,7 @@
 #include "centraltabview.hpp"
 
 #include <KActionCollection>
-
 #include <QDebug>
-
 #include <chi/Context.hpp>
 #include <chi/GraphFunction.hpp>
 #include <chi/GraphStruct.hpp>
@@ -53,7 +51,7 @@ void CentralTabView::selectNewFunction(chi::GraphFunction& func) {
 	setTabIcon(idx, QIcon::fromTheme(QStringLiteral("code-context")));
 	setCurrentWidget(view);
 
-	connect(view, &FunctionView::dirtied, this, [ this, mod = &func.module() ] { dirtied(*mod); });
+	connect(view, &FunctionView::dirtied, this, [this, mod = &func.module()] { dirtied(*mod); });
 	connect(view, &FunctionView::functionDoubleClicked, this, &CentralTabView::selectNewFunction);
 
 	functionViewChanged(view, true);
@@ -129,7 +127,7 @@ void CentralTabView::refreshModule(chi::GraphModule& mod) {
 		mOpenFunctions[qualifiedFunctionName] = view;
 
 		connect(view, &FunctionView::dirtied, this,
-		        [ this, mod = &func->module() ] { dirtied(*mod); });
+		        [this, mod = &func->module()] { dirtied(*mod); });
 		connect(view, &FunctionView::functionDoubleClicked, this,
 		        &CentralTabView::selectNewFunction);
 	}
@@ -148,7 +146,7 @@ FunctionView* CentralTabView::viewFromFunctionName(const QString& fullName) {
 }
 
 FunctionView* CentralTabView::viewFromFunctionName(const std::filesystem::path& mod,
-                                                   const std::string&             function) {
+                                                   const std::string&           function) {
 	return viewFromFunctionName(QString::fromStdString(mod.string() + ":" + function));
 }
 

@@ -4,7 +4,6 @@
 #include <QHeaderView>
 #include <QTreeView>
 #include <QVBoxLayout>
-
 #include <cassert>
 
 ChiItemSelectionDialog::ChiItemSelectionDialog(chi::Context& ctx, std::filesystem::path* toFill,
@@ -60,7 +59,7 @@ std::filesystem::path ChiItemSelectionDialog::getItem(
     QWidget* parent, chi::Context& ctx, const QString& title, WorkspaceTree::eType type,
     const std::filesystem::path& startWithSelection) {
 	std::filesystem::path ret;
-	auto                    dialog = new ChiItemSelectionDialog(ctx, &ret, type, parent);
+	auto                  dialog = new ChiItemSelectionDialog(ctx, &ret, type, parent);
 	dialog->setWindowTitle(title);
 	dialog->setCurrentItem(startWithSelection);
 

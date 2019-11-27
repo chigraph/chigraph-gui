@@ -4,9 +4,7 @@
 #define CHIGRAPHGUI_NEW_MODULE_DIALOG_HPP
 
 #include <QDialog>
-
 #include <chi/Fwd.hpp>
-
 #include <filesystem>
 
 class ChiItemSelectWidget;

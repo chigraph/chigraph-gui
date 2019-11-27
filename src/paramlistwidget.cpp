@@ -1,14 +1,12 @@
 #include "paramlistwidget.hpp"
 
+#include <KComboBox>
+#include <KMessageBox>
 #include <QComboBox>
 #include <QGridLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
-
-#include <KComboBox>
-#include <KMessageBox>
-
 #include <chi/Context.hpp>
 #include <chi/DataType.hpp>
 #include <chi/GraphFunction.hpp>
@@ -52,7 +50,6 @@ void ParamListWidget::setFunction(FunctionView* func, Type ty) {
 		tySelector->setCurrentType(param.type);
 		connect(tySelector, &TypeSelector::typeSelected, this,
 		        [this, id](const chi::DataType& newType) {
-
 			        if (!newType.valid()) { return; }
 
 			        if (mType == Input) {
@@ -63,8 +60,7 @@ void ParamListWidget::setFunction(FunctionView* func, Type ty) {
 				        refreshExits();
 			        }
 			        dirtied();
-
-			    });
+		        });
 		layout->addWidget(tySelector, id, 1, Qt::AlignTop);
 
 		auto deleteButton = new QPushButton(QIcon::fromTheme(QStringLiteral("list-remove")), {});
@@ -103,7 +99,6 @@ void ParamListWidget::setFunction(FunctionView* func, Type ty) {
 			setFunction(mFunc, mType);
 		}
 		dirtied();
-
 	});
 	layout->addWidget(newButton, id, 2, Qt::AlignRight | Qt::AlignTop);
 }

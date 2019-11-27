@@ -1,14 +1,14 @@
 #include "localvariables.hpp"
-#include "execparamlistwidget.hpp"
-#include "paramlistwidget.hpp"
-#include "typeselector.hpp"
 
 #include <QComboBox>
 #include <QGridLayout>
 #include <QPushButton>
-
 #include <chi/DataType.hpp>
 #include <chi/LangModule.hpp>
+
+#include "execparamlistwidget.hpp"
+#include "paramlistwidget.hpp"
+#include "typeselector.hpp"
 
 LocalVariables::LocalVariables(QWidget* parent) : QWidget{parent} {
 	setSizePolicy({QSizePolicy::Preferred, QSizePolicy::Preferred});
@@ -47,8 +47,7 @@ void LocalVariables::loadFunction(FunctionView* func) {
 			        mFunctionView->function()->retypeLocalVariable(localName, newType);
 			        refreshReferencingNodes(localName);
 			        dirtied();
-
-			    });
+		        });
 		layout->addWidget(tySelector, id, 1);
 
 		auto deleteButton = new QPushButton(QIcon::fromTheme(QStringLiteral("list-remove")), {});
@@ -63,7 +62,6 @@ void LocalVariables::loadFunction(FunctionView* func) {
 			// refresh the local vars panel
 			loadFunction(mFunctionView);
 			dirtied();
-
 		});
 		layout->addWidget(deleteButton, id, 2);
 
@@ -86,7 +84,7 @@ void LocalVariables::refreshReferencingNodes(const std::string& name) {
 	auto setNodes = mFunctionView->function()->nodesWithType(
 	    mFunctionView->function()->module().fullName(), "_set_" + name);
 	for (const auto& node : setNodes) { mFunctionView->refreshGuiForNode(*node); }
-	auto             getNodes = mFunctionView->function()->nodesWithType(
+	auto getNodes = mFunctionView->function()->nodesWithType(
 	    mFunctionView->function()->module().fullName(), "_get_" + name);
 	for (const auto& node : getNodes) { mFunctionView->refreshGuiForNode(*node); }
 }

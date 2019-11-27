@@ -1,16 +1,15 @@
 #include "modulepropertiesdialog.hpp"
-#include "chiitemselectiondialog.hpp"
 
+#include <KLocalizedString>
+#include <KMessageBox>
 #include <QCheckBox>
 #include <QListWidget>
 #include <QPushButton>
 #include <QVBoxLayout>
-
-#include <KLocalizedString>
-#include <KMessageBox>
-
 #include <chi/GraphModule.hpp>
 #include <chi/Support/Result.hpp>
+
+#include "chiitemselectiondialog.hpp"
 
 ModulePropertiesDialog::ModulePropertiesDialog(QWidget* parent, chi::GraphModule& modToEdit)
     : QDialog{parent}, mModule{&modToEdit} {
@@ -54,7 +53,6 @@ ModulePropertiesDialog::ModulePropertiesDialog(QWidget* parent, chi::GraphModule
 
 		// add it to the list
 		depsList->addItem(QString::fromStdString(newDep.string()));
-
 	});
 
 	// the C support button

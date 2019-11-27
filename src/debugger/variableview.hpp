@@ -3,13 +3,12 @@
 #ifndef CHIGRAPHGUI_DEBUGGER_VARIABLE_VIEW_HPP
 #define CHIGRAPHGUI_DEBUGGER_VARIABLE_VIEW_HPP
 
-#include "../toolview.hpp"
-
-#include <QTreeWidget>
+#include <lldb/API/SBFrame.h>
 
 #include <KLocalizedString>
+#include <QTreeWidget>
 
-#include <lldb/API/SBFrame.h>
+#include "../toolview.hpp"
 
 class VariableView : public QTreeWidget, public ToolView {
 public:

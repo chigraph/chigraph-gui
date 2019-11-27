@@ -3,11 +3,10 @@
 #ifndef CHIGRAPHGUI_DEBUGGER_DEBUGGER_WORKER_THREAD_HPP
 #define CHIGRAPHGUI_DEBUGGER_DEBUGGER_WORKER_THREAD_HPP
 
-#include <QObject>
-
-#include <chi/Debugger/Debugger.hpp>
-
 #include <lldb/API/SBEvent.h>
+
+#include <QObject>
+#include <chi/Debugger/Debugger.hpp>
 
 class DebuggerWorkerThread : public QObject {
 	Q_OBJECT

@@ -1,13 +1,12 @@
 #include "typeselector.hpp"
 
+#include <KLocalizedString>
+#include <KMessageBox>
 #include <chi/ChiModule.hpp>
 #include <chi/Context.hpp>
 #include <chi/DataType.hpp>
 #include <chi/GraphFunction.hpp>
 #include <chi/Support/Result.hpp>
-
-#include <KLocalizedString>
-#include <KMessageBox>
 
 namespace {
 

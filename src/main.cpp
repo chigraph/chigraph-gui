@@ -2,7 +2,6 @@
 #include <KCrash>
 #include <KLocalizedString>
 #include <KMessageBox>
-
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QtPlugin>

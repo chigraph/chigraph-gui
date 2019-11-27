@@ -7,10 +7,8 @@
 #include <nodes/NodeGeometry>
 
 class CurrentNodeDecorator : public QtNodes::NodePainterDelegate {
-
-	void paint(QPainter* painter,
-        QtNodes::NodeGeometry const& geometry,
-        QtNodes::NodeIndex const& index) override {
+	void paint(QPainter* painter, QtNodes::NodeGeometry const& geometry,
+	           QtNodes::NodeIndex const& index) override {
 		painter->drawRect(QRect(geometry.width() / 2, 0, 10, 10));
 	}
 };

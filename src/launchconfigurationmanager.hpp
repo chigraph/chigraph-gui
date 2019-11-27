@@ -3,10 +3,8 @@
 #ifndef CHIGRAPHGUI_LAUNCH_CONFIGURATION_HPP
 #define CHIGRAPHGUI_LAUNCH_CONFIGURATION_HPP
 
-#include <QObject>
-
 #include <KConfigGroup>
-
+#include <QObject>
 #include <chi/Fwd.hpp>
 
 struct LaunchConfiguration {
@@ -57,7 +55,7 @@ public:
 	const std::vector<LaunchConfiguration> configurations() const { return mConfigurations; }
 
 	LaunchConfiguration currentConfiguration() const { return mCurrent; }
-	void setCurrentConfiguration(LaunchConfiguration config);
+	void                setCurrentConfiguration(LaunchConfiguration config);
 
 	LaunchConfiguration newConfiguration();
 

@@ -1,12 +1,10 @@
 #include "execparamlistwidget.hpp"
 
+#include <KMessageBox>
 #include <QComboBox>
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QPushButton>
-
-#include <KMessageBox>
-
 #include <chi/Context.hpp>
 #include <chi/GraphFunction.hpp>
 
@@ -102,7 +100,6 @@ void ExecParamListWidget::setFunction(FunctionView* func, Type ty) {
 
 			setFunction(mFunc, mType);
 		}
-
 	});
 	layout->addWidget(newButton, id, 1, Qt::AlignRight);
 }

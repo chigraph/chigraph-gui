@@ -3,16 +3,12 @@
 #ifndef CHIGRAPHGUI_FUNCTION_TAB_VIEW_HPP
 #define CHIGRAPHGUI_FUNCTION_TAB_VIEW_HPP
 
+#include <KXMLGUIClient>
 #include <QString>
 #include <QTabWidget>
-
-#include <KXMLGUIClient>
-
 #include <chi/Fwd.hpp>
-
-#include <unordered_map>
-
 #include <filesystem>
+#include <unordered_map>
 
 class FunctionView;
 class StructEdit;

@@ -5,7 +5,6 @@
 
 #include <QListWidget>
 #include <QTableView>
-
 #include <chi/Context.hpp>
 #include <chi/GraphModule.hpp>
 

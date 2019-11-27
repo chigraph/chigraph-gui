@@ -1,15 +1,13 @@
 #include "moduletreemodel.hpp"
 
-#include <filesystem>
-
+#include <KMessageBox>
 #include <chi/Context.hpp>
 #include <chi/GraphFunction.hpp>
 #include <chi/GraphModule.hpp>
 #include <chi/GraphStruct.hpp>
 #include <chi/NodeInstance.hpp>
 #include <chi/Support/Result.hpp>
-
-#include <KMessageBox>
+#include <filesystem>
 
 namespace fs = std::filesystem;
 

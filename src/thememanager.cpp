@@ -1,11 +1,5 @@
 #include "thememanager.hpp"
 
-#include <QBitmap>
-#include <QDir>
-#include <QMenu>
-#include <QPainter>
-#include <QStandardPaths>
-
 #include <KColorScheme>
 #include <KConfigGroup>
 #include <KLocalizedString>
@@ -13,6 +7,11 @@
 #include <KSharedConfig>
 #include <KToolInvocation>
 #include <QApplication>
+#include <QBitmap>
+#include <QDir>
+#include <QMenu>
+#include <QPainter>
+#include <QStandardPaths>
 
 ThemeManager::ThemeManager(KActionMenu* menu) : mMenu{menu} {
 	Q_ASSERT(menu != nullptr);
@@ -62,7 +61,6 @@ ThemeManager::ThemeManager(KActionMenu* menu) : mMenu{menu} {
 	configAct->setIcon(QIcon::fromTheme(QStringLiteral("preferences-desktop-theme")));
 	mMenu->addAction(configAct);
 	connect(configAct, &QAction::triggered, this, [] {
-
 		// open the colors dialog
 		int errCode = KToolInvocation::kdeinitExec(QStringLiteral("kcmshell5"),
 		                                           QStringList(QStringLiteral("colors")));

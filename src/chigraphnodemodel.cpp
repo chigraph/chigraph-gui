@@ -1,5 +1,9 @@
 #include "chigraphnodemodel.hpp"
 
+#include <KActionCollection>
+#include <KTextEditor/Document>
+#include <KTextEditor/Editor>
+#include <KTextEditor/View>
 #include <chi/ChiModule.hpp>
 #include <chi/Context.hpp>
 #include <chi/DataType.hpp>
@@ -8,13 +12,7 @@
 #include <chi/GraphModule.hpp>
 #include <chi/NodeInstance.hpp>
 #include <chi/Support/Result.hpp>
-
 #include <nodes/NodeData>
-
-#include <KActionCollection>
-#include <KTextEditor/Document>
-#include <KTextEditor/Editor>
-#include <KTextEditor/View>
 
 namespace {
 

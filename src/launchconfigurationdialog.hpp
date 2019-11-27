@@ -4,12 +4,10 @@
 #define CHIGRPAHGUI_LAUNCH_CONFIGURATION_DIALOG_HPP
 
 #include <QDialog>
-
+#include <filesystem>
 #include <unordered_map>
 
 #include "launchconfigurationmanager.hpp"
-
-#include <filesystem>
 
 class KUrlRequester;
 

@@ -16,7 +16,7 @@ void VariableView::setFrame(lldb::SBFrame frame) {
 	                               true,  // locals
 	                               true,  // statics
 	                               true   // in scope only
-	                               );
+	);
 
 	for (uint32_t idx = 0; idx < vars.GetSize(); ++idx) {
 		auto val = vars.GetValueAtIndex(idx);

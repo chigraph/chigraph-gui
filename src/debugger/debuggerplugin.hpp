@@ -3,17 +3,14 @@
 #ifndef CHIGRAPHGUI_DEBUGGER_DEBUGGER_PLUGIN_HPP
 #define CHIGRAPHGUI_DEBUGGER_DEBUGGER_PLUGIN_HPP
 
-#include "../chigraphplugin.hpp"
+#include <QAction>
+#include <chi/Debugger/Debugger.hpp>
+#include <nodes/FlowScene>
 
+#include "../chigraphplugin.hpp"
 #include "breakpointview.hpp"
 #include "debuggerworkerthread.hpp"
 #include "variableview.hpp"
-
-#include <QAction>
-
-#include <nodes/FlowScene>
-
-#include <chi/Debugger/Debugger.hpp>
 
 class DebuggerPlugin : public QObject, public ChigraphPlugin {
 	Q_OBJECT

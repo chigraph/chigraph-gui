@@ -4,12 +4,9 @@
 #define CHIGRAPHGUI_MODULE_TREE_MODEL_HPP
 
 #include <QAbstractItemModel>
-
-#include <memory>
-
 #include <chi/Fwd.hpp>
-
 #include <filesystem>
+#include <memory>
 
 struct WorkspaceTree {
 	enum eType { FUNCTION, MODULE, STRUCT, FOLDER };
