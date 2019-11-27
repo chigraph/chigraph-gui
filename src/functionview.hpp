@@ -3,13 +3,10 @@
 #ifndef CHIGGUI_FUNCTIONVIEW_HPP
 #define CHIGGUI_FUNCTIONVIEW_HPP
 
-#include <chi/GraphFunction.hpp>
-#include <chi/GraphModule.hpp>
-#include <chi/NodeInstance.hpp>
-#include <memory>
+#include <chi/Fwd.hpp>
 #include <nodes/FlowScene>
 #include <nodes/FlowView>
-#include <unordered_map>
+#include <vector>
 
 #include "chigraphnodemodel.hpp"
 

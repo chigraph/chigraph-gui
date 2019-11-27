@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <chi/Context.hpp>
 #include <chi/GraphFunction.hpp>
+#include <chi/GraphModule.hpp>
 #include <chi/GraphStruct.hpp>
 #include <chi/Support/Result.hpp>
 

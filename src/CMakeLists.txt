@@ -4,9 +4,6 @@ set(KDE_SKIP_TEST_SETTINGS ON)
 # make sure QtMain is linked
 cmake_policy(SET CMP0020 NEW)
 
-# supress warnings about expansions
-cmake_policy(SET CMP0053 OLD)
-
 # Check that the dependencies dirs exist
 if (NOT APPLE) # apple uses brew
 	if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug")

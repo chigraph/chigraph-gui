@@ -4,6 +4,7 @@
 #include <QGridLayout>
 #include <QPushButton>
 #include <chi/DataType.hpp>
+#include <chi/GraphFunction.hpp>
 #include <chi/LangModule.hpp>
 
 #include "execparamlistwidget.hpp"

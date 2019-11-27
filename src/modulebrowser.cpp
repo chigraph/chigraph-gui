@@ -7,6 +7,7 @@
 #include <QHeaderView>
 #include <QMenu>
 #include <QTreeWidgetItem>
+#include <chi/GraphFunction.hpp>
 #include <chi/GraphStruct.hpp>
 #include <chi/Support/Result.hpp>
 #include <filesystem>
