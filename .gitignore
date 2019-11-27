@@ -9,3 +9,10 @@ kdev4/
 
 # VS Code
 .vscode/
+
+# Cquery
+.cquery_cache
+
+# Source trail 
+*.srctrlbm
+*.srctrldb
