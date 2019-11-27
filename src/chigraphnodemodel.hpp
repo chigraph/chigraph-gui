@@ -13,8 +13,7 @@
 #include <QPushButton>
 #include <QTextEdit>
 #include <QValidator>
-#include <chi/NodeInstance.hpp>
-#include <chi/NodeType.hpp>
+#include <chi/Fwd.hpp>
 #include <chi/Support/Result.hpp>
 #include <memory>
 #include <nodes/FlowSceneModel>
@@ -34,10 +33,7 @@ public:
 	// Retrieval functions
 	//////////////////////
 
-	QtNodes::NodeIndex nodeIndex(const chi::NodeInstance& node) const {
-		return nodeIndex(QUuid::fromRfc4122(
-		    QByteArray(reinterpret_cast<const char*>(node.id().data().data()), 16)));
-	}
+	QtNodes::NodeIndex nodeIndex(const chi::NodeInstance& node) const;
 
 	QList<QUuid>                 nodeUUids() const override;
 	QtNodes::NodeIndex           nodeIndex(const QUuid& ID) const override;

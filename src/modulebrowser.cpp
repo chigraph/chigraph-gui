@@ -8,7 +8,10 @@
 #include <QMenu>
 #include <QTreeWidgetItem>
 #include <chi/GraphFunction.hpp>
+#include <chi/GraphModule.hpp>
 #include <chi/GraphStruct.hpp>
+#include <chi/NodeInstance.hpp>
+#include <chi/NodeType.hpp>
 #include <chi/Support/Result.hpp>
 #include <filesystem>
 

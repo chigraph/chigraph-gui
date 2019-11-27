@@ -6,6 +6,7 @@
 #include <chi/GraphFunction.hpp>
 #include <chi/GraphModule.hpp>
 #include <chi/GraphStruct.hpp>
+#include <chi/NodeInstance.hpp>
 #include <chi/Support/Result.hpp>
 
 #include "functionview.hpp"

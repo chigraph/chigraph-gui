@@ -6,6 +6,7 @@
 #include <chi/FunctionValidator.hpp>
 #include <chi/GraphModule.hpp>
 #include <chi/NodeInstance.hpp>
+#include <chi/NodeType.hpp>
 #include <chi/Support/Result.hpp>
 #include <nodes/ConnectionStyle>
 #include <nodes/NodeGraphicsObject>

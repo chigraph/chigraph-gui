@@ -4,6 +4,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <chi/GraphFunction.hpp>
 
 #include "functioninouts.hpp"
 #include "functionview.hpp"

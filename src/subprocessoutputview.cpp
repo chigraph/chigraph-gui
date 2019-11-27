@@ -9,6 +9,7 @@
 #include <QPlainTextEdit>
 #include <QVBoxLayout>
 #include <chi/Context.hpp>
+#include <chi/GraphModule.hpp>
 #include <chi/Support/Result.hpp>
 #include <chi/Support/TempFile.hpp>
 #include <filesystem>

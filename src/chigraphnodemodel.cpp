@@ -11,6 +11,7 @@
 #include <chi/GraphFunction.hpp>
 #include <chi/GraphModule.hpp>
 #include <chi/NodeInstance.hpp>
+#include <chi/NodeType.hpp>
 #include <chi/Support/Result.hpp>
 #include <nodes/NodeData>
 
@@ -256,6 +257,11 @@ bool ChigraphFlowSceneModel::getTypeConvertable(QtNodes::TypeConverterId const& 
 	} else {
 		return true;
 	}
+}
+
+QtNodes::NodeIndex ChigraphFlowSceneModel::nodeIndex(const chi::NodeInstance& node) const {
+	return nodeIndex(
+	    QUuid::fromRfc4122(QByteArray(reinterpret_cast<const char*>(node.id().data().data()), 16)));
 }
 
 QList<QUuid> ChigraphFlowSceneModel::nodeUUids() const {

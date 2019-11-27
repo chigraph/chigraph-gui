@@ -10,9 +10,8 @@
 #include <QProcess>
 #include <QTabWidget>
 #include <QUrl>
-#include <chi/ChiModule.hpp>
 #include <chi/Context.hpp>
-#include <chi/GraphModule.hpp>
+#include <chi/Fwd.hpp>
 #include <nodes/FlowScene>
 #include <nodes/FlowView>
 

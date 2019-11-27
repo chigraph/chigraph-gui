@@ -4,7 +4,7 @@
 #define CHIGGUI_FUNCTION_IN_OUTS_HPP
 
 #include <QWidget>
-#include <chi/GraphFunction.hpp>
+#include <chi/Fwd.hpp>
 
 #include "execparamlistwidget.hpp"
 #include "paramlistwidget.hpp"

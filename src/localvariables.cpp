@@ -3,8 +3,10 @@
 #include <QComboBox>
 #include <QGridLayout>
 #include <QPushButton>
+#include <chi/Context.hpp>
 #include <chi/DataType.hpp>
 #include <chi/GraphFunction.hpp>
+#include <chi/GraphModule.hpp>
 #include <chi/LangModule.hpp>
 
 #include "execparamlistwidget.hpp"

@@ -26,6 +26,7 @@
 #include <chi/GraphFunction.hpp>
 #include <chi/GraphModule.hpp>
 #include <chi/LangModule.hpp>
+#include <chi/NodeInstance.hpp>
 #include <chi/Support/Result.hpp>
 #include <chi/Support/json.hpp>
 #include <fstream>

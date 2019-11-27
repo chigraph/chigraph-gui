@@ -5,28 +5,12 @@
 
 #include <QListWidget>
 #include <QTableView>
-#include <chi/Context.hpp>
-#include <chi/GraphModule.hpp>
+#include <chi/Fwd.hpp>
 
 class FunctionView;
 
-inline QStringList createTypeOptions(const chi::GraphModule& mod) {
-	QStringList ret;
+QStringList createTypeOptions(const chi::GraphModule& mod);
 
-	// add the module
-	for (const auto& ty : mod.typeNames()) {
-		ret << QString::fromStdString(mod.fullName() + ":" + ty);
-	}
-
-	// and its dependencies
-	for (auto dep : mod.dependencies()) {
-		auto depMod = mod.context().moduleByFullName(dep);
-		for (const auto& type : depMod->typeNames()) {
-			ret << QString::fromStdString(depMod->fullName() + ":" + type);
-		}
-	}
-	return ret;
-}
 class ParamListWidget : public QWidget {
 	Q_OBJECT
 
