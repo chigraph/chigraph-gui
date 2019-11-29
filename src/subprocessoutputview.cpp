@@ -32,7 +32,7 @@ SubprocessOutputView::SubprocessOutputView(chi::GraphModule* module) : mModule(m
 
 	// write it to a temporary file
 	fs::path tempBitcodeFile = chi::makeTempPath(".bc");
-	LLVMWriteBitcodeToFile(*llmod, tempBitcodeFile.c_str());
+	LLVMWriteBitcodeToFile(*llmod, tempBitcodeFile.string().c_str());
 	setReadOnly(true);
 
 	std::filesystem::path chiPath =

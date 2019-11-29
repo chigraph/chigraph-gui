@@ -50,7 +50,10 @@ include(FeatureSummary)
 find_package(Qt5 5.6.0 REQUIRED COMPONENTS Gui Script Xml Core Widgets Network PrintSupport Svg)
 find_package(Qt5 5.6.0 COMPONENTS DBus)
 
-find_package(KF5 REQUIRED COMPONENTS Archive TextEditor JobWidgets DBusAddons KIO Crash Sonnet SyntaxHighlighting Parts GuiAddons ItemViews Config ConfigWidgets Auth Codecs Completion GlobalAccel Service WindowSystem CoreAddons I18n XmlGui WidgetsAddons TextWidgets IconThemes)
+find_package(KF5 REQUIRED COMPONENTS 
+	Attica Archive TextEditor JobWidgets DBusAddons KIO Crash Sonnet SyntaxHighlighting 
+	Parts GuiAddons ItemViews Config ConfigWidgets Auth Codecs Completion GlobalAccel
+	Service WindowSystem CoreAddons I18n XmlGui WidgetsAddons TextWidgets IconThemes)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -148,14 +151,14 @@ if(WIN32)
 	foreach(QTLIB
 		Qt5::Widgets Qt5::Core Qt5::Gui Qt5::Script
 		Qt5::Network Qt5::DBus Qt5::Svg Qt5::PrintSupport Qt5::Xml
-		KF5::Crash KF5::Parts KF5::KIOCore KF5::KIOWidgets
+		KF5::Attica KF5::Crash KF5::Parts KF5::KIOCore KF5::KIOWidgets
 		KF5::JobWidgets KF5::TextEditor KF5::SyntaxHighlighting
 		KF5::DBusAddons KF5::Archive KF5::ConfigWidgets
 		KF5::GuiAddons KF5::ItemViews KF5::Codecs KF5::Auth
 		KF5::Completion KF5::SonnetCore KF5::SonnetUi
-		KF5::Service KF5::ConfigGui KF5::ConfigCore KF5::WindowSystem
+		KF5::Service KF5::ConfigGui KF5::WindowSystem
 		KF5::GlobalAccel KF5::CoreAddons KF5::I18n KF5::XmlGui
-		KF5::WidgetsAddons KF5::TextWidgets KF5::IconThemes
+		KF5::WidgetsAddons KF5::TextWidgets KF5::IconThemes KF5::AuthCore
 	)
 
 		add_custom_command(
@@ -170,25 +173,30 @@ if(WIN32)
 	
 	endforeach()
 	
+	find_package(Intl REQUIRED)
+	get_filename_component(INTL_DIR ${Intl_LIBRARY} DIRECTORY)
 	
-	# copy iconv.dll
-	add_custom_command(
-	TARGET copydlls POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different
-		${CMAKE_CURRENT_SOURCE_DIR}/../third_party/iconv-win64/bin/iconv.dll
-		$<TARGET_FILE_DIR:chigraphgui>
-	COMMENT "Copying iconv from ${CMAKE_CURRENT_SOURCE_DIR}/../third_party/iconv-win64/bin/iconv.dll to $<TARGET_FILE_DIR:chigraphgui>"
-	)
+	find_file(INTL_DLL "intl.dll" HINTS "${INTL_DIR}/../bin") # "$<TARGET_FILE_DIR:Qt5::Widgets>" "$<TARGET_FILE_DIR:KF5::Attica>")
 
 	# copy libintl.dll
 	add_custom_command(
 	TARGET copydlls POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_if_different
-		${CMAKE_CURRENT_SOURCE_DIR}/../third_party/gettext-win64/bin/libintl.dll
+		${INTL_DLL}
 		$<TARGET_FILE_DIR:chigraphgui>
-	COMMENT "Copying libitnl from ${CMAKE_CURRENT_SOURCE_DIR}/../third_party/gettext-win64/bin/libintl.dll to $<TARGET_FILE_DIR:chigraphgui>"
+	COMMENT "Copying libitnl from ${INTL_DLL} to $<TARGET_FILE_DIR:chigraphgui>"
 	)
 	
+	# copy clang
+	find_program(CLANG_EXE "clang")
+	add_custom_command(
+	TARGET copydlls POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		${CLANG_EXE}
+		$<TARGET_FILE_DIR:chigraphgui>
+	COMMENT "Copying clang from ${CLANG_EXE} to $<TARGET_FILE_DIR:chigraphgui>"
+	)
+
 endif()
 
 install(TARGETS chigraphgui DESTINATION bin)
