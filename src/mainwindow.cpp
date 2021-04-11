@@ -262,7 +262,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent) {
 	                                        i18n("Launch Configuration"), this);
 	actColl->addAction(QStringLiteral("select-launch-configuration"), mConfigSelectAction);
 	connect(mConfigSelectAction,
-	        static_cast<void (KSelectAction::*)(const QString&)>(&KSelectAction::triggered), this,
+			&KSelectAction::textTriggered, this,
 	        [this](const QString& str) {
 		        launchManager().setCurrentConfiguration(launchManager().configByName(str));
 	        });
