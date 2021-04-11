@@ -35,7 +35,8 @@ std::unique_ptr<ModuleTreeModel> ModuleTreeModel::createFromContext(chi::Context
 	srcTree->name   = QStringLiteral("src");
 
 	// create the tree
-	for (const fs::path& mod : modules) {
+	for (const auto& modStr : modules) {
+		auto           mod    = fs::path(modStr);
 		WorkspaceTree* parent = srcTree.get();
 
 		// for each component of mod

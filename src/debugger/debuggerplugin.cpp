@@ -8,6 +8,8 @@
 #include <QDebug>
 #include <QThread>
 #include <QToolTip>
+#include <chi/NodeInstance.hpp>
+#include <chi/NodeType.hpp>
 #include <chi/Support/Result.hpp>
 #include <thread>
 
