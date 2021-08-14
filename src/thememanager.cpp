@@ -2,6 +2,7 @@
 
 #include <KColorScheme>
 #include <KConfigGroup>
+#include <KIO/CommandLauncherJob>
 #include <KLocalizedString>
 #include <KMessageBox>
 #include <KSharedConfig>
@@ -60,16 +61,19 @@ ThemeManager::ThemeManager(KActionMenu* menu) : mMenu{menu} {
 	auto configAct = new QAction(i18n("Configuration..."), mMenu);
 	configAct->setIcon(QIcon::fromTheme(QStringLiteral("preferences-desktop-theme")));
 	mMenu->addAction(configAct);
-	connect(configAct, &QAction::triggered, this, [] {
+	connect(configAct, &QAction::triggered, this, [this] {
 		// open the colors dialog
-		int errCode = KToolInvocation::kdeinitExec(QStringLiteral("kcmshell5"),
-		                                           QStringList(QStringLiteral("colors")));
+		auto job = new KIO::CommandLauncherJob(QStringLiteral("kcmshell5 colors"));
+		job->setAutoDelete(true);
+		job->start();
 
-		if (errCode > 0) {
-			KMessageBox::error(0,
-			                   i18n("Cannot start Colors Settings panel from KDE Control Center. "
-			                        "Please check your system..."));
-		}
+		connect(job, &KIO::CommandLauncherJob::finished, this, [](KJob* job) {
+			if (job->error() != 0) {
+				KMessageBox::error(
+				    0, i18n("Cannot start Colors Settings panel from KDE Control Center. "
+				            "Please check your system..."));
+			}
+		});
 	});
 }
 
