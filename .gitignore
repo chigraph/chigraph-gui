@@ -13,6 +13,8 @@ kdev4/
 # Cquery
 .cquery_cache
 
+.cache
+
 # Source trail 
 *.srctrlbm
 *.srctrldb

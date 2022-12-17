@@ -388,18 +388,18 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 
 	// see if they want to save them
 	for (auto mod : mModuleBrowser->dirtyModules()) {
-		auto bc = KMessageBox::questionYesNoCancel(
+		auto bc = KMessageBox::questionTwoActionsCancel(
 		    this,
 		    i18n("Module <b>") + QString::fromStdString(mod->fullName()) +
 		        i18n("</b> has unsaved changes. Do you want to save your changes or discard them?"),
 		    i18n("Close"), KStandardGuiItem::save(), KStandardGuiItem::discard());
 
 		switch (bc) {
-		case KMessageBox::Yes:
+		case KMessageBox::PrimaryAction:
 			// this means save
 			save();
 			break;
-		case KMessageBox::No:
+		case KMessageBox::SecondaryAction:
 			// this means discard
 			// TODO: implement discard
 			break;
